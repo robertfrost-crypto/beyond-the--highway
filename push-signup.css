@@ -1,0 +1,142 @@
+/* Beyond the Highway — push notification popup styles
+   Include this on onnow.html and wherever the coupon banner lives, e.g.:
+   <link rel="stylesheet" href="push-signup.css"> */
+
+#bth-push-popup {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none; /* only the card itself is interactive, page stays usable behind it */
+}
+
+.bth-push-card {
+  pointer-events: auto;
+  position: absolute;
+  left: 14px; right: 14px; bottom: 20px;
+  max-width: 420px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 18px;
+  padding: 20px 18px 18px;
+  box-shadow: 0 16px 40px -14px rgba(0,0,0,.45);
+  overflow: hidden;
+  animation: bth-push-rise 0.4s cubic-bezier(0.2,0.8,0.2,1);
+  font-family: var(--sans, "Avenir Next", Avenir, "Segoe UI", system-ui, -apple-system, sans-serif);
+}
+@keyframes bth-push-rise {
+  from { transform: translateY(14px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.bth-push-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.bth-push-bell {
+  flex: 0 0 auto;
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  background: rgba(201,143,62,.12);
+  border: 1px solid rgba(201,143,62,.3);
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px;
+}
+.bth-push-bell svg { width: 16px; height: 16px; }
+.bth-push-title {
+  font-family: var(--serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #0c1712;
+}
+.bth-push-sub {
+  font-size: 15px;
+  line-height: 1.45;
+  color: #26312b;
+}
+
+.bth-push-steps {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #26312b;
+}
+.bth-push-steps li { margin-bottom: 3px; }
+.bth-push-share-icon {
+  display: inline-block;
+  vertical-align: -3px;
+  margin: 0 1px;
+}
+
+.bth-push-topics {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,0,0,.08);
+}
+.bth-push-topic {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.bth-push-tname {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #0c1712;
+}
+.bth-push-tfreq {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: #4a564f;
+  margin-top: 1px;
+}
+
+.bth-push-switch { position: relative; width: 38px; height: 22px; flex: 0 0 auto; }
+.bth-push-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.bth-push-track {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.14);
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+.bth-push-thumb {
+  position: absolute;
+  top: 2.5px; left: 2.5px;
+  width: 17px; height: 17px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.bth-push-switch input:checked + .bth-push-track {
+  background: linear-gradient(90deg, var(--green-1, #9be84a), var(--green-2, #5bc94f));
+}
+.bth-push-switch input:checked + .bth-push-track .bth-push-thumb { transform: translateX(16px); }
+
+.bth-push-actions { display: flex; gap: 8px; }
+.bth-push-btn {
+  flex: 1;
+  font-family: var(--sans, "Avenir Next", Avenir, "Segoe UI", system-ui, -apple-system, sans-serif);
+  font-size: 14.5px;
+  font-weight: 700;
+  padding: 11px;
+  border-radius: 10px;
+  border: none;
+  text-align: center;
+  cursor: pointer;
+}
+.bth-push-btn-primary {
+  background: linear-gradient(90deg, var(--gold, #e6b85c), var(--gold-soft, #c98f3e));
+  color: #1a1005;
+}
+.bth-push-btn-secondary {
+  background: transparent;
+  color: #33413a;
+}

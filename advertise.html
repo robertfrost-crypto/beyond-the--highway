@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Get Featured on Beyond the Highway</title>
+<style>
+  :root{--bg:#04140d;--green:#7CFF5C;--green-soft:#9bdc75;--soft:rgba(140,255,92,.28);--ink:#eafff0;--mut:#9fc4ad;--gold:#ffe5aa}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:
+    radial-gradient(1200px 600px at 50% -10%,#0a2b1c 0%,var(--bg) 55%) fixed;color:var(--ink);
+    -webkit-font-smoothing:antialiased;line-height:1.45}
+  .wrap{max-width:640px;margin:0 auto;padding:0 16px 60px}
+  .backBtn{display:inline-flex;align-items:center;gap:7px;margin:14px 0 0;padding:9px 14px;border:1px solid var(--soft);
+    border-radius:12px;background:rgba(4,17,11,.72);color:var(--green-soft);text-decoration:none;font-size:13px;font-weight:700}
+  header{margin:22px 2px 6px;text-align:center}
+  .kick{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);
+    border:1px solid var(--soft);border-radius:999px;padding:4px 11px;margin-bottom:12px}
+  h1{margin:.1em 0 .3em;font-size:1.6rem;line-height:1.2}
+  .lede{color:var(--mut);font-size:.95rem;margin:0 auto;max-width:480px}
+
+  .card{border:1.5px solid #2f9e5e;border-radius:14px;background:rgba(4,17,11,.72);padding:16px;margin:16px 0}
+  label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--green-soft);margin:0 0 8px}
+  select{width:100%;background:#04140d;color:var(--ink);border:1px solid var(--soft);border-radius:10px;
+    padding:12px 13px;font-size:15px;font-family:inherit}
+
+  .tiers{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+  .tier{border:1.5px solid #2f9e5e;border-radius:12px;padding:13px 14px;cursor:pointer;position:relative;transition:border-color .15s,background .15s}
+  .tier.selected{border-color:var(--green);background:rgba(140,255,92,.08)}
+  .tier.unavailable{opacity:.45;cursor:not-allowed}
+  .tier .tname{font-weight:800;font-size:1rem;display:flex;align-items:center;justify-content:space-between}
+  .tier .tprice{color:var(--green-soft);font-weight:700;font-size:.92rem}
+  .tier .tdesc{color:var(--mut);font-size:.85rem;margin-top:4px}
+  .tier .tnote{color:#ffb199;font-size:.8rem;margin-top:6px;font-weight:700}
+  .period{display:flex;gap:8px;margin-top:10px}
+  .period button{flex:1;padding:8px;border-radius:8px;border:1px solid var(--soft);background:#04140d;color:var(--mut);
+    font-size:.83rem;font-weight:700;cursor:pointer}
+  .period button.active{border-color:var(--green);color:var(--ink);background:rgba(140,255,92,.12)}
+
+  .note{font-size:.82rem;color:var(--mut);margin-top:10px}
+
+  .cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:18px 0 4px;padding:14px;
+    border:none;border-radius:14px;background:linear-gradient(135deg,#7CFF5C,#39c46a);color:#04140d;font-weight:800;
+    font-size:1.02rem;cursor:pointer;box-shadow:0 6px 20px rgba(57,196,106,.25)}
+  .cta:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+  .discount{text-align:center;font-size:.82rem;color:var(--mut);margin-top:10px}
+
+  footer{margin-top:30px;color:var(--mut);font-size:.8rem;text-align:center}
+
+  .divider{display:flex;align-items:center;gap:10px;margin:30px 0 18px;color:var(--mut);font-size:.8rem;text-transform:uppercase;letter-spacing:.1em}
+  .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--soft)}
+  .freeCard{border:1.5px dashed var(--soft);border-radius:14px;background:rgba(4,17,11,.5);padding:16px;margin:0 0 16px}
+  .freeCard h2{margin:0 0 6px;font-size:1.05rem}
+  .freeCard .sub{color:var(--mut);font-size:.85rem;margin:0 0 14px}
+  .freeCard input,.freeCard select,.freeCard textarea{width:100%;background:#04140d;color:var(--ink);
+    border:1px solid var(--soft);border-radius:10px;padding:11px 12px;font-size:14px;font-family:inherit;margin-bottom:10px}
+  .freeCard textarea{resize:vertical;min-height:64px}
+  .freeCta{width:100%;padding:13px;border:1px solid var(--soft);border-radius:12px;background:transparent;
+    color:var(--ink);font-weight:800;font-size:.95rem;cursor:pointer}
+  .freeCta:disabled{opacity:.5;cursor:not-allowed}
+  .formMsg{font-size:.85rem;margin-top:10px;text-align:center}
+  .formMsg.ok{color:var(--green-soft)}
+  .formMsg.err{color:#ffb199}
+
+  .hidden{display:none !important}
+  .dirToggle{display:flex;gap:8px;margin:0 0 16px}
+  .dirBtn{flex:1;padding:10px;border-radius:10px;border:1px solid var(--soft);background:#04140d;color:var(--mut);
+    font-size:.85rem;font-weight:700;cursor:pointer}
+  .dirBtn.active{border-color:var(--green);color:var(--ink);background:rgba(140,255,92,.12)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="backBtn" href="places.html">&larr;&nbsp;Back to Places</a>
+  <header>
+    <span class="kick">Beyond the Highway</span>
+    <h1>Get Featured</h1>
+    <p class="lede">Paid placement puts your business in front of every visitor browsing that category — pick your category and a spot below.</p>
+  </header>
+
+  <div class="card">
+    <label for="category">Your category</label>
+    <select id="category"></select>
+  </div>
+
+  <div class="card">
+    <label style="margin-bottom:12px">Choose a placement</label>
+    <div class="tiers" id="tiers"></div>
+  </div>
+
+  <button class="cta" id="ctaBtn" disabled>Select a placement to continue</button>
+  <p class="discount">Have a discount code? You'll be able to enter it at checkout.</p>
+
+  <div class="divider">or</div>
+
+  <div class="dirToggle" id="dirToggle">
+    <button type="button" class="dirBtn active" data-dir="places">Places</button>
+    <button type="button" class="dirBtn" data-dir="local">Local Business Directory</button>
+  </div>
+
+  <div class="freeCard">
+    <h2>Just want to be listed?</h2>
+    <p class="sub">Free — no placement boost, just a standard entry in the directory. We'll review and add it.</p>
+    <label for="reqName">Business name</label>
+    <input id="reqName" placeholder="e.g. Riverside Farmers Market">
+    <label for="reqCategory">Category</label>
+    <select id="reqCategory"></select>
+    <label for="reqWebsite">Website or phone number</label>
+    <input id="reqWebsite" placeholder="https://... or 780-555-0100">
+    <label for="reqSummary">Short summary (optional)</label>
+    <textarea id="reqSummary" placeholder="One or two lines about the business"></textarea>
+    <label for="reqContact">Your email (so we can follow up)</label>
+    <input id="reqContact" type="email" placeholder="you@example.com">
+    <button class="freeCta" id="reqSubmit" type="button">Submit request</button>
+    <p class="formMsg" id="reqMsg"></p>
+  </div>
+
+  <div class="freeCard">
+    <h2>Already listed? Edit your listing</h2>
+    <p class="sub">Update your info any time — changes are reviewed before they go live.</p>
+    <label for="editSelect">Your business</label>
+    <select id="editSelect"><option value="">Select your listing…</option></select>
+    <div id="editFields" class="hidden">
+      <label for="editWebsite">Website or phone number</label>
+      <input id="editWebsite" placeholder="https://... or 780-555-0100">
+      <label for="editSummary">Short summary</label>
+      <textarea id="editSummary" placeholder="One or two lines about the business"></textarea>
+      <label for="editDetails">About (shown when expanded)</label>
+      <textarea id="editDetails" placeholder="More detail about your business"></textarea>
+      <button class="freeCta" id="editSubmit" type="button">Submit changes for review</button>
+      <p class="formMsg" id="editMsg"></p>
+    </div>
+  </div>
+
+  <footer>Beyond the Highway &middot; Fort McMurray Wood Buffalo</footer>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://ceipylnjdidjqidamkpw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlaXB5bG5qZGlkanFpZGFta3B3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyOTQ1MjAsImV4cCI6MjA5ODg3MDUyMH0.TGZYRcjscN3ysRfTT5iHSl2pTOIhvMF6dCd-elm7L7g';
+const PLACES_CLOUD_KEY = 'places_items';
+
+/* ============================================================
+   PAYMENT LINKS — paste your 5 Stripe Payment Links below once
+   they're created (Payment Links → Create link, with "Allow
+   promotion codes" turned on for each). Pricing is flat across
+   every category, so these 5 links cover all of them.
+   ============================================================ */
+const PAYMENT_LINKS = {
+  topPickMonthly:   'https://buy.stripe.com/fZu4gycfk4tAc4MccYcfK0D', // Top Pick — $25/mo
+  topPickAnnual:     'https://buy.stripe.com/4gM8wO5QWf8e9WE6SEcfK0C', // Top Pick — $250/yr
+  featuredMonthly:   'https://buy.stripe.com/aFa00i4MS2lsgl2gtecfK0F', // Featured — $15/mo
+  featuredAnnual:    'https://buy.stripe.com/3cI7sK2EK2lsb0I90McfK0E', // Featured — $150/yr
+  ambassador:        'https://buy.stripe.com/7sYdR8ens1ho4Cka4QcfK0G',  // Ambassador — $20 one-time
+  couponPartnerMonthly: 'https://buy.stripe.com/00w3cu2EK4tA9WE3GscfK0H', // Coupon Partner — $20/mo
+  couponPartnerAnnual:  'https://buy.stripe.com/dRm8wO1AG0dk4Ck3GscfK0I'  // Coupon Partner — $200/yr
+};
+
+const CAT_ORDER=['Fine Dining','Restaurants','Cafés','Bars & Nightlife','Fast Food','Pizza & Donair','Hotels & Stays','Air Travel','Festivals','Museums','Theatres','Family Fun','Family','Trails','Lakes','Lakes & Outfitters','Winter','Outdoor Rinks','Skate Parks','Golf','Spray Parks','Provincial Parks','Campgrounds','Parks & Playgrounds','Taxis','Grocery Stores','Gas Stations','Convenience Stores','Pharmacies','Banks & ATMs','Realtors','Hospital & Health','Sporting Goods','Gift & Novelty','Florists','Trophies & Engraving','Art & Galleries'];
+const LOCAL_CAT_ORDER=['HVAC','Plumbing','Electrical','Construction & Renovation','Roofing','Landscaping','Painting','Auto Repair','Appliance Repair','Cleaning Services','Pest Control','Locksmiths','Moving Companies','Tree Service','Garage Doors','Welding & Junk & Snow Removal','Lawyers','Dentists','Accountants','Financial Advisors','Chiropractors','Optometrists','Doctors & Walk-in Clinics'];
+
+const TIERS = [
+  { key:'topPick', name:'Top Pick', badge:'★ Beyond the Highway Top Pick',
+    desc:'Shown first in your category — only 3 spots per category.',
+    periods:{ monthly:{ price:'$25/mo', link:'topPickMonthly' }, annual:{ price:'$250/yr', link:'topPickAnnual' } },
+    limitPerCategory:3 },
+  { key:'featured', name:'Featured', badge:'Beyond the Highway Featured',
+    desc:'Featured badge and a boost up the list — annual membership.',
+    periods:{ monthly:{ price:'$15/mo', link:'featuredMonthly' }, annual:{ price:'$150/yr', link:'featuredAnnual' } } },
+  { key:'ambassador', name:'Ambassador', badge:'Beyond the Highway Ambassador',
+    desc:'Window sticker / poster display for your storefront.',
+    periods:{ oneTime:{ price:'$20 one-time', link:'ambassador' } } },
+  { key:'couponPartner', name:'Coupon Partner', badge:'Beyond the Highway Coupon Partner',
+    desc:'Run an ongoing coupon on the Coupons page, with a push notification to nearby subscribers when it goes live. No cap per category — and it stacks with Top Pick or Featured.',
+    periods:{ monthly:{ price:'$20/mo', link:'couponPartnerMonthly' }, annual:{ price:'$200/yr', link:'couponPartnerAnnual' } } }
+];
+
+let items = [];
+let localItems = [];
+let currentDir = 'places';
+let selectedTier = null;
+let selectedPeriod = {};
+
+function categoriesFromItems(list){
+  const present = Array.from(new Set(list.map(i=>i.category||'Other')));
+  const ordered = CAT_ORDER.filter(c=>present.includes(c));
+  const extras = present.filter(c=>!CAT_ORDER.includes(c)).sort();
+  return ordered.length ? [...ordered, ...extras] : CAT_ORDER.slice();
+}
+
+// ---- Directory-aware helpers (Places vs Local Business Directory) ----
+// Used by the "Just want to be listed?" and "Edit your listing" sections
+// below the paid tiers, which work the same way for either directory.
+function liveItemsFor(dir){ return dir === 'local' ? localItems : items; }
+function catOrderFor(dir){ return dir === 'local' ? LOCAL_CAT_ORDER : CAT_ORDER; }
+function liveKeyFor(dir){ return dir === 'local' ? 'local_business_items' : 'places_items'; }
+function pendingKeyFor(dir){ return dir === 'local' ? 'local_business_pending_edits' : 'places_pending_edits'; }
+function catsFor(dir){
+  const list = liveItemsFor(dir);
+  const order = catOrderFor(dir);
+  const present = Array.from(new Set(list.map(i=>i.category||'Other')));
+  const ordered = order.filter(c=>present.includes(c));
+  const extras = present.filter(c=>!order.includes(c)).sort();
+  return ordered.length ? [...ordered, ...extras] : order.slice();
+}
+function escHtml(s){ return String(s==null?'':s).replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+// These fields accept either a website or a phone number, so only prepend
+// https:// when the input actually looks like a domain, not a phone number.
+function normalizeWebsiteOrPhone(v){
+  v = (v||'').trim();
+  if (!v) return v;
+  if (/^https?:\/\//i.test(v)) return v;
+  if (/^[+\d\s().-]+$/.test(v)) return v; // looks like a phone number, leave as-is
+  if (/^\/\//.test(v)) return 'https:' + v;
+  return 'https://' + v;
+}
+const ADMIN_PIN = '2005'; // shared Supabase bth_save_content PIN used across the site
+function cloudPull(key){
+  return fetch(`${SUPABASE_URL}/rest/v1/bth_content?key=eq.${encodeURIComponent(key)}&select=data`, {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+  }).then(res => res.ok ? res.json() : null)
+    .then(rows => (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : [])
+    .catch(() => []);
+}
+function cloudPush(key, data){
+  return fetch(`${SUPABASE_URL}/rest/v1/rpc/bth_save_content`, {
+    method: 'POST',
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_pin: ADMIN_PIN, p_key: key, p_data: data })
+  });
+}
+
+function placesCloudPull(){
+  return fetch(`${SUPABASE_URL}/rest/v1/bth_content?key=eq.${encodeURIComponent(PLACES_CLOUD_KEY)}&select=data`, {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+  }).then(res => res.ok ? res.json() : null)
+    .then(rows => (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : [])
+    .catch(() => []);
+}
+
+function topPickCount(category){
+  return items.filter(i => (i.category||'Other') === category && i.tier === 'Top Pick').length;
+}
+
+function renderCategorySelect(){
+  const sel = document.getElementById('category');
+  sel.innerHTML = categoriesFromItems(items).map(c => `<option value="${c}">${c}</option>`).join('');
+  sel.onchange = renderTiers;
+}
+
+function renderTiers(){
+  const category = document.getElementById('category').value;
+  const wrap = document.getElementById('tiers');
+  wrap.innerHTML = '';
+  TIERS.forEach(tier => {
+    const isTopPick = tier.key === 'topPick';
+    const taken = isTopPick ? topPickCount(category) : 0;
+    const full = isTopPick && taken >= tier.limitPerCategory;
+
+    const el = document.createElement('div');
+    el.className = 'tier' + (full ? ' unavailable' : '') + (selectedTier === tier.key ? ' selected' : '');
+    const periodKeys = Object.keys(tier.periods);
+    const defaultPeriod = selectedPeriod[tier.key] || periodKeys[0];
+
+    let priceHtml = tier.periods[defaultPeriod].price;
+    let periodButtons = '';
+    if (periodKeys.length > 1) {
+      periodButtons = `<div class="period">` + periodKeys.map(p =>
+        `<button type="button" data-tier="${tier.key}" data-period="${p}" class="${p===defaultPeriod?'active':''}">${p==='monthly'?'Monthly':'Annual'}</button>`
+      ).join('') + `</div>`;
+    }
+
+    el.innerHTML = `
+      <div class="tname"><span>${tier.name}</span><span class="tprice">${priceHtml}</span></div>
+      <div class="tdesc">${tier.desc}</div>
+      ${full ? `<div class="tnote">All 3 Top Pick spots in ${category} are taken</div>` : ''}
+      ${!full ? periodButtons : ''}
+    `;
+
+    if (!full) {
+      el.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') return; // handled separately
+        selectedTier = tier.key;
+        if (!selectedPeriod[tier.key]) selectedPeriod[tier.key] = periodKeys[0];
+        renderTiers();
+        updateCta();
+      });
+    }
+    wrap.appendChild(el);
+  });
+
+  wrap.querySelectorAll('.period button').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectedPeriod[btn.dataset.tier] = btn.dataset.period;
+      selectedTier = btn.dataset.tier;
+      renderTiers();
+      updateCta();
+    });
+  });
+
+  updateCta();
+}
+
+function updateCta(){
+  const btn = document.getElementById('ctaBtn');
+  if (!selectedTier) { btn.disabled = true; btn.textContent = 'Select a placement to continue'; return; }
+  const tier = TIERS.find(t => t.key === selectedTier);
+  const period = selectedPeriod[selectedTier] || Object.keys(tier.periods)[0];
+  btn.disabled = false;
+  btn.textContent = `Continue — ${tier.name} (${tier.periods[period].price})`;
+}
+
+document.getElementById('ctaBtn').addEventListener('click', () => {
+  if (!selectedTier) return;
+  const tier = TIERS.find(t => t.key === selectedTier);
+  const period = selectedPeriod[selectedTier] || Object.keys(tier.periods)[0];
+  // Coupon Partner needs the actual coupon details collected before checkout,
+  // so it goes to its own signup page instead of straight to Stripe — carrying
+  // over which billing period was picked here so it's pre-selected there too.
+  if (tier.key === 'couponPartner') {
+    window.location.href = 'coupon-signup.html?period=' + encodeURIComponent(period);
+    return;
+  }
+  // Top Pick / Featured / Ambassador collect the business's own listing info
+  // (or which existing listing to boost) before checkout, same self-serve
+  // pattern as Coupon Partner above — see placement-signup.html.
+  const cat = document.getElementById('category').value || '';
+  window.location.href = 'placement-signup.html?tier=' + encodeURIComponent(tier.key)
+    + '&period=' + encodeURIComponent(period)
+    + '&category=' + encodeURIComponent(cat);
+});
+
+const LISTING_REQUESTS_KEY = 'listing_requests';
+
+function renderRequestCategorySelect(){
+  const sel = document.getElementById('reqCategory');
+  const opts = catsFor(currentDir);
+  sel.innerHTML = opts.map(c => `<option value="${c}">${c}</option>`).join('')
+    + `<option value="Other">Other / not sure</option>`;
+}
+
+async function fetchListingRequests(){
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/bth_content?key=eq.${encodeURIComponent(LISTING_REQUESTS_KEY)}&select=data`, {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+    });
+    if (!res.ok) return [];
+    const rows = await res.json();
+    return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : [];
+  } catch(e){ return []; }
+}
+
+const REQ_ADMIN_PIN = '2005'; // must match the Supabase bth_save_content PIN used elsewhere on the site
+
+async function saveListingRequests(list){
+  return fetch(`${SUPABASE_URL}/rest/v1/rpc/bth_save_content`, {
+    method: 'POST',
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_pin: REQ_ADMIN_PIN, p_key: LISTING_REQUESTS_KEY, p_data: list })
+  });
+}
+
+document.getElementById('reqSubmit').addEventListener('click', async () => {
+  const name = document.getElementById('reqName').value.trim();
+  const category = document.getElementById('reqCategory').value;
+  const website = normalizeWebsiteOrPhone(document.getElementById('reqWebsite').value.trim());
+  const summary = document.getElementById('reqSummary').value.trim();
+  const contact = document.getElementById('reqContact').value.trim();
+  const msg = document.getElementById('reqMsg');
+  const btn = document.getElementById('reqSubmit');
+
+  if (!name || !website || !contact){
+    msg.textContent = 'Please fill in business name, website/phone, and your email.';
+    msg.className = 'formMsg err';
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = 'Submitting...';
+  try{
+    // Read-append-write against the shared JSON blob — same pattern the rest of
+    // the site uses. Fine for the low submission volume this form expects;
+    // if two people submit in the same instant, one could overwrite the other.
+    const current = await fetchListingRequests();
+    current.push({ name, category, website, summary, contact, directory: currentDir, submittedAt: new Date().toISOString(), status: 'pending' });
+    const res = await saveListingRequests(current);
+    if (!res.ok) throw new Error('save failed');
+    msg.textContent = 'Thanks! We\u2019ll review it and get you listed.';
+    msg.className = 'formMsg ok';
+    document.getElementById('reqName').value = '';
+    document.getElementById('reqWebsite').value = '';
+    document.getElementById('reqSummary').value = '';
+    document.getElementById('reqContact').value = '';
+  } catch(e){
+    msg.textContent = 'Something went wrong \u2014 please try again in a moment.';
+    msg.className = 'formMsg err';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Submit request';
+  }
+});
+
+// ---- Directory toggle (governs the free-listing and edit-listing sections) ----
+document.querySelectorAll('.dirBtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentDir = btn.dataset.dir;
+    document.querySelectorAll('.dirBtn').forEach(b => b.classList.toggle('active', b === btn));
+    renderRequestCategorySelect();
+    renderEditSelect();
+  });
+});
+
+// ---- Edit your listing (existing free/standard listings, either directory) ----
+function renderEditSelect(){
+  const sel = document.getElementById('editSelect');
+  const list = liveItemsFor(currentDir);
+  sel.innerHTML = '<option value="">Select your listing…</option>'
+    + list.map((it, i) => `<option value="${i}">${escHtml(it.title)}</option>`).join('');
+  document.getElementById('editFields').classList.add('hidden');
+  document.getElementById('editMsg').textContent = '';
+}
+document.getElementById('editSelect').addEventListener('change', () => {
+  const idx = document.getElementById('editSelect').value;
+  const fields = document.getElementById('editFields');
+  if (idx === '') { fields.classList.add('hidden'); return; }
+  const it = liveItemsFor(currentDir)[Number(idx)];
+  document.getElementById('editWebsite').value = it.website || '';
+  document.getElementById('editSummary').value = it.summary || '';
+  document.getElementById('editDetails').value = it.details || '';
+  fields.classList.remove('hidden');
+});
+document.getElementById('editSubmit').addEventListener('click', async () => {
+  const idx = document.getElementById('editSelect').value;
+  const msg = document.getElementById('editMsg');
+  const btn = document.getElementById('editSubmit');
+  if (idx === '') { msg.textContent = 'Select your listing first.'; msg.className = 'formMsg err'; return; }
+  const original = liveItemsFor(currentDir)[Number(idx)];
+  const patch = {
+    website: normalizeWebsiteOrPhone(document.getElementById('editWebsite').value.trim()),
+    summary: document.getElementById('editSummary').value.trim(),
+    details: document.getElementById('editDetails').value.trim()
+  };
+  btn.disabled = true; btn.textContent = 'Submitting...';
+  try {
+    const pendingKey = pendingKeyFor(currentDir);
+    const pending = await cloudPull(pendingKey);
+    pending.push({
+      id: Date.now() + '-' + Math.random().toString(36).slice(2),
+      submittedAt: new Date().toISOString(),
+      action: 'edit',
+      targetTitle: original.title,
+      item: Object.assign({}, patch, { title: original.title })
+    });
+    const res = await cloudPush(pendingKey, pending);
+    if (!res.ok) throw new Error('save failed');
+    msg.textContent = 'Thanks! Your changes are pending admin approval.';
+    msg.className = 'formMsg ok';
+  } catch (e) {
+    msg.textContent = 'Something went wrong \u2014 please try again in a moment.';
+    msg.className = 'formMsg err';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Submit changes for review';
+  }
+});
+
+(async function init(){
+  items = await placesCloudPull();
+  localItems = await cloudPull(liveKeyFor('local'));
+  renderCategorySelect();
+  renderTiers();
+  renderRequestCategorySelect();
+  renderEditSelect();
+})();
+</script>
+<script src="visitor-tracker.js" defer></script>
+</body>
+</html>

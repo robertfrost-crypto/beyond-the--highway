@@ -1,0 +1,3130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin — Beyond the Highway</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
+<style>
+  :root{
+    --ink:#04100a; --gold:#e6b85c; --green-1:#9be84a; --green-2:#5bc94f; --green-3:#cdfca0;
+    --paper:#f5f1e7; --moss:#0f1f17; --moss-2:#162a1d; --line:rgba(224,168,80,.22); --mist:rgba(245,241,231,.74);
+    --serif:Palatino,Georgia,serif; --sans:"Avenir Next",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; min-height:100vh; font-family:var(--sans); color:var(--paper);
+    background:radial-gradient(120% 80% at 50% -10%, #0d2418, #06130d 60%, #040d08);}
+  .wrap{max-width:600px; margin:0 auto;
+    padding:calc(env(safe-area-inset-top) + 18px) clamp(14px,4.5vw,22px) calc(env(safe-area-inset-bottom) + 28px)}
+  .topbar{display:flex; align-items:center; gap:12px; margin-bottom:20px}
+  .brandmark{width:50px; height:50px; flex:0 0 auto; border-radius:50%; display:grid; place-items:center;
+    background:radial-gradient(circle at 50% 35%, #143324, #07150e);
+    border:1.5px solid rgba(155,232,74,.35); box-shadow:0 0 22px rgba(155,232,74,.16)}
+  .brandmark svg{width:24px; height:24px; color:var(--green-3); filter:drop-shadow(0 0 6px rgba(155,232,74,.5))}
+  .brandtext{flex:1; line-height:1.1}
+  .brandtext .b1{font-family:var(--serif); font-weight:700; font-size:19px}
+  .brandtext .b3{display:block; margin-top:2px; font-size:10px; letter-spacing:.22em; color:var(--gold); text-transform:uppercase}
+  .back{color:var(--gold); text-decoration:none; font-size:13px; padding:8px 12px; border:1px solid var(--line);
+    border-radius:11px; background:var(--moss); white-space:nowrap}
+  .card{background:linear-gradient(160deg,#13271a,#0c1c12); border:1px solid var(--line);
+    border-radius:16px; padding:18px; margin-bottom:16px; box-shadow:0 14px 36px -20px #000}
+  h2{font-family:var(--serif); margin:0 0 6px; font-size:20px; color:var(--green-3)}
+  .muted{color:var(--mist); font-size:13.5px; margin:0 0 14px; line-height:1.5}
+  label{display:block; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); margin:0 0 7px}
+  input,textarea{width:100%; background:#091610; color:var(--paper); border:1px solid var(--line);
+    border-radius:11px; padding:12px 13px; font-size:15px; font-family:var(--sans); resize:vertical}
+  input:focus,textarea:focus{outline:none; border-color:rgba(155,232,74,.5)}
+  textarea{min-height:96px; line-height:1.5}
+  .btn{margin-top:13px; padding:13px 18px; border-radius:12px; border:0; cursor:pointer; font-weight:700; font-size:15px;
+    font-family:var(--sans); background:linear-gradient(160deg,#2a8f3a,#1d6e2c); color:#eafff0; width:100%}
+  .btn.ghost{background:var(--moss-2); color:var(--paper); border:1px solid var(--line)}
+  .note{font-size:13px; margin:11px 0 0; min-height:18px}
+  .note.ok{color:var(--green-1)} .note.err{color:#f3a98c}
+  .hide{display:none}
+  .row{display:flex; gap:10px} .row .btn{flex:1}
+  details{margin-top:6px} summary{cursor:pointer; color:var(--gold); font-size:13px; padding:6px 0}
+  .toggle{display:flex; align-items:center; gap:12px; margin:4px 0 2px; cursor:pointer; -webkit-tap-highlight-color:transparent}
+  .toggle input{position:absolute; opacity:0; width:1px; height:1px}
+  .toggle .track{flex:0 0 auto; width:50px; height:30px; border-radius:999px; position:relative;
+    background:#091610; border:1px solid var(--line); transition:background .15s, border-color .15s}
+  .toggle .track::after{content:""; position:absolute; top:3px; left:3px; width:22px; height:22px;
+    border-radius:50%; background:var(--mist); transition:transform .15s, background .15s}
+  .toggle input:checked + .track{background:linear-gradient(160deg,#2a8f3a,#1d6e2c); border-color:rgba(155,232,74,.5)}
+  .toggle input:checked + .track::after{transform:translateX(20px); background:#eafff0}
+  .toggle input:focus-visible + .track{outline:2px solid var(--green-3); outline-offset:2px}
+  .toggle .tlabel{margin:0; font-size:15px; color:var(--paper); text-transform:none; letter-spacing:0}
+
+  /* On Now preview — mirrors onnow.html's own look so what you see here
+     matches the live page exactly */
+  #onPreviewCard{--on-bg:#04140d;--on-green:#7CFF5C;--on-green-soft:#9bdc75;--on-soft:rgba(140,255,92,.28);--on-ink:#eafff0;--on-mut:#9fc4ad;
+    background:var(--on-bg); border-radius:14px; padding:12px 12px 14px; color:var(--on-ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
+  #onPreviewCard .on-range{color:var(--on-mut); font-size:.85rem; margin:0 0 10px}
+  #onPreviewCard .vcard{border:1.5px solid #2f9e5e; border-radius:12px; background:rgba(255,255,255,.03); padding:8px 12px; margin:8px 0}
+  #onPreviewCard .venue{font-weight:800; color:var(--on-ink); font-size:.98rem; margin:0 0 1px}
+  #onPreviewCard .ev{display:flex; gap:12px; align-items:baseline; padding:4px 0; border-bottom:1px solid rgba(140,255,92,.10)}
+  #onPreviewCard .ev:last-of-type{border-bottom:none}
+  #onPreviewCard .ev .n{flex:1; font-size:.9rem}
+  #onPreviewCard .ev .tag{flex:0 0 auto; color:var(--on-green-soft); font-weight:700; font-size:.74rem; border:1px solid var(--on-soft);
+    border-radius:999px; padding:3px 10px; white-space:nowrap}
+  #onPreviewCard .uphead{margin:18px 2px 4px; font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--on-green);
+    border-top:1px solid var(--on-soft); padding-top:12px}
+  #onPreviewCard .up{display:flex; gap:12px; align-items:baseline; padding:6px 2px}
+  #onPreviewCard .up .ui{flex:1; font-size:.9rem; color:var(--on-mut)}
+  #onPreviewCard .up .ui b{color:var(--on-ink); font-weight:700}
+  #onPreviewCard .up .tag{flex:0 0 auto; color:var(--on-green-soft); font-weight:700; font-size:.74rem; border:1px solid var(--on-soft);
+    border-radius:999px; padding:3px 10px; white-space:nowrap}
+  #onPreviewCard .empty{color:var(--on-mut); text-align:center; padding:18px 0}
+
+  /* Local News preview — same look-and-feel as the On Now preview above */
+  #lnPreviewCard{--on-bg:#04140d;--on-green:#7CFF5C;--on-green-soft:#9bdc75;--on-soft:rgba(140,255,92,.28);--on-ink:#eafff0;--on-mut:#9fc4ad;
+    background:var(--on-bg); border-radius:14px; padding:12px 12px 14px; color:var(--on-ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
+  #lnPreviewCard .ln-updated{color:var(--on-mut); font-size:.85rem; margin:0 0 10px}
+  #lnPreviewCard .lncard{border:1.5px solid #2f9e5e; border-radius:12px; background:rgba(255,255,255,.03); padding:10px 12px; margin:8px 0}
+  #lnPreviewCard .lncard img{width:100%; border-radius:8px; margin:0 0 8px; display:block}
+  #lnPreviewCard .lncard .headline{font-weight:800; color:var(--on-ink); font-size:.98rem; margin:0 0 4px}
+  #lnPreviewCard .lncard .body{font-size:.88rem; color:var(--on-mut); margin:0 0 6px; white-space:pre-wrap}
+  #lnPreviewCard .lncard .meta{display:flex; gap:10px; align-items:baseline; font-size:.74rem}
+  #lnPreviewCard .lncard .source{color:var(--on-green-soft); font-weight:700}
+  #lnPreviewCard .lncard .link a{color:var(--on-green); text-decoration:none}
+  #lnPreviewCard .empty{color:var(--on-mut); text-align:center; padding:18px 0}
+
+  /* Local News preview — mirrors local-news.html's real entry styling so this is a true preview, not a summary */
+  #lnPreviewCard .ln-entry{border:1.5px solid #2f9e5e; border-radius:12px; background:rgba(255,255,255,.03); padding:14px 16px; margin:8px 0}
+  #lnPreviewCard .ln-meta{display:flex; align-items:center; gap:10px; margin:0 0 6px}
+  #lnPreviewCard .ln-badge{font-weight:800; font-size:.78rem; letter-spacing:.02em; padding:2px 9px; border-radius:999px; border:1.5px solid currentColor}
+  #lnPreviewCard .ln-badge.ymm{color:#b98cf0}
+  #lnPreviewCard .ln-badge.rmwb{color:#6fa8d8}
+  #lnPreviewCard .ln-date{color:var(--on-mut); font-size:.8rem}
+  #lnPreviewCard .ln-headline{font-weight:800; color:var(--on-ink); font-size:1.05rem; margin:0 0 6px}
+  #lnPreviewCard .ln-teaser{font-size:.9rem; color:var(--on-mut); margin:0 0 10px}
+  #lnPreviewCard .ln-expand{background:transparent; border:1.5px solid var(--on-green); color:var(--on-green); border-radius:8px; padding:7px 14px; font-weight:700; font-size:.85rem; cursor:pointer}
+  #lnPreviewCard .ln-panel{display:none; margin-top:12px; border-top:1px solid rgba(255,255,255,.12); padding-top:12px}
+  #lnPreviewCard .ln-panel.open{display:block}
+  #lnPreviewCard .ln-credit-row{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin:0 0 10px}
+  #lnPreviewCard .ln-credit{color:var(--on-mut); font-size:.78rem}
+  #lnPreviewCard .ln-credit a{color:var(--on-green)}
+  #lnPreviewCard .ln-fullscreen-btn{flex-shrink:0; background:transparent; border:1.5px solid var(--on-green); color:var(--on-green); font-size:.75rem; font-weight:700; padding:4px 10px; border-radius:999px; cursor:pointer}
+  #lnPreviewCard iframe.ln-frame{width:100%; height:600px; border:none; border-radius:8px; background:#fff}
+  #lnPreviewCard .ln-body{color:var(--on-ink); font-size:.9rem; line-height:1.5}
+  #lnPreviewCard .ln-body h3{color:var(--on-ink)}
+  #lnPreviewCard .ln-body .contact{margin-top:10px; font-size:.82rem; color:var(--on-mut)}
+  #lnPreviewCard .pub-banner{border-radius:12px; overflow:hidden; background:#fff; margin:0 0 14px; border:1px solid rgba(185,140,240,.4)}
+  #lnPreviewCard .pub-banner img{width:100%; display:block}
+  #lnPreviewCard .pub-body{padding:12px 14px 14px; border-top:4px solid #69288f; color:#232019}
+  #lnPreviewCard .pub-kicker{font-size:.68rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#58534a}
+  #lnPreviewCard .pub-name{font-size:1.15rem; font-weight:800; color:#69288f; margin:2px 0 4px}
+  #lnPreviewCard .pub-name span{font-size:.8rem; font-weight:500; color:#58534a}
+  #lnPreviewCard .pub-tag{font-size:.85rem; color:#58534a; margin:0 0 10px}
+  #lnPreviewCard .pub-actions{display:flex; flex-wrap:wrap; gap:8px}
+  #lnPreviewCard .pub-btn{font-size:.8rem; font-weight:700; padding:6px 12px; border-radius:999px; text-decoration:none; border:1.5px solid #69288f; color:#69288f}
+  #lnPreviewCard .pub-btn.primary{background:#69288f; color:#fff}
+  #lnPreviewCard .pub-also{font-size:.75rem; color:#58534a; margin:10px 0 0}
+  #lnPreviewCard .pub-also a{color:#69288f}
+  #lnAdminFullscreenOverlay{display:none; position:fixed; inset:0; z-index:9999; background:#fff}
+  #lnAdminFullscreenOverlay.open{display:block}
+  #lnAdminFullscreenOverlay iframe{width:100%; height:100%; border:none; display:block}
+  #lnAdminFullscreenClose{position:fixed; top:max(12px, env(safe-area-inset-top)); right:12px; z-index:10000; width:40px; height:40px; border-radius:50%; background:#04140d; color:#fff; border:none; font-size:20px; line-height:1; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,.4)}
+
+  /* Map-only locations panel */
+  select{width:100%; background:#091610; color:var(--paper); border:1px solid var(--line);
+    border-radius:11px; padding:12px 13px; font-size:15px; font-family:var(--sans)}
+  select:focus{outline:none; border-color:rgba(155,232,74,.5)}
+  #mlocMiniMap{width:100%; height:220px; border-radius:12px; border:1px solid var(--line); margin-top:10px; overflow:hidden}
+  .mloc-coords{font-size:12.5px; color:var(--mist); margin:8px 0 0}
+  .upload-zone{border:1.5px dashed var(--line); border-radius:12px; padding:16px; text-align:center; cursor:pointer;
+    color:var(--mist); font-size:14px; margin-top:10px}
+  .upload-zone:active{border-color:#9be84a; background:rgba(155,232,74,.06)}
+  .upload-zone .preview-img{max-width:100%; max-height:140px; border-radius:8px; margin-top:8px; display:block; margin-left:auto; margin-right:auto}
+  .upload-zone audio{width:100%; margin-top:8px}
+  .media-row{display:flex; gap:10px; margin-top:10px}
+  .media-row .upload-zone{flex:1; margin-top:0}
+  .media-row .upload-zone .hint{font-size:11px; color:var(--mist); margin-top:4px}
+  #recOverlay{display:none; position:fixed; inset:0; background:rgba(4,16,10,.95); z-index:9999;
+    align-items:center; justify-content:center; padding:20px}
+  #recOverlay .box{max-width:400px; width:100%; background:var(--moss); border:1px solid var(--line);
+    border-radius:20px; padding:28px 22px; text-align:center}
+  #recOverlay .status{font-family:var(--serif); font-size:20px; color:var(--paper); margin-bottom:6px}
+  #recOverlay .timer{font-size:44px; font-weight:700; color:var(--green-1); margin:14px 0}
+  #recDot{display:none; width:12px; height:12px; border-radius:50%; background:#ff4444; margin:0 auto 14px; animation:recPulse 1s ease-in-out infinite}
+  @keyframes recPulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .mloc-item{border:1px solid var(--line); border-radius:11px; padding:12px 13px; margin-bottom:10px}
+  .mloc-item .ttl{font-weight:700; font-size:15px}
+  .mloc-item .cat{color:var(--gold); font-size:12px; text-transform:uppercase; letter-spacing:.08em; margin:2px 0 6px}
+  .mloc-item .sum{font-size:13.5px; color:var(--mist)}
+  .checkbox-row{display:flex; align-items:center; gap:10px; margin-top:14px; cursor:pointer}
+  .checkbox-row input{width:20px; height:20px; accent-color:#9be84a}
+  .checkbox-row span{font-size:14px; color:var(--paper)}
+  .onnow-badge{display:inline-block; background:#ff5d7a; color:#fff; font-size:10.5px; font-weight:700;
+    text-transform:uppercase; letter-spacing:.06em; padding:2px 8px; border-radius:8px; margin-left:6px}
+
+  /* Tours panel */
+  #tourMiniMap{width:100%; height:200px; border-radius:12px; border:1px solid var(--line); margin-top:10px; overflow:hidden}
+  .tour-stop-row{display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:11px; padding:10px 12px; margin-bottom:8px}
+  .tour-stop-row .num{flex:0 0 auto; width:26px; height:26px; border-radius:50%; background:linear-gradient(160deg,#2a8f3a,#1d6e2c); color:#eafff0; font-weight:700; font-size:12.5px; display:flex; align-items:center; justify-content:center}
+  .tour-stop-row .nm{flex:1; font-size:14px}
+  .tour-stop-row .ctrls{flex:0 0 auto; display:flex; gap:6px}
+  .tour-stop-row .ctrls button{background:var(--moss-2); color:var(--paper); border:1px solid var(--line); border-radius:8px; padding:5px 9px; font-size:12px; cursor:pointer}
+  .tour-item{border:1px solid var(--line); border-radius:11px; padding:12px 13px; margin-bottom:10px}
+  .tour-item .ttl{font-weight:700; font-size:15px}
+  .tour-item .cnt{color:var(--gold); font-size:12px; text-transform:uppercase; letter-spacing:.08em; margin:2px 0 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brandmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg></div>
+    <div class="brandtext"><span class="b1">Beyond the Highway</span><span class="b3">Administration</span></div>
+    <a class="back" href="index.html">&larr; Home</a>
+  </div>
+
+  <!-- PIN gate -->
+  <div class="card" id="gate">
+    <h2>Enter PIN</h2>
+    <p class="muted">This area lets you update what visitors see. Enter your 4-digit admin PIN.</p>
+    <label for="pin">Admin PIN</label>
+    <input id="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="••••" maxlength="8">
+    <button class="btn" id="unlock">Unlock</button>
+    <p class="note err" id="gateNote"></p>
+  </div>
+
+  <!-- Settings -->
+  <div class="card hide" id="panel">
+    <h2>Edit a directory</h2>
+    <p class="muted">Open a section's editor. Each directory is edited and published on its own, so changes here never touch the rest of the site.</p>
+    <a class="btn" href="trails.html?admin=1" style="display:block;text-align:center;text-decoration:none;margin-top:4px">Edit Trails &rarr;</a>
+    <p class="muted" style="margin:12px 0 0">Places, Adventures, Sports, Facilities and Stories will appear here as each one is wired up.</p>
+  </div>
+
+  <div class="card hide" id="panel2">
+    <h2>Day Tripper tip</h2>
+    <p class="muted">Shown when a visitor reaches the first milestone on their journey. Keep it short and local — a hidden gem, a fun fact, a seasonal tip. Change it whenever you like.</p>
+    <label for="tip">The tip / fun fact</label>
+    <textarea id="tip" maxlength="240" placeholder="e.g. The Snye is the best aurora-watching spot in town."></textarea>
+    <button class="btn" id="saveTip">Save tip</button>
+    <p class="note" id="tipNote"></p>
+
+    <details>
+      <summary>Change admin PIN</summary>
+      <div style="margin-top:10px">
+        <label for="newpin">New PIN (4–8 digits)</label>
+        <input id="newpin" type="text" inputmode="numeric" autocomplete="off" placeholder="New PIN" maxlength="8">
+        <button class="btn ghost" id="savePin">Update PIN</button>
+        <p class="note" id="pinNote"></p>
+      </div>
+    </details>
+  </div>
+
+  <div class="card hide" id="panel3">
+    <h2>Local Sports &amp; Tournaments</h2>
+    <p class="muted">These buttons show on the home screen, under &ldquo;On&nbsp;Now&rdquo;. Uncheck a team to hide it for the off-season without losing its saved link &mdash; check it again when the season starts back up. Tournaments only appear while at least one is listed &mdash; add them when a tournament is in town, remove them after it ends.</p>
+
+    <label style="display:flex;align-items:center;gap:8px;font-weight:normal">
+      <input id="teamOBenabled" type="checkbox" style="width:auto" checked> Show Oil Barons on the home screen
+    </label>
+    <label for="teamOBurl" style="margin-top:6px">Oil Barons &mdash; schedule link</label>
+    <input id="teamOBurl" type="url" inputmode="url" autocomplete="off" placeholder="https://www.fortmcmurrayoilbarons.ca/stats/schedule">
+
+    <label style="display:flex;align-items:center;gap:8px;font-weight:normal;margin-top:13px">
+      <input id="teamGIenabled" type="checkbox" style="width:auto" checked> Show Giants on the home screen
+    </label>
+    <label for="teamGIurl" style="margin-top:6px">Giants &mdash; schedule link</label>
+    <input id="teamGIurl" type="url" inputmode="url" autocomplete="off" placeholder="https://www.fortmcmurraygiants.ca/2026-home-schedule">
+
+    <div id="tournWrap" style="margin-top:18px"></div>
+    <button class="btn ghost" id="addTourn" type="button">+ Add a tournament</button>
+
+    <button class="btn" id="saveLinks" type="button">Save</button>
+    <p class="note" id="linksNote"></p>
+
+    <details>
+      <summary>Advanced: manual backup / export</summary>
+      <div style="margin-top:10px">
+        <p class="muted" style="margin:0 0 10px">Saving now publishes to everyone automatically \u2014 no redeploy needed. This section is only for making a manual code backup of the current teams/tournaments, or restoring an older hub-links.js file by hand if you ever need to.</p>
+        <button class="btn ghost" id="exportLinks" type="button">Copy code</button>
+        <p class="note" id="exportNote"></p>
+        <textarea id="linksCode" readonly onclick="this.select()" style="width:100%;margin-top:10px;min-height:130px;font-family:monospace;font-size:12px;box-sizing:border-box"></textarea>
+      </div>
+    </details>
+  </div>
+
+  <div class="card hide" id="panel5">
+    <h2>Aboriginal Experiences tile</h2>
+    <p class="muted">Controls whether the &ldquo;Aboriginal Experiences&rdquo; tile shows on the home screen. Switch it on whenever content is ready &mdash; no redeploy needed.</p>
+
+    <label class="toggle">
+      <input type="checkbox" id="aeEnabled">
+      <span class="track"></span>
+      <span class="tlabel">Show the tile on the home screen</span>
+    </label>
+
+    <button class="btn" id="saveAe" type="button">Save</button>
+    <p class="note" id="aeNote"></p>
+  </div>
+
+  <div class="card hide" id="panel5b">
+    <h2>Maps tile</h2>
+    <p class="muted">Controls whether the &ldquo;Maps&rdquo; tile shows on the home screen. Switch it on once the map is tested and ready &mdash; no redeploy needed.</p>
+
+    <label class="toggle">
+      <input type="checkbox" id="mapEnabled">
+      <span class="track"></span>
+      <span class="tlabel">Show the tile on the home screen</span>
+    </label>
+
+    <button class="btn" id="saveMap" type="button">Save</button>
+    <p class="note" id="mapNote"></p>
+  </div>
+
+  <div class="card hide" id="panel15">
+    <h2>Local Hub tile</h2>
+    <p class="muted">Controls whether the &ldquo;Local Hub&rdquo; tile (local business directory, classifieds and local news) shows on the home screen. Keep it off while we build out the directory, then switch it on when it's ready &mdash; no redeploy needed.</p>
+
+    <label class="toggle">
+      <input type="checkbox" id="lhEnabled">
+      <span class="track"></span>
+      <span class="tlabel">Show the tile on the home screen</span>
+    </label>
+
+    <button class="btn" id="saveLh" type="button">Save</button>
+    <p class="note" id="lhNote"></p>
+  </div>
+
+  <div class="card hide" id="panel6">
+    <h2>On Now — weekly lineup</h2>
+    <p class="muted">Each week I'll send you a finished data block to paste below. Preview it, then Publish &mdash; it goes live for every visitor immediately, no redeploy needed.</p>
+
+    <label for="onData">Regular weekly lineup (recurring bars)</label>
+    <textarea id="onData" style="min-height:200px;font-family:monospace;font-size:12px;line-height:1.4" placeholder="Paste the block I send you here"></textarea>
+
+    <label for="onExtraData" style="margin-top:14px">Newsletter events (extra &mdash; optional, leave blank most weeks)</label>
+    <textarea id="onExtraData" style="min-height:120px;font-family:monospace;font-size:12px;line-height:1.4" placeholder="Paste one-off events pulled from the newsletter here. I'll merge these in with the lineup above automatically &mdash; you never need to combine them yourself."></textarea>
+
+    <div class="row">
+      <button class="btn ghost" id="onPreviewBtn" type="button">Preview</button>
+      <button class="btn" id="onPublishBtn" type="button">Publish</button>
+    </div>
+    <p class="note" id="onNote"></p>
+
+    <div id="onPreviewWrap" class="on-preview hide" style="margin-top:16px">
+      <p class="muted" style="margin:0 0 8px">Preview &mdash; this is exactly what visitors will see on the On Now page:</p>
+      <div id="onPreviewCard"></div>
+    </div>
+  </div>
+
+  <div class="card hide" id="panel22">
+    <h2>On Now &mdash; featured promos</h2>
+    <p class="muted">Cards that sit at the very top of the On Now page: trails, seasonal events, anything you want people to tap. Fill in the form, hit Save &amp; publish, and it is live right away. Use the dates to schedule a card ahead of time and have it disappear on its own.</p>
+
+    <label for="fpTitle">Title</label>
+    <input id="fpTitle" type="text" autocomplete="off" maxlength="80" placeholder="e.g. Ghost Hunt: Birchwood Trails">
+
+    <label for="fpKicker" style="margin-top:13px">Small label above the title (optional)</label>
+    <input id="fpKicker" type="text" autocomplete="off" maxlength="30" placeholder="Featured">
+
+    <label for="fpBlurb" style="margin-top:13px">Short write-up</label>
+    <textarea id="fpBlurb" maxlength="300" placeholder="e.g. Eight ghost stories hidden along the trail. Find a ghost, hear its story. Free, family friendly, and open all October."></textarea>
+
+    <label style="margin-top:13px">Cover image</label>
+    <div class="upload-zone" id="fpImageZone" onclick="document.getElementById('fpImageInput').click()">📷 Tap to upload an image</div>
+    <input type="file" id="fpImageInput" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" onchange="fpUploadFile(event)">
+
+    <label for="fpUrl" style="margin-top:13px">Link</label>
+    <input id="fpUrl" type="url" autocomplete="off" placeholder="https://familyadventuregame.com/?play=...">
+
+    <label for="fpButton" style="margin-top:13px">Button text</label>
+    <input id="fpButton" type="text" autocomplete="off" maxlength="30" placeholder="Play now">
+
+    <div class="row" style="margin-top:13px">
+      <div style="flex:1">
+        <label for="fpFrom">Show from (optional)</label>
+        <input id="fpFrom" type="date">
+      </div>
+      <div style="flex:1">
+        <label for="fpUntil">Hide after (optional)</label>
+        <input id="fpUntil" type="date">
+      </div>
+    </div>
+    <p class="muted" style="margin:8px 0 0">Leave both blank to show it until you remove it. The Halloween hunts could end Oct 31.</p>
+
+    <label class="checkbox-row" for="fpActive">
+      <input type="checkbox" id="fpActive" checked>
+      <span>Visible on the On Now page</span>
+    </label>
+
+    <div class="row">
+      <button class="btn" id="fpSave" type="button">Save &amp; publish</button>
+      <button class="btn ghost hide" id="fpCancel" type="button">Cancel edit</button>
+    </div>
+    <p class="note" id="fpNote"></p>
+
+    <div id="fpList" style="margin-top:14px"></div>
+  </div>
+
+  <div class="card hide" id="panel20">
+    <h2>Local News</h2>
+    <p class="muted">Each week: paste one small details block, attach the newsletter file, hit Publish. The newsletter itself never gets typed or pasted as text &mdash; it's too big for that &mdash; the file picker handles it instead.</p>
+
+    <h3 style="margin:18px 0 4px">This week's newsletter</h3>
+    <label for="lnYmmMeta">Newsletter details (paste the small block I send you)</label>
+    <textarea id="lnYmmMeta" style="min-height:110px;font-family:monospace;font-size:12px;line-height:1.4" placeholder='{"badge":"YMM Weekly","date":"Sept 17, 2026","headline":"...","teaser":"..."}'></textarea>
+    <label for="lnYmmFile" style="margin-top:10px">Newsletter file (the one saved as HTML from Safari)</label>
+    <input type="file" id="lnYmmFile" accept=".html,.htm,text/html">
+    <p class="note" id="lnYmmFileNote"></p>
+
+    <h3 style="margin:22px 0 4px">Other short notices (optional)</h3>
+    <p class="muted" style="margin:0 0 8px">For small municipal/community notices with no ads to preserve &mdash; this box stays small so it's safe to paste directly. Leave empty most weeks.</p>
+    <label for="lnOtherData">Other notices (paste here, JSON array)</label>
+    <textarea id="lnOtherData" style="min-height:120px;font-family:monospace;font-size:12px;line-height:1.4" placeholder="Paste any additional short notices here, or leave blank"></textarea>
+
+    <div class="row" style="margin-top:14px">
+      <button class="btn ghost" id="lnPreviewBtn" type="button">Preview</button>
+      <button class="btn" id="lnPublishBtn" type="button">Publish</button>
+    </div>
+    <p class="note" id="lnNote"></p>
+
+    <div id="lnPreviewWrap" class="on-preview hide" style="margin-top:16px">
+      <p class="muted" style="margin:0 0 8px">Preview &mdash; this is exactly what visitors will see on the Local News page:</p>
+      <div id="lnPreviewCard"></div>
+    </div>
+  </div>
+
+  <div class="card hide" id="panel21">
+    <h2>Local News tile</h2>
+    <p class="muted">Controls whether the &ldquo;Local News&rdquo; tile shows on the home screen, linking straight to the Local News page. Keep it off until you've published this week's content, then switch it on &mdash; no redeploy needed.</p>
+
+    <label class="toggle">
+      <input type="checkbox" id="lnTileEnabled">
+      <span class="track"></span>
+      <span class="tlabel">Show the tile on the home screen</span>
+    </label>
+
+    <button class="btn" id="saveLnTile" type="button">Save</button>
+    <p class="note" id="lnTileNote"></p>
+  </div>
+
+  <div id="lnAdminFullscreenOverlay">
+    <button id="lnAdminFullscreenClose" type="button" onclick="closeLnAdminFullscreen()" aria-label="Close">&times;</button>
+    <iframe id="lnAdminFullscreenFrame" src="about:blank"></iframe>
+  </div>
+
+  <div class="card hide" id="panel7">
+    <h2>Business Listing Requests</h2>
+    <p class="muted">Free "just list me" requests submitted from the advertise page. Add the ones you want to Places, then dismiss.</p>
+    <div id="reqList"></div>
+    <p class="note" id="reqNote"></p>
+  </div>
+
+  <div class="card hide" id="panel8">
+    <h2>Locals&rsquo; Picks &mdash; pending review</h2>
+    <p class="muted">Recommendations submitted from the Locals&rsquo; Picks page. Approve to publish it live immediately, or reject to discard it.</p>
+    <div id="recList"></div>
+    <p class="note" id="recNote"></p>
+  </div>
+
+  <div class="card hide" id="panel4">
+    <h2>Ask MAC button</h2>
+    <p class="muted">The floating button in the bottom-right corner of the home screen. It stays hidden until you switch it on and add a link &mdash; use it to send visitors to your Ask&nbsp;MAC page.</p>
+
+    <label class="toggle">
+      <input type="checkbox" id="cbEnabled">
+      <span class="track"></span>
+      <span class="tlabel">Show the button on the home screen</span>
+    </label>
+
+    <label for="cbUrl" style="margin-top:14px">Link (where the button goes)</label>
+    <input id="cbUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://your-ask-mac-page">
+    <label for="cbLabel" style="margin-top:13px">Button name (for screen readers)</label>
+    <input id="cbLabel" type="text" autocomplete="off" placeholder="Ask MAC" maxlength="40">
+
+    <button class="btn" id="saveChat" type="button">Save</button>
+    <p class="note" id="chatNote"></p>
+
+    <details>
+      <summary>Publish to everyone</summary>
+      <div style="margin-top:10px">
+        <p class="muted" style="margin:0 0 10px">Saving keeps the button on this device so you can preview it. To show it to <em>everyone</em>: tap Copy code, then paste it into a new file named <code>chat-button.js</code> next to <code>index.html</code> in your site folder, then redeploy the whole folder to Netlify.</p>
+        <button class="btn ghost" id="exportChat" type="button">Copy code</button>
+        <p class="note" id="chatExportNote"></p>
+        <textarea id="chatCode" readonly onclick="this.select()" style="width:100%;margin-top:10px;min-height:110px;font-family:monospace;font-size:12px;box-sizing:border-box"></textarea>
+      </div>
+    </details>
+  </div>
+
+  <div class="card hide" id="panel9">
+    <h2>Map-Only Locations</h2>
+    <p class="muted">Pins that live only on the map &mdash; not full Places listings. Good for a mural, a viewpoint, a historic marker, a tour stop. Saving here publishes straight to the map, no redeploy needed.</p>
+
+    <label for="mlocTitle">Name</label>
+    <input id="mlocTitle" type="text" autocomplete="off" placeholder="e.g. Snye Point Mural">
+
+    <label for="mlocCategory" style="margin-top:13px">Category</label>
+    <select id="mlocCategory"></select>
+
+    <label for="mlocAddress" style="margin-top:13px">Address (optional &mdash; for auto-locating)</label>
+    <div class="row">
+      <input id="mlocAddress" type="text" autocomplete="off" placeholder="e.g. 123 Riverside Dr, Fort McMurray" style="flex:1">
+      <button class="btn ghost" id="mlocFindAddr" type="button" style="width:auto; white-space:nowrap; margin-top:0">Find</button>
+    </div>
+    <p class="muted" style="margin:8px 0 0">Or tap the map below to drop / move the pin directly.</p>
+    <div id="mlocMiniMap"></div>
+    <p class="mloc-coords" id="mlocCoords">No location set yet.</p>
+
+    <label for="mlocSummary" style="margin-top:13px">Short write-up</label>
+    <textarea id="mlocSummary" maxlength="400" placeholder="A sentence or two for the map card and popup."></textarea>
+
+    <label style="margin-top:13px">Photo</label>
+    <div class="upload-zone" id="mlocImageZone" onclick="document.getElementById('mlocImageInput').click()">📷 Tap to upload a photo</div>
+    <input type="file" id="mlocImageInput" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" onchange="mlocUploadFile(event,'image')">
+
+    <label style="margin-top:13px">Audio recording</label>
+    <div id="mlocAudioZone"></div>
+    <input type="file" id="mlocAudioInput" accept="audio/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" onchange="mlocUploadFile(event,'audio')">
+
+    <label class="checkbox-row" for="mlocOnNow">
+      <input type="checkbox" id="mlocOnNow">
+      <span>🎤 This is a recurring On Now venue (a bar/venue with regular live lineups)</span>
+    </label>
+    <p class="muted" style="margin:6px 0 0">When checked, the map card's button links to your On Now page instead of driving directions &mdash; matched to this venue by name.</p>
+
+    <label class="checkbox-row" for="mlocNotify">
+      <input type="checkbox" id="mlocNotify">
+      <span>🔔 Show a "nearby" banner on the map when visitors are within ~200m</span>
+    </label>
+    <input id="mlocNotifyLabel" type="text" maxlength="40" placeholder="Banner text, e.g. &quot;Story nearby&quot; (keep it short)" style="margin-top:10px">
+
+    <button class="btn" id="mlocSave" type="button">Save location</button>
+    <p class="note" id="mlocNote"></p>
+
+    <details style="margin-top:16px">
+      <summary>Saved map-only locations</summary>
+      <div id="mlocList" style="margin-top:10px"></div>
+    </details>
+  </div>
+
+  <div class="card hide" id="panel10">
+    <h2>Tours</h2>
+    <p class="muted">Build a walking tour: name it, add stops in order, save. On the map, tapping the tour draws the real walking route between your stops.</p>
+
+    <label for="tourTitle">Tour name</label>
+    <input id="tourTitle" type="text" autocomplete="off" placeholder="e.g. Downtown Riverfront Walk">
+    <label for="tourDesc" style="margin-top:13px">Short description</label>
+    <textarea id="tourDesc" maxlength="200" placeholder="One line shown under the tour name."></textarea>
+
+    <div style="margin-top:18px; padding-top:14px; border-top:1px solid var(--line)">
+      <label for="tourStopName">Add a stop &mdash; name</label>
+      <input id="tourStopName" type="text" autocomplete="off" placeholder="e.g. Snye Point Mural">
+      <label for="tourStopAddress" style="margin-top:13px">Address (optional)</label>
+      <div class="row">
+        <input id="tourStopAddress" type="text" autocomplete="off" placeholder="e.g. 123 Riverside Dr" style="flex:1">
+        <button class="btn ghost" id="tourStopFind" type="button" style="width:auto; white-space:nowrap; margin-top:0">Find</button>
+      </div>
+      <p class="muted" style="margin:8px 0 0">Or tap the map to drop the stop's pin directly.</p>
+      <div id="tourMiniMap"></div>
+      <p class="mloc-coords" id="tourStopCoords">No location set for this stop yet.</p>
+
+      <label style="margin-top:13px">Stop photo (optional)</label>
+      <div class="upload-zone" id="tourStopImageZone" onclick="document.getElementById('tourStopImageInput').click()">📷 Tap to upload a photo</div>
+      <input type="file" id="tourStopImageInput" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" onchange="tourStopUploadFile(event,'image')">
+
+      <label style="margin-top:13px">Stop audio (optional)</label>
+      <div id="tourStopAudioZone"></div>
+      <input type="file" id="tourStopAudioInput" accept="audio/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" onchange="tourStopUploadFile(event,'audio')">
+
+      <button class="btn ghost" id="tourAddStop" type="button" style="margin-top:16px">+ Add this stop to the tour</button>
+    </div>
+
+    <div id="tourStopsWrap" style="margin-top:16px"></div>
+
+    <button class="btn" id="tourSave" type="button">Save tour</button>
+    <p class="note" id="tourNote"></p>
+
+    <details style="margin-top:16px">
+      <summary>Saved tours</summary>
+      <div id="tourList" style="margin-top:10px"></div>
+    </details>
+  </div>
+
+  <div class="card hide" id="panel11">
+    <h2>Coupon Partners</h2>
+    <p class="muted">Manage a business's coupon offer. Publishing here flags that business as a Coupon Partner, adds the offer to the public Coupons page, and sends an instant push to everyone subscribed to coupon offers.</p>
+
+    <label for="couponBusiness">Business</label>
+    <select id="couponBusiness"><option value="">Loading businesses&hellip;</option></select>
+    <p class="muted" style="margin:8px 0 0">Not listed in Places? Type their name instead &mdash; it doesn't need to match a listing.</p>
+    <input id="couponBusinessOther" type="text" autocomplete="off" placeholder="Type a business name not listed above" style="margin-top:8px">
+
+    <label for="couponDiscount" style="margin-top:13px">Discount / offer</label>
+    <input id="couponDiscount" type="text" autocomplete="off" placeholder="e.g. 20% off any large pizza">
+
+    <label for="couponDesc" style="margin-top:13px">Details</label>
+    <textarea id="couponDesc" maxlength="400" placeholder="Terms, what's included, dine-in only, etc."></textarea>
+
+    <label for="couponLocation" style="margin-top:13px">Location (optional)</label>
+    <input id="couponLocation" type="text" autocomplete="off" placeholder="e.g. 123 Franklin Ave, Fort McMurray">
+    <p class="muted" style="margin:8px 0 0">Shows a Directions button on the coupon page &mdash; useful even if this business isn't in Places.</p>
+
+    <label for="couponEmail" style="margin-top:13px">Email (optional)</label>
+    <input id="couponEmail" type="email" autocomplete="off" placeholder="e.g. owner@business.com">
+    <p class="muted" style="margin:8px 0 0">Shows an Email button on the coupon page for customers to contact the business.</p>
+
+    <label for="couponWebsite" style="margin-top:13px">Website (optional)</label>
+    <input id="couponWebsite" type="text" autocomplete="off" placeholder="e.g. mybusiness.com">
+    <p class="muted" style="margin:8px 0 0">Shows a Website button on the coupon page. https:// is added automatically if you leave it off.</p>
+
+    <label for="couponSponsor" style="margin-top:13px">Sponsoring group (optional)</label>
+    <select id="couponSponsor"><option value="">No sponsor</option></select>
+    <p class="muted" style="margin:8px 0 0">Shows &ldquo;In support of &hellip;&rdquo; on the coupon. Manage the list below in Sponsor Organizations.</p>
+
+    <label style="margin-top:13px">Photo (optional)</label>
+    <div class="upload-zone" id="couponImageZone" onclick="document.getElementById('couponImageInput').click()">📷 Tap to upload a photo</div>
+    <input type="file" id="couponImageInput" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" onchange="couponUploadFile(event)">
+
+    <label for="couponExpires" style="margin-top:13px">Expires</label>
+    <input id="couponExpires" type="date">
+
+    <label for="couponLimit" style="margin-top:13px">Claim limit (optional)</label>
+    <input id="couponLimit" type="number" min="0" step="10" inputmode="numeric" placeholder="e.g. 50 — leave blank for unlimited">
+    <p class="muted" style="margin:8px 0 0">How many times this offer can be redeemed in total, in steps of 10. Leave blank for no limit. Shows as &ldquo;X of Y claimed&rdquo; below and on the Coupons page, and the redeem button stops working once the limit is hit.</p>
+
+    <label class="checkbox-row" for="couponActive">
+      <input type="checkbox" id="couponActive" checked>
+      <span>Live on the Coupons page</span>
+    </label>
+    <p class="muted" style="margin:6px 0 0">Turning this off hides the offer without ending the business's Coupon Partner status &mdash; the monthly tier keeps running either way.</p>
+
+    <button class="btn" id="couponSave" type="button">Save &amp; publish</button>
+    <p class="note" id="couponNote"></p>
+
+    <details style="margin-top:16px">
+      <summary>Coupon Partners</summary>
+      <div id="couponList" style="margin-top:10px"></div>
+    </details>
+  </div>
+
+  <div class="card hide" id="panel12">
+    <h2>Coupon Signups &mdash; pending review</h2>
+    <p class="muted">Self-serve coupon signups from businesses (scanned from a sponsor's link/QR code, or from the Advertise page). Nothing here is public yet. Once you've confirmed the Stripe payment landed, Approve &amp; publish to make it a live coupon &mdash; or Reject if it's spam or they changed their mind.</p>
+    <div id="couponSignupList"></div>
+    <p class="note" id="couponSignupNote"></p>
+  </div>
+
+  <div class="card hide" id="panel14">
+    <h2>Placement Signups &mdash; pending review</h2>
+    <p class="muted">Self-serve Top Pick / Featured / Ambassador signups from advertise.html. "Already listed" entries just need their tier applied to an existing business; "New business" entries need the listing created too. Confirm the Stripe payment landed, then Approve &amp; publish &mdash; or Reject.</p>
+    <div id="placementSignupList"></div>
+    <p class="note" id="placementSignupNote"></p>
+  </div>
+
+  <div class="card hide" id="panel18">
+    <h2>Places &mdash; pending edits</h2>
+    <p class="muted">Anyone can suggest an addition, edit or removal directly on places.html. Nothing goes live until you approve it here.</p>
+    <div id="placeEditsList"></div>
+    <p class="note" id="placeEditsNote"></p>
+  </div>
+
+  <div class="card hide" id="panel19">
+    <h2>Local Business Directory &mdash; pending edits</h2>
+    <p class="muted">Anyone can suggest an addition, edit or removal directly on local-business.html. Nothing goes live until you approve it here.</p>
+    <div id="lbizEditsList"></div>
+    <p class="note" id="lbizEditsNote"></p>
+  </div>
+
+  <div class="card hide" id="panel13">
+    <h2>Sponsor Organizations</h2>
+    <p class="muted">Nonprofits/youth groups signing businesses up as Coupon Partners. Add one here, then copy its signup link to put on the cards/QR codes you give them &mdash; any business that signs up through that link shows up already credited to that group.</p>
+
+    <label for="sponsorName">Organization name</label>
+    <input id="sponsorName" type="text" autocomplete="off" placeholder="e.g. Wood Buffalo Youth Group">
+    <button class="btn" id="sponsorAdd" type="button" style="margin-top:13px">Add organization</button>
+    <p class="note" id="sponsorNote"></p>
+
+    <div id="sponsorList" style="margin-top:14px"></div>
+  </div>
+
+</div>
+
+<div id="recOverlay">
+  <div class="box">
+    <div class="status" id="recStatus">Ready to record</div>
+    <div class="timer" id="recTimer">0:00</div>
+    <div id="recDot"></div>
+    <audio id="recPreview" controls style="display:none; width:100%; margin:14px 0"></audio>
+    <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px">
+      <button class="btn" id="recPrimary" type="button" onclick="recAction()">🎙 Start recording</button>
+      <button class="btn ghost" id="recRetry" type="button" onclick="recRetry()" style="display:none">↻ Re-record</button>
+      <button class="btn" id="recSave" type="button" onclick="recSave()" style="display:none">✓ Use this recording</button>
+      <button class="btn ghost" type="button" onclick="recCancel()">Cancel</button>
+    </div>
+    <p class="muted" id="recHint" style="margin-top:12px">Tap start, speak your message, tap stop. Up to 5 minutes.</p>
+  </div>
+</div>
+
+<script src="hub-links.js"></script>
+<script src="journey.js"></script>
+<script>
+  function note(el, msg, ok){ el.textContent=msg; el.className='note ' + (ok ? 'ok' : 'err'); }
+
+  var pin = document.getElementById('pin');
+  document.getElementById('unlock').onclick = function(){
+    if (window.BTH && BTH.checkPin(pin.value.trim())){
+      BTH.adminUnlock();
+      document.getElementById('gate').classList.add('hide');
+      document.getElementById('panel').classList.remove('hide');
+      document.getElementById('panel2').classList.remove('hide');
+      document.getElementById('panel3').classList.remove('hide');
+      document.getElementById('panel4').classList.remove('hide');
+      document.getElementById('panel5').classList.remove('hide');
+      document.getElementById('panel5b').classList.remove('hide');
+      document.getElementById('panel6').classList.remove('hide');
+      document.getElementById('panel7').classList.remove('hide');
+      document.getElementById('panel8').classList.remove('hide');
+      document.getElementById('panel9').classList.remove('hide');
+      document.getElementById('panel10').classList.remove('hide');
+      document.getElementById('panel11').classList.remove('hide');
+      document.getElementById('panel12').classList.remove('hide');
+      document.getElementById('panel13').classList.remove('hide');
+      document.getElementById('panel14').classList.remove('hide');
+      document.getElementById('panel15').classList.remove('hide');
+      document.getElementById('panel18').classList.remove('hide');
+      document.getElementById('panel19').classList.remove('hide');
+      document.getElementById('panel20').classList.remove('hide');
+      document.getElementById('panel21').classList.remove('hide');
+      document.getElementById('panel22').classList.remove('hide');
+      loadListingRequests();
+      loadRecommendations();
+      loadPlaceEdits();
+      loadLbizEdits();
+      document.getElementById('tip').value = BTH.getSettings().tip25 || '';
+      hlPopulate();
+      cbPopulate();
+      aePopulate();
+      mapPopulate();
+      lhPopulate();
+      onPopulate();
+      fpPopulate();
+      lnPopulate();
+      lnTilePopulate();
+      mlocPopulate();
+      tourPopulate();
+      sponsorPopulate();
+      couponPopulate();
+      loadCouponSignups();
+      loadPlacementSignups();
+    } else {
+      note(document.getElementById('gateNote'), 'That PIN didn\u2019t match. Try again.', false);
+      pin.value=''; pin.focus();
+    }
+  };
+  pin.addEventListener('keydown', function(e){ if (e.key==='Enter') document.getElementById('unlock').click(); });
+
+  document.getElementById('saveTip').onclick = function(){
+    var v = document.getElementById('tip').value.trim();
+    if (!v){ note(document.getElementById('tipNote'),'Please enter a tip first.',false); return; }
+    BTH.saveSettings({ tip25: v });
+    note(document.getElementById('tipNote'),'Saved. Visitors will see this from now on.',true);
+  };
+
+  document.getElementById('savePin').onclick = function(){
+    var v = document.getElementById('newpin').value.trim();
+    if (!/^\d{4,8}$/.test(v)){ note(document.getElementById('pinNote'),'Use 4 to 8 digits.',false); return; }
+    BTH.saveSettings({ pin: v });
+    document.getElementById('newpin').value='';
+    note(document.getElementById('pinNote'),'PIN updated.',true);
+  };
+
+  // ---- Local Sports & Tournaments ----
+  var HL_KEY = 'bthHubLinks';
+
+  // Cloud sync (Supabase) — hub links are admin-edited shared content, so
+  // they're mirrored to Supabase for every visitor. localStorage stays as
+  // the fast local preview cache.
+  var SUPABASE_URL = 'https://ceipylnjdidjqidamkpw.supabase.co';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlaXB5bG5qZGlkanFpZGFta3B3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyOTQ1MjAsImV4cCI6MjA5ODg3MDUyMH0.TGZYRcjscN3ysRfTT5iHSl2pTOIhvMF6dCd-elm7L7g';
+  var HL_CLOUD_KEY = 'hub_links';
+  var HL_ADMIN_PIN = '2005'; // must match the Supabase bth_save_content PIN
+
+  function hlCloudPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(HL_CLOUD_KEY) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && rows[0].data !== undefined) ? rows[0].data : null; })
+      .catch(function(err){ console.warn('[cloud] hub links pull failed, using local cache:', err); return null; });
+  }
+
+  function hlCloudPush(value){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: HL_ADMIN_PIN, p_key: HL_CLOUD_KEY, p_data: value })
+    }).then(function(res){
+      if (!res.ok) console.warn('[cloud] hub links push failed:', res.status);
+      return res.ok;
+    }).catch(function(err){ console.warn('[cloud] hub links push failed, saved locally only:', err); return false; });
+  }
+
+  function hlDefaults(){ return (window.HUB_LINKS && typeof window.HUB_LINKS === 'object') ? window.HUB_LINKS : { teams: [], tournaments: [] }; }
+  function hlLoad(){ try { var d = JSON.parse(localStorage.getItem(HL_KEY)); if (d && typeof d === 'object') return d; } catch (e) {} return hlDefaults(); }
+  function hlTeamUrl(arr, name){ arr = arr || []; for (var i=0;i<arr.length;i++){ if (arr[i] && arr[i].name === name) return arr[i].url || ''; } return ''; }
+  function hlTeamEnabled(arr, name){ arr = arr || []; for (var i=0;i<arr.length;i++){ if (arr[i] && arr[i].name === name) return arr[i].enabled !== false; } return true; }
+  function hlAttr(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+  function hlTournRow(name, url, sub){
+    var d = document.createElement('div');
+    d.className = 'tourn-row';
+    d.style.cssText = 'border:1px solid var(--line); border-radius:12px; padding:12px; margin-bottom:10px';
+    d.innerHTML =
+      '<label>Tournament name</label>' +
+      '<input class="t-name" type="text" placeholder="e.g. 18U Baseball Nationals" value="' + hlAttr(name) + '">' +
+      '<label style="margin-top:10px">Link (website or schedule)</label>' +
+      '<input class="t-url" type="url" inputmode="url" placeholder="https://..." value="' + hlAttr(url) + '">' +
+      '<label style="margin-top:10px">When (optional)</label>' +
+      '<input class="t-sub" type="text" placeholder="e.g. Aug 13-16" value="' + hlAttr(sub) + '">' +
+      '<button class="btn ghost t-del" type="button" style="margin-top:10px">Remove this tournament</button>';
+    d.querySelector('.t-del').onclick = function(){ d.remove(); };
+    return d;
+  }
+  function hlBuild(){
+    var teams = [
+      { name:'Oil Barons', sub:'Junior A hockey \u00b7 game schedule', url:(document.getElementById('teamOBurl').value||'').trim(), enabled: document.getElementById('teamOBenabled').checked },
+      { name:'Giants', sub:'WCBL baseball \u00b7 game schedule', url:(document.getElementById('teamGIurl').value||'').trim(), enabled: document.getElementById('teamGIenabled').checked }
+    ];
+    var tournaments = [];
+    var rows = document.querySelectorAll('#tournWrap .tourn-row');
+    for (var i=0;i<rows.length;i++){
+      var n=(rows[i].querySelector('.t-name').value||'').trim();
+      var u=(rows[i].querySelector('.t-url').value||'').trim();
+      var sb=(rows[i].querySelector('.t-sub').value||'').trim();
+      if (n && u) tournaments.push(sb ? {name:n,url:u,sub:sb} : {name:n,url:u});
+    }
+    return { teams: teams, tournaments: tournaments };
+  }
+  function hlPopulate(){
+    var d = hlLoad();
+    document.getElementById('teamOBurl').value = hlTeamUrl(d.teams, 'Oil Barons');
+    document.getElementById('teamGIurl').value = hlTeamUrl(d.teams, 'Giants');
+    document.getElementById('teamOBenabled').checked = hlTeamEnabled(d.teams, 'Oil Barons');
+    document.getElementById('teamGIenabled').checked = hlTeamEnabled(d.teams, 'Giants');
+    var w = document.getElementById('tournWrap'); w.innerHTML = '';
+    var t = Array.isArray(d.tournaments) ? d.tournaments : [];
+    for (var i=0;i<t.length;i++) w.appendChild(hlTournRow(t[i].name||'', t[i].url||'', t[i].sub||''));
+    // Refresh from the shared Supabase copy so the form reflects what's
+    // actually live, not just whatever was last saved from this device.
+    hlCloudPull().then(function(cloudData){
+      if (!cloudData) return;
+      localStorage.setItem(HL_KEY, JSON.stringify(cloudData));
+      document.getElementById('teamOBurl').value = hlTeamUrl(cloudData.teams, 'Oil Barons');
+      document.getElementById('teamGIurl').value = hlTeamUrl(cloudData.teams, 'Giants');
+      document.getElementById('teamOBenabled').checked = hlTeamEnabled(cloudData.teams, 'Oil Barons');
+      document.getElementById('teamGIenabled').checked = hlTeamEnabled(cloudData.teams, 'Giants');
+      var w2 = document.getElementById('tournWrap'); w2.innerHTML = '';
+      var t2 = Array.isArray(cloudData.tournaments) ? cloudData.tournaments : [];
+      for (var j=0;j<t2.length;j++) w2.appendChild(hlTournRow(t2[j].name||'', t2[j].url||'', t2[j].sub||''));
+    });
+  }
+  document.getElementById('addTourn').onclick = function(){ document.getElementById('tournWrap').appendChild(hlTournRow('','','')); };
+  document.getElementById('saveLinks').onclick = function(){
+    var m = hlBuild();
+    if (!m.teams[0].url || !m.teams[1].url){ note(document.getElementById('linksNote'),'Both team links are required.',false); return; }
+    localStorage.setItem(HL_KEY, JSON.stringify(m));
+    note(document.getElementById('linksNote'),'Saving...',true);
+    hlCloudPush(m).then(function(ok){
+      note(document.getElementById('linksNote'), ok ? 'Saved \u2014 live for everyone now.' : 'Saved on this device, but publishing failed. Check your connection and try again.', ok);
+    });
+  };
+  function copyToClipboard(text, cb){
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ cb(true); }, function(){ cb(false); });
+    } else {
+      cb(false);
+    }
+  }
+  document.getElementById('exportLinks').onclick = function(){
+    var m = hlBuild(); localStorage.setItem(HL_KEY, JSON.stringify(m));
+    var header = '/* Beyond the Highway \u2014 hub buttons (Local Sports + Tournaments)\n   Edit in the app: Admin \u2192 Local Sports & Tournaments. After saving, copy this\n   code, replace the old hub-links.js in your site folder, and redeploy. */\n';
+    var body = 'window.HUB_LINKS = ' + JSON.stringify(m, null, 2) + ';\n';
+    var content = header + body;
+    var box = document.getElementById('linksCode');
+    box.value = content;
+    copyToClipboard(content, function(ok){
+      if (ok){
+        note(document.getElementById('exportNote'),'Copied! Paste it into hub-links.js in your site folder and redeploy.',true);
+      } else {
+        box.focus(); box.select();
+        note(document.getElementById('exportNote'),'Couldn\u2019t auto-copy \u2014 the code is selected below, so just copy it manually.',false);
+      }
+    });
+  };
+
+  // ---- Aboriginal Experiences tile toggle ----
+  var AE_CLOUD_KEY = 'aboriginal_experiences';
+  var AE_ADMIN_PIN = HL_ADMIN_PIN; // same admin PIN used for the other Supabase-backed content
+
+  function aeCloudPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(AE_CLOUD_KEY) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && rows[0].data !== undefined) ? rows[0].data : null; })
+      .catch(function(err){ console.warn('[cloud] aboriginal experiences pull failed:', err); return null; });
+  }
+  function aeCloudPush(value){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: AE_ADMIN_PIN, p_key: AE_CLOUD_KEY, p_data: value })
+    }).then(function(res){
+      if (!res.ok) console.warn('[cloud] aboriginal experiences push failed:', res.status);
+      return res.ok;
+    }).catch(function(err){ console.warn('[cloud] aboriginal experiences push failed:', err); return false; });
+  }
+  function aePopulate(){
+    aeCloudPull().then(function(data){
+      document.getElementById('aeEnabled').checked = !!(data && data.enabled === true);
+    });
+  }
+  document.getElementById('saveAe').onclick = function(){
+    var enabled = document.getElementById('aeEnabled').checked;
+    note(document.getElementById('aeNote'),'Saving...',true);
+    aeCloudPush({ enabled: enabled }).then(function(ok){
+      note(document.getElementById('aeNote'), ok ? (enabled ? 'Saved — the tile is now live for everyone.' : 'Saved — the tile is now hidden for everyone.') : 'Publishing failed. Check your connection and try again.', ok);
+    });
+  };
+
+  // ---- Maps tile toggle ----
+  var MAP_CLOUD_KEY = 'map_feature';
+  var MAP_ADMIN_PIN = HL_ADMIN_PIN; // same admin PIN used for the other Supabase-backed content
+
+  function mapCloudPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(MAP_CLOUD_KEY) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && rows[0].data !== undefined) ? rows[0].data : null; })
+      .catch(function(err){ console.warn('[cloud] map feature pull failed:', err); return null; });
+  }
+  function mapCloudPush(value){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: MAP_ADMIN_PIN, p_key: MAP_CLOUD_KEY, p_data: value })
+    }).then(function(res){
+      if (!res.ok) console.warn('[cloud] map feature push failed:', res.status);
+      return res.ok;
+    }).catch(function(err){ console.warn('[cloud] map feature push failed:', err); return false; });
+  }
+  function mapPopulate(){
+    mapCloudPull().then(function(data){
+      document.getElementById('mapEnabled').checked = !!(data && data.enabled === true);
+    });
+  }
+  document.getElementById('saveMap').onclick = function(){
+    var enabled = document.getElementById('mapEnabled').checked;
+    note(document.getElementById('mapNote'),'Saving...',true);
+    mapCloudPush({ enabled: enabled }).then(function(ok){
+      note(document.getElementById('mapNote'), ok ? (enabled ? 'Saved — the tile is now live for everyone.' : 'Saved — the tile is now hidden for everyone.') : 'Publishing failed. Check your connection and try again.', ok);
+    });
+  };
+
+  // ---- Local Hub tile toggle ----
+  var LH_CLOUD_KEY = 'local_hub';
+  var LH_ADMIN_PIN = HL_ADMIN_PIN; // same admin PIN used for the other Supabase-backed content
+
+  function lhCloudPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(LH_CLOUD_KEY) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && rows[0].data !== undefined) ? rows[0].data : null; })
+      .catch(function(err){ console.warn('[cloud] local hub pull failed:', err); return null; });
+  }
+  function lhCloudPush(value){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: LH_ADMIN_PIN, p_key: LH_CLOUD_KEY, p_data: value })
+    }).then(function(res){
+      if (!res.ok) console.warn('[cloud] local hub push failed:', res.status);
+      return res.ok;
+    }).catch(function(err){ console.warn('[cloud] local hub push failed:', err); return false; });
+  }
+  function lhPopulate(){
+    lhCloudPull().then(function(data){
+      document.getElementById('lhEnabled').checked = !!(data && data.enabled === true);
+    });
+  }
+  document.getElementById('saveLh').onclick = function(){
+    var enabled = document.getElementById('lhEnabled').checked;
+    note(document.getElementById('lhNote'),'Saving...',true);
+    lhCloudPush({ enabled: enabled }).then(function(ok){
+      note(document.getElementById('lhNote'), ok ? (enabled ? 'Saved — the tile is now live for everyone.' : 'Saved — the tile is now hidden for everyone.') : 'Publishing failed. Check your connection and try again.', ok);
+    });
+  };
+
+  // ---- On Now (weekly lineup) ----
+  var ON_CLOUD_KEY = 'onnow_content';
+  var ON_ADMIN_PIN = HL_ADMIN_PIN; // same admin PIN used for the other Supabase-backed content
+
+  function onCloudPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(ON_CLOUD_KEY) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && rows[0].data !== undefined) ? rows[0].data : null; })
+      .catch(function(err){ console.warn('[cloud] on now pull failed:', err); return null; });
+  }
+  function onCloudPush(value){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: ON_ADMIN_PIN, p_key: ON_CLOUD_KEY, p_data: value })
+    }).then(function(res){
+      if (!res.ok) console.warn('[cloud] on now push failed:', res.status);
+      return res.ok;
+    }).catch(function(err){ console.warn('[cloud] on now push failed:', err); return false; });
+  }
+  function onParseBlock(elId, label, required){
+    var raw = (document.getElementById(elId).value || '').trim();
+    if (!raw) {
+      if (required) return { error: 'Paste the weekly data block first.' };
+      return { data: { venues: [], upcoming: [] } }; // empty extra box = nothing to merge
+    }
+    try {
+      var data = JSON.parse(raw);
+      if (!data || typeof data !== 'object' || (data.venues !== undefined && !Array.isArray(data.venues))) {
+        return { error: 'The ' + label + ' block doesn\u2019t look valid \u2014 check you copied the whole thing.' };
+      }
+      if (!Array.isArray(data.venues)) data.venues = [];
+      if (!Array.isArray(data.upcoming)) data.upcoming = [];
+      return { data: data };
+    } catch (e) {
+      return { error: 'Couldn\u2019t read the ' + label + ' block \u2014 make sure nothing got cut off when you pasted it.' };
+    }
+  }
+  function onMergeVenues(base, extra){
+    var venues = base.map(function(v){ return { venue: v.venue, events: (v.events||[]).slice() }; });
+    extra.forEach(function(ev){
+      var match = null;
+      for (var i=0; i<venues.length; i++){
+        if ((venues[i].venue||'').trim().toLowerCase() === (ev.venue||'').trim().toLowerCase()){ match = venues[i]; break; }
+      }
+      if (match) { match.events = match.events.concat(ev.events||[]); }
+      else { venues.push({ venue: ev.venue, events: (ev.events||[]).slice() }); }
+    });
+    return venues;
+  }
+  function onGetMerged(){
+    var base = onParseBlock('onData', 'regular lineup', true);
+    if (base.error) return { error: base.error };
+    var extra = onParseBlock('onExtraData', 'newsletter events', false);
+    if (extra.error) return { error: extra.error };
+    var merged = {
+      range: base.data.range || extra.data.range || '',
+      venues: onMergeVenues(base.data.venues, extra.data.venues),
+      upcoming: (base.data.upcoming||[]).concat(extra.data.upcoming||[])
+    };
+    return { data: merged };
+  }
+  function onRenderPreview(data){
+    var wrap = document.getElementById('onPreviewCard');
+    var html = '<p class="on-range">' + (data.range || '') + '</p>';
+    var venues = data.venues || [];
+    var any = venues.some(function(v){ return (v.events||[]).length; });
+    if (!any) {
+      html += '<p class="empty">This weekend\u2019s full lineup is on the poster \u2014 tap the button above.</p>';
+    } else {
+      venues.forEach(function(v){
+        if (!(v.events||[]).length) return;
+        html += '<div class="vcard"><div class="venue">' + (v.venue||'') + '</div>';
+        v.events.forEach(function(e){
+          html += '<div class="ev"><div class="n">' + (e.n||'') + '</div>' + (e.d ? '<div class="tag">'+e.d+'</div>' : '') + '</div>';
+        });
+        html += '</div>';
+      });
+    }
+    if ((data.upcoming||[]).length) {
+      html += '<div class="uphead">Upcoming</div>';
+      data.upcoming.forEach(function(u){
+        html += '<div class="up"><div class="ui"><b>' + (u.v||'') + '</b> \u2014 ' + (u.n||'') + '</div>' + (u.d ? '<div class="tag">'+u.d+'</div>' : '') + '</div>';
+      });
+    }
+    wrap.innerHTML = html;
+    document.getElementById('onPreviewWrap').classList.remove('hide');
+  }
+  document.getElementById('onPreviewBtn').onclick = function(){
+    var r = onGetMerged();
+    if (r.error) { note(document.getElementById('onNote'), r.error, false); document.getElementById('onPreviewWrap').classList.add('hide'); return; }
+    onRenderPreview(r.data);
+    note(document.getElementById('onNote'), 'Preview updated below. Nothing is live yet.', true);
+  };
+  document.getElementById('onPublishBtn').onclick = function(){
+    var r = onGetMerged();
+    if (r.error) { note(document.getElementById('onNote'), r.error, false); return; }
+    onRenderPreview(r.data);
+    note(document.getElementById('onNote'), 'Publishing...', true);
+    onCloudPush(r.data).then(function(ok){
+      note(document.getElementById('onNote'), ok ? 'Published \u2014 live for everyone now.' : 'Publishing failed. Check your connection and try again.', ok);
+    });
+  };
+  function onPopulate(){
+    onCloudPull().then(function(cloud){
+      if (!cloud) return;
+      document.getElementById('onData').value = JSON.stringify(cloud, null, 2);
+      document.getElementById('onExtraData').value = '';
+      onRenderPreview(cloud);
+    });
+  }
+
+  // ---- On Now featured promos (cards above the weekly lineup) ----
+  var FP_CLOUD_KEY = 'onnow_promos';
+  var FP_ADMIN_PIN = HL_ADMIN_PIN; // same admin PIN used for the other Supabase-backed content
+  var fpList = [];
+  var fpEditIndex = null;
+  var fpImageUrl = '';
+
+  function fpCloudPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(FP_CLOUD_KEY) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && rows[0].data && Array.isArray(rows[0].data.items)) ? rows[0].data.items : []; })
+      .catch(function(err){ console.warn('[cloud] promos pull failed:', err); return []; });
+  }
+  function fpCloudPush(items){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: FP_ADMIN_PIN, p_key: FP_CLOUD_KEY, p_data: { items: items } })
+    }).then(function(res){
+      if (!res.ok) console.warn('[cloud] promos push failed:', res.status);
+      return res.ok;
+    }).catch(function(err){ console.warn('[cloud] promos push failed:', err); return false; });
+  }
+
+  function fpToday(){
+    try { return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Edmonton' }); }
+    catch(e){ return new Date().toISOString().slice(0,10); }
+  }
+  function fpStatus(p){
+    var t = fpToday();
+    if (p.active === false) return { label: 'Hidden', color: 'var(--mist)' };
+    if (p.from && t < p.from) return { label: 'Scheduled for ' + p.from, color: 'var(--gold)' };
+    if (p.until && t > p.until) return { label: 'Ended ' + p.until, color: 'var(--mist)' };
+    return { label: 'Live now' + (p.until ? ' (until ' + p.until + ')' : ''), color: '#9be84a' };
+  }
+
+  function fpRenderImageZone(){
+    var zone = document.getElementById('fpImageZone');
+    zone.innerHTML = fpImageUrl
+      ? '<img class="preview-img" src="' + esc(fpImageUrl) + '"><div style="margin-top:8px; font-size:12.5px; color:var(--gold)">Tap to replace</div>'
+      : '📷 Tap to upload an image';
+  }
+
+  function fpUploadFile(e){
+    var file = e.target.files[0];
+    if (!file) return;
+    var sizeMB = file.size / (1024 * 1024);
+    if (sizeMB > 25){ alert('This file is ' + sizeMB.toFixed(1) + 'MB, which is too large. Try a smaller file.'); e.target.value = ''; return; }
+    note(document.getElementById('fpNote'), 'Uploading ' + file.name + '...', true);
+    fileToDataURL(file).then(function(dataUrl){
+      return cloudUploadMedia(dataUrl, 'onnow-promo');
+    }).then(function(url){
+      fpImageUrl = url; fpRenderImageZone();
+      note(document.getElementById('fpNote'), 'Uploaded. Remember to save.', true);
+    }).catch(function(err){
+      note(document.getElementById('fpNote'), 'Upload failed: ' + (err.message || err), false);
+    }).finally(function(){
+      e.target.value = '';
+    });
+  }
+
+  function fpResetForm(){
+    fpEditIndex = null; fpImageUrl = '';
+    ['fpTitle','fpKicker','fpBlurb','fpUrl','fpButton','fpFrom','fpUntil'].forEach(function(id){ document.getElementById(id).value = ''; });
+    document.getElementById('fpActive').checked = true;
+    document.getElementById('fpSave').textContent = 'Save & publish';
+    document.getElementById('fpCancel').classList.add('hide');
+    fpRenderImageZone();
+  }
+
+  function fpEdit(i){
+    var p = fpList[i]; if (!p) return;
+    fpEditIndex = i; fpImageUrl = p.image || '';
+    document.getElementById('fpTitle').value = p.title || '';
+    document.getElementById('fpKicker').value = p.kicker || '';
+    document.getElementById('fpBlurb').value = p.blurb || '';
+    document.getElementById('fpUrl').value = p.url || '';
+    document.getElementById('fpButton').value = p.button || '';
+    document.getElementById('fpFrom').value = p.from || '';
+    document.getElementById('fpUntil').value = p.until || '';
+    document.getElementById('fpActive').checked = p.active !== false;
+    document.getElementById('fpSave').textContent = 'Update & publish';
+    document.getElementById('fpCancel').classList.remove('hide');
+    fpRenderImageZone();
+    note(document.getElementById('fpNote'), 'Editing "' + (p.title || '') + '". Change what you need, then update.', true);
+    document.getElementById('fpTitle').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function fpSave(){
+    var noteEl = document.getElementById('fpNote');
+    var title = document.getElementById('fpTitle').value.trim();
+    var url = document.getElementById('fpUrl').value.trim();
+    var from = document.getElementById('fpFrom').value;
+    var until = document.getElementById('fpUntil').value;
+    if (!title){ note(noteEl, 'Add a title first.', false); return; }
+    if (!url){ note(noteEl, 'Add the link people should open.', false); return; }
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+    if (from && until && until < from){ note(noteEl, 'The hide-after date is before the show-from date.', false); return; }
+
+    var item = {
+      id: (fpEditIndex !== null && fpList[fpEditIndex] && fpList[fpEditIndex].id) ? fpList[fpEditIndex].id : ('p' + Date.now().toString(36)),
+      title: title,
+      kicker: document.getElementById('fpKicker').value.trim(),
+      blurb: document.getElementById('fpBlurb').value.trim(),
+      image: fpImageUrl,
+      url: url,
+      button: document.getElementById('fpButton').value.trim(),
+      from: from, until: until,
+      active: document.getElementById('fpActive').checked
+    };
+    var next = fpList.slice();
+    if (fpEditIndex !== null) next[fpEditIndex] = item; else next.unshift(item);
+
+    note(noteEl, 'Publishing...', true);
+    fpCloudPush(next).then(function(ok){
+      if (ok){
+        fpList = next; fpRenderList(); fpResetForm();
+        note(noteEl, 'Published. It is live on On Now.', true);
+      } else {
+        note(noteEl, 'Publishing failed. Check your connection and try again.', false);
+      }
+    });
+  }
+
+  function fpMutate(next, okMsg){
+    var noteEl = document.getElementById('fpNote');
+    note(noteEl, 'Saving...', true);
+    fpCloudPush(next).then(function(ok){
+      if (ok){ fpList = next; fpEditIndex = null; fpRenderList(); note(noteEl, okMsg, true); }
+      else note(noteEl, 'Could not save that. Check your connection and try again.', false);
+    });
+  }
+  function fpToggle(i){
+    var next = fpList.map(function(p){ return Object.assign({}, p); });
+    next[i].active = (next[i].active === false);
+    fpMutate(next, next[i].active ? 'Now visible.' : 'Hidden. You can turn it back on any time.');
+  }
+  function fpMove(i){
+    if (i <= 0) return;
+    var next = fpList.slice();
+    var t = next[i-1]; next[i-1] = next[i]; next[i] = t;
+    fpMutate(next, 'Moved up.');
+  }
+  function fpRemove(i){
+    if (!confirm('Remove "' + (fpList[i].title || 'this card') + '" for good?')) return;
+    fpMutate(fpList.slice(0, i).concat(fpList.slice(i + 1)), 'Removed.');
+  }
+
+  function fpRenderList(){
+    var wrap = document.getElementById('fpList');
+    if (!fpList.length){ wrap.innerHTML = '<p class="muted" style="margin:0">No featured cards yet.</p>'; return; }
+    wrap.innerHTML = fpList.map(function(p, i){
+      var st = fpStatus(p);
+      return '<div class="mloc-item">'
+        + (p.image ? '<img src="' + esc(p.image) + '" alt="" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px">' : '')
+        + '<div class="ttl">' + esc(p.title) + '</div>'
+        + '<div class="cat" style="color:' + st.color + '">' + esc(st.label) + '</div>'
+        + (p.blurb ? '<div class="sum">' + esc(p.blurb) + '</div>' : '')
+        + '<div class="row" style="margin-top:10px;flex-wrap:wrap">'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" data-fp-edit="' + i + '">Edit</button>'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" data-fp-toggle="' + i + '">' + (p.active === false ? 'Show' : 'Hide') + '</button>'
+        +   (i > 0 ? '<button class="btn ghost" style="margin-top:0" type="button" data-fp-up="' + i + '">Move up</button>' : '')
+        +   '<button class="btn ghost" style="margin-top:0" type="button" data-fp-remove="' + i + '">Remove</button>'
+        + '</div></div>';
+    }).join('');
+    function bind(attr, fn){
+      wrap.querySelectorAll('[' + attr + ']').forEach(function(btn){
+        btn.onclick = function(){ fn(parseInt(btn.getAttribute(attr), 10)); };
+      });
+    }
+    bind('data-fp-edit', fpEdit); bind('data-fp-toggle', fpToggle);
+    bind('data-fp-up', fpMove); bind('data-fp-remove', fpRemove);
+  }
+
+  function fpPopulate(){
+    document.getElementById('fpSave').onclick = fpSave;
+    document.getElementById('fpCancel').onclick = function(){ fpResetForm(); note(document.getElementById('fpNote'), '', true); };
+    fpRenderImageZone();
+    fpCloudPull().then(function(items){ fpList = items; fpRenderList(); });
+  }
+
+  // ---- Local News ----
+  var LN_CLOUD_KEY = 'local_news_content';
+  var LN_ADMIN_PIN = HL_ADMIN_PIN; // same admin PIN used for the other Supabase-backed content
+
+  function lnCloudPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(LN_CLOUD_KEY) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && rows[0].data !== undefined) ? rows[0].data : null; })
+      .catch(function(err){ console.warn('[cloud] local news pull failed:', err); return null; });
+  }
+  function lnCloudPush(value){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: LN_ADMIN_PIN, p_key: LN_CLOUD_KEY, p_data: value })
+    }).then(function(res){
+      if (!res.ok) console.warn('[cloud] local news push failed:', res.status);
+      return res.ok;
+    }).catch(function(err){ console.warn('[cloud] local news push failed:', err); return false; });
+  }
+  function lnParse(){
+    // Local News no longer reads a giant pasted block. Build entries from:
+    // 1) a small metadata paste (badge/date/headline/teaser) + the attached file's encoded content, and
+    // 2) the small "other notices" textarea (JSON array, optional).
+    var metaRaw = (document.getElementById('lnYmmMeta').value || '').trim();
+    var b64 = window.__lnYmmB64 || '';
+    var meta = null;
+    if (metaRaw) {
+      try {
+        meta = JSON.parse(metaRaw);
+      } catch (e) {
+        return { error: 'Couldn\u2019t read the newsletter details block \u2014 check it\u2019s complete and valid.' };
+      }
+    }
+
+    var entries = [];
+    var hasYmmContent = meta || b64;
+    if (hasYmmContent) {
+      if (!b64) return { error: 'Attach the newsletter file before previewing/publishing \u2014 the file provides the full reproduction.' };
+      if (!meta || !meta.date || !meta.headline) return { error: 'The newsletter details block needs at least a date and headline.' };
+      var badge = meta.badge || 'YMM Weekly';
+      // Keep the link to the auto-synced issue unless a new file was attached by hand
+      var loaded = (window.__lnYmmLoaded && !window.__lnYmmFileNew) ? window.__lnYmmLoaded : null;
+      var editedByHand = !!(loaded && loaded.editedByHand) ||
+        !!(loaded && (meta.headline !== loaded.headline || (meta.teaser || '') !== (loaded.teaser || '') || meta.date !== loaded.date));
+      entries.push({
+        id: loaded && loaded.id ? loaded.id : 'ymm',
+        sourceGuid: loaded ? loaded.sourceGuid : undefined,
+        editedByHand: editedByHand || undefined,
+        badge: badge,
+        badgeClass: 'ymm',
+        date: meta.date,
+        headline: meta.headline,
+        teaser: meta.teaser || '',
+        expandLabel: 'Read the full newsletter',
+        creditHtml: 'Published by <a href="https://ymmonline.ca" target="_blank" rel="noopener">' + badge + '</a> \u2014 shown here as originally sent, ads included.',
+        type: 'iframe',
+        headerImg: window.__lnYmmHeader || '',
+        html_b64: b64
+      });
+      // Keep any other auto-synced issues (e.g. the weekend issue) that aren't edited in this panel
+      entries = entries.concat(window.__lnYmmExtra || []);
+    }
+
+    var otherRaw = (document.getElementById('lnOtherData').value || '').trim();
+    if (otherRaw) {
+      try {
+        var otherEntries = JSON.parse(otherRaw);
+        if (!Array.isArray(otherEntries)) return { error: 'The "other notices" box should be a JSON array \u2014 check the format.' };
+        entries = entries.concat(otherEntries);
+      } catch (e) {
+        return { error: 'Couldn\u2019t read the "other notices" box \u2014 check the JSON is complete and valid.' };
+      }
+    }
+
+    if (!entries.length) return { error: 'Nothing to publish yet \u2014 paste the newsletter details and/or attach a file.' };
+    return { data: { entries: entries } };
+  }
+  function lnExtractAndEncode(fileText){
+    // Mirrors the same extraction Claude does by hand: pull the real content out of Mailchimp's
+    // wrapper (between the BEGIN/END TEMPLATE markers) plus its <style> block, then base64-encode.
+    var beginMarker = '<!-- BEGIN TEMPLATE // -->';
+    var endMarker = '<!-- // END TEMPLATE -->';
+    var bStart = fileText.indexOf(beginMarker);
+    var bEnd = fileText.indexOf(endMarker);
+    if (bStart === -1 || bEnd === -1) {
+      throw new Error('Couldn\u2019t find the newsletter content in that file \u2014 make sure it was saved as "Page Source" / "HTML Only", not a different format.');
+    }
+    var body = fileText.slice(bStart + beginMarker.length, bEnd);
+    var styleStart = fileText.indexOf('<style');
+    var styleEnd = fileText.indexOf('</style>');
+    var styleBlock = (styleStart !== -1 && styleEnd !== -1) ? fileText.slice(styleStart, styleEnd + 8) : '';
+    var fullHtml = '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n' + styleBlock + '\n</head>\n<body id="archivebody">\n' + body + '\n</body>\n</html>';
+    // Strip Bob's personal subscriber info before it ever gets published
+    fullHtml = lnSanitize(fullHtml);
+    window.__lnYmmHeader = lnFindHeaderImg(fullHtml);
+    return lnB64Encode(fullHtml);
+  }
+
+  // ---- Newsletter helpers (same as local-news.html) ----
+  var LN_PUBLISHERS = {
+    ymm: {
+      name: 'YMM Weekly',
+      from: 'from YMM Media',
+      tagline: 'Fort McMurray’s local news, events and good news — free in your inbox every week.',
+      url: 'https://ymmonline.ca',
+      urlLabel: 'Visit ymmonline.ca',
+      subscribeUrl: 'https://ymmonline.us3.list-manage.com/subscribe?u=e04cc7ca586aea30193f5489c&id=82e18a4068',
+      also: [
+        { label: 'Your McMurray Magazine', url: 'https://yourmcmurraymagazine.com/' },
+        { label: 'YMM Parent', url: 'https://ymmparent.ca/' }
+      ]
+    }
+  };
+  function lnB64Decode(b64){
+    try {
+      var bin = atob(b64), bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return new TextDecoder().decode(bytes);
+    } catch (e) { return ''; }
+  }
+  function lnB64Encode(str){
+    var bytes = new TextEncoder().encode(str), bin = '';
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin);
+  }
+  function lnSanitize(html){
+    return html
+      .replace(/This email was sent to\s*<a[^>]*>[\s\S]*?<\/a>/gi, '')
+      .replace(/https?:\/\/[a-z0-9.-]*list-manage\.com\/(unsubscribe|profile)\?[^"'\s>]*/gi, LN_PUBLISHERS.ymm.subscribeUrl)
+      .replace(/([?&]|&amp;)e=[0-9a-f]{6,}/gi, function(m, pre){ return pre === '?' ? '?_=' : ''; })
+      .replace(/%26e%3D[0-9a-f]{6,}/gi, '')
+      .replace(/mailto:[^"'\s>]*@travtriv\.ca/gi, '#')
+      .replace(/[\w.+-]+@travtriv\.ca/gi, '');
+  }
+  function lnFindHeaderImg(html){
+    var start = html.indexOf('<body');
+    var m = html.slice(start === -1 ? 0 : start).match(/<img[^>]+src="(https?:\/\/[^"]+)"/i);
+    return m ? m[1] : '';
+  }
+  function lnEsc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function lnPublisherBanner(en){
+    var pub = en.publisher || LN_PUBLISHERS[en.badgeClass || 'ymm'];
+    if (!pub || en.type !== 'iframe') return '';
+    var h = '<div class="pub-banner">';
+    if (en.headerImg) h += '<a href="' + pub.url + '" target="_blank" rel="noopener"><img src="' + en.headerImg + '" alt="' + lnEsc(pub.name) + '" onerror="this.parentNode.style.display=\'none\'"></a>';
+    h += '<div class="pub-body"><div class="pub-kicker">Brought to you by</div>'
+      + '<div class="pub-name">' + lnEsc(pub.name) + ' <span>' + lnEsc(pub.from || '') + '</span></div>'
+      + '<p class="pub-tag">' + lnEsc(pub.tagline || '') + '</p>'
+      + '<div class="pub-actions"><a class="pub-btn primary" href="' + pub.subscribeUrl + '" target="_blank" rel="noopener">Get it in your inbox</a>'
+      + '<a class="pub-btn" href="' + pub.url + '" target="_blank" rel="noopener">' + lnEsc(pub.urlLabel) + '</a></div>';
+    if (pub.also && pub.also.length) {
+      h += '<p class="pub-also">Also from YMM Media: ' + pub.also.map(function(a){ return '<a href="' + a.url + '" target="_blank" rel="noopener">' + lnEsc(a.label) + '</a>'; }).join(' · ') + '</p>';
+    }
+    return h + '</div></div>';
+  }
+  document.getElementById('lnYmmFile').addEventListener('change', function(e){
+    var file = e.target.files[0];
+    var noteEl = document.getElementById('lnYmmFileNote');
+    if (!file) return;
+    noteEl.textContent = 'Reading file\u2026';
+    var reader = new FileReader();
+    reader.onload = function(){
+      try {
+        window.__lnYmmB64 = lnExtractAndEncode(reader.result);
+        window.__lnYmmFileNew = true;
+        var kb = Math.round((window.__lnYmmB64.length * 0.75) / 1024);
+        noteEl.textContent = 'File loaded \u2014 \u2248' + kb + ' KB ready to publish.';
+      } catch (err) {
+        window.__lnYmmB64 = '';
+        noteEl.textContent = err.message || 'Couldn\u2019t read that file.';
+      }
+    };
+    reader.onerror = function(){ noteEl.textContent = 'Couldn\u2019t read that file.'; };
+    reader.readAsText(file);
+  });
+  var lnPreviewEntries = [];
+  function lnRenderPreview(data){
+    var wrap = document.getElementById('lnPreviewCard');
+    var entries = data.entries || [];
+    lnPreviewEntries = entries;
+    var html = '';
+    if (!entries.length) {
+      html += '<p class="empty">No news entries yet.</p>';
+    } else {
+      entries.forEach(function(en, idx){
+        var badgeClass = en.badgeClass || 'ymm';
+        var panelId = 'lnAdminPanel' + idx;
+        html += '<div class="ln-entry">';
+        html += lnPublisherBanner(en);
+        html += '<div class="ln-meta"><span class="ln-badge ' + badgeClass + '">' + (en.badge||'') + '</span><span class="ln-date">' + (en.date||'') + '</span></div>';
+        if (en.headline) html += '<div class="ln-headline">' + en.headline + '</div>';
+        if (en.teaser) html += '<div class="ln-teaser">' + en.teaser + '</div>';
+        html += '<button class="ln-expand" type="button" onclick="lnAdminToggle(\'' + panelId + '\', this)">' + (en.expandLabel || 'Read more') + '</button>';
+        html += '<div class="ln-panel" id="' + panelId + '">';
+        html += '<div class="ln-credit-row"><span class="ln-credit">' + (en.creditHtml || '') + '</span>';
+        if (en.type === 'iframe' && en.html_b64) {
+          html += '<button class="ln-fullscreen-btn" type="button" onclick="openLnAdminFullscreen(' + idx + ')">Full screen</button>';
+        }
+        html += '</div>';
+        if (en.type === 'iframe' && en.html_b64) {
+          html += '<iframe class="ln-frame" src="data:text/html;base64,' + en.html_b64 + '"></iframe>';
+        } else if (en.bodyHtml) {
+          html += '<div class="ln-body">' + en.bodyHtml + '</div>';
+        }
+        html += '</div></div>';
+      });
+    }
+    wrap.innerHTML = html;
+    document.getElementById('lnPreviewWrap').classList.remove('hide');
+  }
+  window.openLnAdminFullscreen = function(idx){
+    var entry = lnPreviewEntries[idx];
+    if (!entry || !entry.html_b64) return;
+    document.getElementById('lnAdminFullscreenFrame').src = 'data:text/html;base64,' + entry.html_b64;
+    document.getElementById('lnAdminFullscreenOverlay').classList.add('open');
+  };
+  window.closeLnAdminFullscreen = function(){
+    document.getElementById('lnAdminFullscreenOverlay').classList.remove('open');
+    document.getElementById('lnAdminFullscreenFrame').src = 'about:blank';
+  };
+  window.lnAdminToggle = function(id, btn){
+    var panel = document.getElementById(id);
+    var opening = !panel.classList.contains('open');
+    panel.classList.toggle('open');
+    btn.textContent = opening ? btn.textContent.replace('Read', 'Hide') : btn.textContent.replace('Hide', 'Read');
+  };
+  document.getElementById('lnPreviewBtn').onclick = function(){
+    var r = lnParse();
+    if (r.error) { note(document.getElementById('lnNote'), r.error, false); document.getElementById('lnPreviewWrap').classList.add('hide'); return; }
+    lnRenderPreview(r.data);
+    note(document.getElementById('lnNote'), 'Preview updated below. Nothing is live yet.', true);
+  };
+  document.getElementById('lnPublishBtn').onclick = function(){
+    var r = lnParse();
+    if (r.error) { note(document.getElementById('lnNote'), r.error, false); return; }
+    lnRenderPreview(r.data);
+    note(document.getElementById('lnNote'), 'Publishing...', true);
+    lnCloudPush(r.data).then(function(ok){
+      note(document.getElementById('lnNote'), ok ? 'Published \u2014 live for everyone now.' : 'Publishing failed. Check your connection and try again.', ok);
+    });
+  };
+  function lnPopulate(){
+    lnCloudPull().then(function(cloud){
+      if (!cloud || !Array.isArray(cloud.entries)) return;
+      var ymmAll = cloud.entries.filter(function(en){ return en.type === 'iframe'; });
+      var ymm = ymmAll[0];
+      window.__lnYmmExtra = ymmAll.slice(1);
+      window.__lnYmmLoaded = ymm || null;
+      window.__lnYmmFileNew = false;
+      var others = cloud.entries.filter(function(en){ return en.type !== 'iframe'; });
+      if (ymm) {
+        document.getElementById('lnYmmMeta').value = JSON.stringify({ badge: ymm.badge || 'YMM Weekly', date: ymm.date || '', headline: ymm.headline || '', teaser: ymm.teaser || '' }, null, 2);
+        window.__lnYmmB64 = ymm.html_b64 || '';
+        window.__lnYmmHeader = ymm.headerImg || '';
+        if (ymm.html_b64) {
+          // Clean up copies published before the personal-info fix, so a plain re-Publish fixes them
+          var decoded = lnB64Decode(ymm.html_b64);
+          if (decoded) {
+            var clean = lnSanitize(decoded);
+            if (!window.__lnYmmHeader) window.__lnYmmHeader = lnFindHeaderImg(clean);
+            if (clean !== decoded) window.__lnYmmB64 = lnB64Encode(clean);
+            ymm.html_b64 = window.__lnYmmB64;
+            ymm.headerImg = window.__lnYmmHeader;
+          }
+          var kb = Math.round((ymm.html_b64.length * 0.75) / 1024);
+          document.getElementById('lnYmmFileNote').textContent = 'Currently live: \u2248' + kb + ' KB (attach a new file to replace it).';
+        }
+      }
+      document.getElementById('lnOtherData').value = others.length ? JSON.stringify(others, null, 2) : '';
+      lnRenderPreview(cloud);
+    });
+  }
+
+  // ---- Local News tile toggle ----
+  var LN_TILE_CLOUD_KEY = 'local_news_tile';
+  var LN_TILE_ADMIN_PIN = HL_ADMIN_PIN; // same admin PIN used for the other Supabase-backed content
+
+  function lnTileCloudPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(LN_TILE_CLOUD_KEY) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && rows[0].data !== undefined) ? rows[0].data : null; })
+      .catch(function(err){ console.warn('[cloud] local news tile pull failed:', err); return null; });
+  }
+  function lnTileCloudPush(value){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: LN_TILE_ADMIN_PIN, p_key: LN_TILE_CLOUD_KEY, p_data: value })
+    }).then(function(res){
+      if (!res.ok) console.warn('[cloud] local news tile push failed:', res.status);
+      return res.ok;
+    }).catch(function(err){ console.warn('[cloud] local news tile push failed:', err); return false; });
+  }
+  function lnTilePopulate(){
+    lnTileCloudPull().then(function(data){
+      document.getElementById('lnTileEnabled').checked = !!(data && data.enabled === true);
+    });
+  }
+  document.getElementById('saveLnTile').onclick = function(){
+    var enabled = document.getElementById('lnTileEnabled').checked;
+    note(document.getElementById('lnTileNote'),'Saving...',true);
+    lnTileCloudPush({ enabled: enabled }).then(function(ok){
+      note(document.getElementById('lnTileNote'), ok ? (enabled ? 'Saved \u2014 the tile is now live for everyone.' : 'Saved \u2014 the tile is now hidden for everyone.') : 'Publishing failed. Check your connection and try again.', ok);
+    });
+  };
+
+  // ---- Business Listing Requests (free "just list me" submissions) ----
+  var REQ_CLOUD_KEY = 'listing_requests';
+  var REQ_ADMIN_PIN = HL_ADMIN_PIN; // same admin PIN used for the other Supabase-backed content
+
+  function reqCloudPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(REQ_CLOUD_KEY) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : []; })
+      .catch(function(err){ console.warn('[cloud] listing requests pull failed:', err); return []; });
+  }
+  function reqCloudPush(list){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: REQ_ADMIN_PIN, p_key: REQ_CLOUD_KEY, p_data: list })
+    }).then(function(res){
+      if (!res.ok) console.warn('[cloud] listing requests push failed:', res.status);
+      return res.ok;
+    }).catch(function(err){ console.warn('[cloud] listing requests push failed:', err); return false; });
+  }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function reqRenderList(list){
+    var wrap = document.getElementById('reqList');
+    if (!list.length) { wrap.innerHTML = '<p class="muted" style="margin:0">No pending requests.</p>'; return; }
+    wrap.innerHTML = list.map(function(r, i){
+      var when = r.submittedAt ? new Date(r.submittedAt).toLocaleDateString() : '';
+      var dirLabel = r.directory === 'local' ? 'Local Business Directory' : 'Places';
+      return '<div style="border:1px solid var(--line); border-radius:11px; padding:12px 13px; margin-bottom:10px">'
+        + '<div style="font-weight:700; font-size:15px">' + esc(r.name) + '</div>'
+        + '<div class="muted" style="margin:2px 0 6px">' + esc(dirLabel) + ' &middot; ' + esc(r.category) + (when ? ' &middot; ' + when : '') + '</div>'
+        + '<div style="font-size:13.5px; margin-bottom:3px">' + esc(r.website) + '</div>'
+        + (r.summary ? '<div style="font-size:13.5px; color:var(--mist); margin-bottom:3px">' + esc(r.summary) + '</div>' : '')
+        + '<div style="font-size:13px; color:var(--gold)">' + esc(r.contact) + '</div>'
+        + '<button class="btn ghost" style="margin-top:10px" type="button" data-dismiss="' + i + '">Dismiss (added / not a fit)</button>'
+        + '</div>';
+    }).join('');
+    wrap.querySelectorAll('[data-dismiss]').forEach(function(btn){
+      btn.onclick = function(){
+        var idx = parseInt(btn.getAttribute('data-dismiss'), 10);
+        var next = list.slice(0, idx).concat(list.slice(idx + 1));
+        note(document.getElementById('reqNote'), 'Dismissing...', true);
+        reqCloudPush(next).then(function(ok){
+          note(document.getElementById('reqNote'), ok ? 'Dismissed.' : 'Couldn\u2019t save that \u2014 check your connection and try again.', ok);
+          if (ok) { list = next; reqRenderList(list); }
+        });
+      };
+    });
+  }
+  function loadListingRequests(){
+    reqCloudPull().then(function(list){ reqRenderList(list); });
+  }
+
+  // ---- Locals' Picks (recommendations review queue) ----
+  var REC_PENDING_KEY = 'recommendations_pending';
+  var REC_LIVE_KEY = 'recommendations_live';
+  var REC_ADMIN_PIN = HL_ADMIN_PIN; // same admin PIN used for the other Supabase-backed content
+
+  function recCloudPull(key){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(key) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : []; })
+      .catch(function(err){ console.warn('[cloud] recommendations pull failed (' + key + '):', err); return []; });
+  }
+  function recCloudPush(key, list){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: REC_ADMIN_PIN, p_key: key, p_data: list })
+    }).then(function(res){
+      if (!res.ok) console.warn('[cloud] recommendations push failed (' + key + '):', res.status);
+      return res.ok;
+    }).catch(function(err){ console.warn('[cloud] recommendations push failed (' + key + '):', err); return false; });
+  }
+  function recStars(n){
+    var r = parseInt(n, 10) || 0;
+    if (!r) return '';
+    var s = '';
+    for (var i = 1; i <= 5; i++) s += (i <= r ? '\u2605' : '\u2606');
+    return s;
+  }
+  function recRenderPending(list){
+    var wrap = document.getElementById('recList');
+    if (!list.length) { wrap.innerHTML = '<p class="muted" style="margin:0">No pending recommendations.</p>'; return; }
+    wrap.innerHTML = list.map(function(r, i){
+      var when = r.submittedAt ? new Date(r.submittedAt).toLocaleDateString() : '';
+      var stars = recStars(r.rating);
+      return '<div style="border:1px solid var(--line); border-radius:11px; padding:12px 13px; margin-bottom:10px">'
+        + '<div style="font-weight:700; font-size:15px">' + esc(r.business) + (stars ? ' <span style="color:var(--gold); font-size:13px">' + stars + '</span>' : '') + '</div>'
+        + '<div class="muted" style="margin:2px 0 6px">' + esc(r.area || '') + (r.area && when ? ' &middot; ' : '') + when + '</div>'
+        + (r.reason ? '<div style="font-size:13.5px; margin-bottom:3px">' + esc(r.reason) + '</div>' : '')
+        + '<div style="font-size:12px; color:var(--mist)">' + esc(r.type || '') + (r.firstname ? ' &middot; from ' + esc(r.firstname) : '') + '</div>'
+        + '<div class="row" style="margin-top:10px">'
+        +   '<button class="btn" style="margin-top:0" type="button" data-approve="' + i + '">Approve &amp; publish</button>'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" data-reject="' + i + '">Reject</button>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+
+    wrap.querySelectorAll('[data-approve]').forEach(function(btn){
+      btn.onclick = function(){
+        var idx = parseInt(btn.getAttribute('data-approve'), 10);
+        var item = list[idx];
+        var nextPending = list.slice(0, idx).concat(list.slice(idx + 1));
+        note(document.getElementById('recNote'), 'Publishing...', true);
+        recCloudPull(REC_LIVE_KEY).then(function(live){
+          var published = {
+            name: item.business,
+            area: item.area || '',
+            stars: item.rating ? parseInt(item.rating, 10) : null,
+            blurb: item.reason || '',
+            by: item.firstname || 'A local',
+            date: String(new Date().getFullYear()),
+            example: false
+          };
+          recCloudPush(REC_LIVE_KEY, [published].concat(live)).then(function(okLive){
+            if (!okLive) { note(document.getElementById('recNote'), 'Couldn\u2019t publish \u2014 check your connection and try again.', false); return; }
+            recCloudPush(REC_PENDING_KEY, nextPending).then(function(okPending){
+              note(document.getElementById('recNote'), okPending ? 'Published \u2014 live on Locals\u2019 Picks now.' : 'Published, but couldn\u2019t clear it from the queue \u2014 refresh to check.', true);
+              if (okPending) { list = nextPending; recRenderPending(list); }
+            });
+          });
+        });
+      };
+    });
+
+    wrap.querySelectorAll('[data-reject]').forEach(function(btn){
+      btn.onclick = function(){
+        var idx = parseInt(btn.getAttribute('data-reject'), 10);
+        var next = list.slice(0, idx).concat(list.slice(idx + 1));
+        note(document.getElementById('recNote'), 'Rejecting...', true);
+        recCloudPush(REC_PENDING_KEY, next).then(function(ok){
+          note(document.getElementById('recNote'), ok ? 'Rejected.' : 'Couldn\u2019t save that \u2014 check your connection and try again.', ok);
+          if (ok) { list = next; recRenderPending(list); }
+        });
+      };
+    });
+  }
+  function loadRecommendations(){
+    recCloudPull(REC_PENDING_KEY).then(function(list){ recRenderPending(list); });
+  }
+
+  // ---- Pending edits review (shared logic for Places and Local Business Directory) ----
+  // Anyone can submit an addition/edit/removal from the public page's admin panel;
+  // it lands here as a pending entry and only touches the live items list once approved.
+  function peTitleOf(entry){ return (entry.item && entry.item.title) || entry.targetTitle || 'Untitled'; }
+  function peApplyToItems(items, entry){
+    if (entry.action === 'add') {
+      return [entry.item].concat(items);
+    }
+    if (entry.action === 'edit') {
+      var idx = items.findIndex(function(x){ return x.title === entry.targetTitle; });
+      if (idx === -1) return [entry.item].concat(items); // original no longer found -- add as new instead
+      var next = items.slice();
+      next[idx] = Object.assign({}, next[idx], entry.item);
+      return next;
+    }
+    if (entry.action === 'delete') {
+      return items.filter(function(x){ return x.title !== entry.targetTitle; });
+    }
+    return items;
+  }
+  function peRenderPending(list, cfg){
+    var wrap = document.getElementById(cfg.listElId);
+    if (!list.length) { wrap.innerHTML = '<p class="muted" style="margin:0">No pending edits.</p>'; return; }
+    var actionLabel = { add: 'New listing', edit: 'Edit', delete: 'Removal' };
+    wrap.innerHTML = list.map(function(r, i){
+      var when = r.submittedAt ? new Date(r.submittedAt).toLocaleString() : '';
+      var title = peTitleOf(r);
+      var cat = r.item ? (r.item.category || '') : '';
+      var summary = r.item ? (r.item.summary || '') : '';
+      return '<div style="border:1px solid var(--line); border-radius:11px; padding:12px 13px; margin-bottom:10px">'
+        + '<div style="font-weight:700; font-size:15px">' + esc(title) + ' <span class="muted" style="font-weight:600; font-size:12px">(' + (actionLabel[r.action] || r.action) + ')</span></div>'
+        + '<div class="muted" style="margin:2px 0 6px">' + esc(cat) + (cat && when ? ' &middot; ' : '') + when + '</div>'
+        + (summary ? '<div style="font-size:13.5px; margin-bottom:3px">' + esc(summary) + '</div>' : '')
+        + (r.action === 'edit' && r.targetTitle && r.targetTitle !== title ? '<div style="font-size:12px; color:var(--mist)">Editing: ' + esc(r.targetTitle) + '</div>' : '')
+        + '<div class="row" style="margin-top:10px">'
+        +   '<button class="btn" style="margin-top:0" type="button" data-approve="' + i + '">Approve &amp; publish</button>'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" data-reject="' + i + '">Reject</button>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+
+    wrap.querySelectorAll('[data-approve]').forEach(function(btn){
+      btn.onclick = function(){
+        var idx = parseInt(btn.getAttribute('data-approve'), 10);
+        var entry = list[idx];
+        var nextPending = list.slice(0, idx).concat(list.slice(idx + 1));
+        note(document.getElementById(cfg.noteElId), 'Publishing...', true);
+        recCloudPull(cfg.liveKey).then(function(liveItems){
+          var updated = peApplyToItems(liveItems, entry);
+          recCloudPush(cfg.liveKey, updated).then(function(okLive){
+            if (!okLive) { note(document.getElementById(cfg.noteElId), 'Couldn\u2019t publish \u2014 check your connection and try again.', false); return; }
+            recCloudPush(cfg.pendingKey, nextPending).then(function(okPending){
+              note(document.getElementById(cfg.noteElId), okPending ? 'Published \u2014 live now.' : 'Published, but couldn\u2019t clear it from the queue \u2014 refresh to check.', true);
+              if (okPending) { list = nextPending; peRenderPending(list, cfg); }
+            });
+          });
+        });
+      };
+    });
+
+    wrap.querySelectorAll('[data-reject]').forEach(function(btn){
+      btn.onclick = function(){
+        var idx = parseInt(btn.getAttribute('data-reject'), 10);
+        var next = list.slice(0, idx).concat(list.slice(idx + 1));
+        note(document.getElementById(cfg.noteElId), 'Rejecting...', true);
+        recCloudPush(cfg.pendingKey, next).then(function(ok){
+          note(document.getElementById(cfg.noteElId), ok ? 'Rejected.' : 'Couldn\u2019t save that \u2014 check your connection and try again.', ok);
+          if (ok) { list = next; peRenderPending(list, cfg); }
+        });
+      };
+    });
+  }
+  var PLACE_EDITS_CFG = { pendingKey: 'places_pending_edits', liveKey: 'places_items', listElId: 'placeEditsList', noteElId: 'placeEditsNote' };
+  var LBIZ_EDITS_CFG = { pendingKey: 'local_business_pending_edits', liveKey: 'local_business_items', listElId: 'lbizEditsList', noteElId: 'lbizEditsNote' };
+  function loadPlaceEdits(){ recCloudPull(PLACE_EDITS_CFG.pendingKey).then(function(list){ peRenderPending(list, PLACE_EDITS_CFG); }); }
+  function loadLbizEdits(){ recCloudPull(LBIZ_EDITS_CFG.pendingKey).then(function(list){ peRenderPending(list, LBIZ_EDITS_CFG); }); }
+
+  // ---- Ask MAC floating button ----
+  var CB_KEY = 'bthChatButton';
+  function cbDefaults(){ return (window.CHAT_BUTTON && typeof window.CHAT_BUTTON === 'object') ? window.CHAT_BUTTON : { enabled:false, url:'', label:'Ask MAC' }; }
+  function cbLoad(){ try { var d = JSON.parse(localStorage.getItem(CB_KEY)); if (d && typeof d === 'object') return d; } catch (e) {} return cbDefaults(); }
+  function cbBuild(){
+    return {
+      enabled: document.getElementById('cbEnabled').checked,
+      url: (document.getElementById('cbUrl').value || '').trim(),
+      label: (document.getElementById('cbLabel').value || '').trim() || 'Ask MAC'
+    };
+  }
+  function cbPopulate(){
+    var d = cbLoad();
+    document.getElementById('cbEnabled').checked = d.enabled === true;
+    document.getElementById('cbUrl').value = d.url || '';
+    document.getElementById('cbLabel').value = d.label || '';
+  }
+  document.getElementById('saveChat').onclick = function(){
+    var m = cbBuild();
+    if (m.enabled && !m.url){ note(document.getElementById('chatNote'),'Add a link before switching the button on.',false); return; }
+    localStorage.setItem(CB_KEY, JSON.stringify(m));
+    note(document.getElementById('chatNote'), m.enabled ? 'Saved on this device. Open the home screen to see it, then Publish to everyone to push it live.' : 'Saved. The button is now hidden on this device.', true);
+  };
+  document.getElementById('exportChat').onclick = function(){
+    var m = cbBuild(); localStorage.setItem(CB_KEY, JSON.stringify(m));
+    var NL = String.fromCharCode(10);
+    var content = [
+      '/* Beyond the Highway - Ask MAC floating button.',
+      '   Edit in the app: Admin > Ask MAC button. After saving, copy this code,',
+      '   place it in a file named chat-button.js next to index.html, and redeploy. */',
+      'window.CHAT_BUTTON = ' + JSON.stringify(m, null, 2) + ';',
+      ''
+    ].join(NL);
+    var box = document.getElementById('chatCode');
+    box.value = content;
+    copyToClipboard(content, function(ok){
+      if (ok){
+        note(document.getElementById('chatExportNote'),'Copied! Paste it into chat-button.js next to index.html and redeploy.',true);
+      } else {
+        box.focus(); box.select();
+        note(document.getElementById('chatExportNote'),'Couldn\u2019t auto-copy \u2014 the code is selected below, so just copy it manually.',false);
+      }
+    });
+  };
+
+  // ---- Map-Only Locations ----
+  var MLOC_CLOUD_KEY = 'map_locations';
+  var MLOC_ADMIN_PIN = HL_ADMIN_PIN; // same admin PIN used for the other Supabase-backed content
+  var MAPBOX_TOKEN = 'pk.eyJ1IjoiYmV5b25kdGhlaHd5IiwiYSI6ImNtczkwOXh0azBqbmsyeHB4NHNqanA1dG8ifQ.-kQIDXdfDz9OYH-J-nhvIA';
+
+  // ---- File upload -> Supabase Storage (same pattern as stories.html) ----
+  var STORAGE_BUCKET = 'story-media';
+
+  function fileToDataURL(file){
+    return new Promise(function(res, rej){
+      var r = new FileReader();
+      r.onload = function(){ res(r.result); };
+      r.onerror = function(){ rej(r.error || new Error('File read failed')); };
+      r.readAsDataURL(file);
+    });
+  }
+
+  function cloudUploadMedia(dataUrl, fileNameHint){
+    return fetch(dataUrl).then(function(res){ return res.blob(); }).then(function(blob){
+      var extGuess = (blob.type.split('/')[1] || 'bin').split(';')[0].split('+')[0];
+      var path = (fileNameHint || 'file').replace(/[^a-z0-9_-]/gi, '_') + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + extGuess;
+      return fetch(SUPABASE_URL + '/storage/v1/object/' + STORAGE_BUCKET + '/' + path, {
+        method: 'POST',
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': blob.type || 'application/octet-stream' },
+        body: blob
+      }).then(function(uploadRes){
+        if (!uploadRes.ok) return uploadRes.text().then(function(t){ throw new Error('Storage upload failed: ' + uploadRes.status + ' ' + t); });
+        return SUPABASE_URL + '/storage/v1/object/public/' + STORAGE_BUCKET + '/' + path;
+      });
+    });
+  }
+
+  // ---- Shared live audio recorder (same approach as stories.html), generalized
+  // with a callback so any panel (map locations, tour stops) can use the same
+  // overlay instead of relying on the OS's file-picker sheet for recording. ----
+  var rec = { mediaRecorder: null, stream: null, chunks: [], startTime: 0, timerInterval: null, state: 'idle', blob: null, dataUrl: null, onSave: null };
+  var MAX_REC_SECONDS = 300;
+
+  function openRecorder(onSaveCallback){
+    rec.onSave = onSaveCallback;
+    document.getElementById('recOverlay').style.display = 'flex';
+    resetRecorder();
+  }
+  function resetRecorder(){
+    rec.state = 'idle'; rec.chunks = []; rec.blob = null; rec.dataUrl = null;
+    document.getElementById('recStatus').textContent = 'Ready to record';
+    document.getElementById('recTimer').textContent = '0:00';
+    document.getElementById('recDot').style.display = 'none';
+    document.getElementById('recPreview').style.display = 'none';
+    document.getElementById('recPreview').src = '';
+    document.getElementById('recPrimary').textContent = '🎙 Start recording';
+    document.getElementById('recPrimary').style.display = '';
+    document.getElementById('recRetry').style.display = 'none';
+    document.getElementById('recSave').style.display = 'none';
+    document.getElementById('recHint').textContent = 'Tap start, speak your message, tap stop. Up to 5 minutes.';
+  }
+  async function recAction(){
+    if (rec.state === 'idle') await beginRecording();
+    else if (rec.state === 'recording') stopRecording();
+  }
+  async function beginRecording(){
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      alert('Recording is not supported in this browser.');
+      return;
+    }
+    try {
+      rec.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (err){
+      if (err.name === 'NotAllowedError') alert('Microphone permission was denied. Allow microphone access and try again.');
+      else if (err.name === 'NotFoundError') alert('No microphone found on this device.');
+      else alert('Could not start recording: ' + (err.message || err.name));
+      return;
+    }
+    var mimeType = '';
+    var candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus', 'audio/ogg'];
+    for (var i = 0; i < candidates.length; i++){
+      if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(candidates[i])){ mimeType = candidates[i]; break; }
+    }
+    try {
+      rec.mediaRecorder = new MediaRecorder(rec.stream, mimeType ? { mimeType: mimeType } : {});
+    } catch (err){
+      alert('Could not start recording: ' + (err.message || err.name));
+      stopStream();
+      return;
+    }
+    rec.chunks = [];
+    rec.mediaRecorder.ondataavailable = function(e){ if (e.data && e.data.size > 0) rec.chunks.push(e.data); };
+    rec.mediaRecorder.onstop = function(){ onRecordingStopped(); };
+    rec.mediaRecorder.start();
+    rec.state = 'recording';
+    rec.startTime = Date.now();
+    document.getElementById('recStatus').textContent = 'Recording…';
+    document.getElementById('recDot').style.display = 'inline-block';
+    document.getElementById('recPrimary').textContent = '⏹ Stop';
+    document.getElementById('recHint').textContent = 'Tap stop when you are done. Auto-stops at 5 minutes.';
+    document.getElementById('recTimer').textContent = '0:00';
+    rec.timerInterval = setInterval(function(){
+      var elapsed = Math.floor((Date.now() - rec.startTime) / 1000);
+      var m = Math.floor(elapsed / 60), s = elapsed % 60;
+      document.getElementById('recTimer').textContent = m + ':' + String(s).padStart(2, '0');
+      if (elapsed >= MAX_REC_SECONDS) stopRecording();
+    }, 250);
+  }
+  function stopRecording(){
+    if (rec.mediaRecorder && rec.mediaRecorder.state !== 'inactive') rec.mediaRecorder.stop();
+    if (rec.timerInterval){ clearInterval(rec.timerInterval); rec.timerInterval = null; }
+    stopStream();
+  }
+  function stopStream(){
+    if (rec.stream){ rec.stream.getTracks().forEach(function(t){ t.stop(); }); rec.stream = null; }
+  }
+  function onRecordingStopped(){
+    var mime = (rec.mediaRecorder && rec.mediaRecorder.mimeType) || 'audio/webm';
+    rec.blob = new Blob(rec.chunks, { type: mime });
+    var reader = new FileReader();
+    reader.onload = function(){
+      rec.dataUrl = reader.result;
+      rec.state = 'ready';
+      var preview = document.getElementById('recPreview');
+      preview.src = rec.dataUrl;
+      preview.style.display = '';
+      document.getElementById('recDot').style.display = 'none';
+      document.getElementById('recStatus').textContent = 'Listen back';
+      document.getElementById('recPrimary').style.display = 'none';
+      document.getElementById('recRetry').style.display = '';
+      document.getElementById('recSave').style.display = '';
+      document.getElementById('recHint').textContent = 'Play it back. Save if you like it, or re-record.';
+    };
+    reader.onerror = function(){ alert('Could not process the recording. Try again.'); resetRecorder(); };
+    reader.readAsDataURL(rec.blob);
+  }
+  function recRetry(){ resetRecorder(); }
+  function recSave(){
+    if (!rec.dataUrl) return;
+    document.getElementById('recStatus').textContent = 'Uploading...';
+    cloudUploadMedia(rec.dataUrl, 'recording').then(function(url){
+      document.getElementById('recOverlay').style.display = 'none';
+      if (rec.onSave) rec.onSave(url);
+      resetRecorder();
+    }).catch(function(err){
+      alert('Could not upload recording: ' + (err.message || err));
+    });
+  }
+  function recCancel(){
+    if (rec.state === 'recording') stopRecording();
+    stopStream();
+    document.getElementById('recOverlay').style.display = 'none';
+    resetRecorder();
+  }
+
+  // Same 6-section / category structure map.html uses, so a location saved
+  // here lands under the right section filter automatically.
+  var MLOC_SECTIONS = [
+    { label: 'Food & Drink', cats: ['Fine Dining','Restaurants','Cafés','Fast Food','Pizza & Donair','Bars & Nightlife'] },
+    { label: 'Family & Fun', cats: ['Family Fun','Theatres','Museums','Festivals','Parks & Playgrounds','Spray Parks','Skate Parks','Outdoor Rinks'] },
+    { label: 'Adventure & Outdoors', cats: ['Lakes','Lakes & Outfitters','Trails','Winter','Golf','Provincial Parks','Campgrounds'] },
+    { label: 'Shopping', cats: ['Sporting Goods','Gift & Novelty','Florists','Trophies & Engraving','Art & Galleries'] },
+    { label: 'Services', cats: ['Grocery Stores','Gas Stations','Convenience Stores','Pharmacies','Banks & ATMs','Hospital & Health','Realtors'] },
+    { label: 'Travel & Stay', cats: ['Hotels & Stays','Air Travel','Taxis'] }
+  ];
+
+  function mlocBuildCategorySelect(){
+    var sel = document.getElementById('mlocCategory');
+    var html = '';
+    MLOC_SECTIONS.forEach(function(sec){
+      html += '<optgroup label="' + esc(sec.label) + '">';
+      sec.cats.forEach(function(c){ html += '<option value="' + esc(c) + '">' + esc(c) + '</option>'; });
+      html += '</optgroup>';
+    });
+    sel.innerHTML = html;
+  }
+
+  function mlocCloudPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(MLOC_CLOUD_KEY) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : []; })
+      .catch(function(err){ console.warn('[cloud] map locations pull failed:', err); return []; });
+  }
+  function mlocCloudPush(list){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: MLOC_ADMIN_PIN, p_key: MLOC_CLOUD_KEY, p_data: list })
+    }).then(function(res){
+      if (!res.ok) console.warn('[cloud] map locations push failed:', res.status);
+      return res.ok;
+    }).catch(function(err){ console.warn('[cloud] map locations push failed:', err); return false; });
+  }
+
+  var mlocList = [];
+  var mlocEditIndex = null;
+  var mlocMap, mlocMarker, mlocLat = null, mlocLng = null;
+  var mlocImageUrl = '', mlocAudioUrl = '';
+
+  function mlocRenderImageZone(){
+    var zone = document.getElementById('mlocImageZone');
+    zone.innerHTML = mlocImageUrl
+      ? '<img class="preview-img" src="' + esc(mlocImageUrl) + '"><div style="margin-top:8px; font-size:12.5px; color:var(--gold)">Tap to replace</div>'
+      : '📷 Tap to upload a photo';
+  }
+  function mlocRenderAudioZone(){
+    var zone = document.getElementById('mlocAudioZone');
+    if (mlocAudioUrl){
+      zone.innerHTML = '<audio controls src="' + esc(mlocAudioUrl) + '" style="width:100%"></audio>'
+        + '<div class="row" style="margin-top:10px">'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" id="mlocAudioReplace">Replace</button>'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" id="mlocAudioRemove">Remove</button>'
+        + '</div>';
+      document.getElementById('mlocAudioReplace').onclick = function(){ mlocAudioUrl = ''; mlocRenderAudioZone(); };
+      document.getElementById('mlocAudioRemove').onclick = function(){ mlocAudioUrl = ''; mlocRenderAudioZone(); };
+    } else {
+      zone.innerHTML = '<div class="media-row">'
+        + '<div class="upload-zone" id="mlocAudioUploadBtn">🎤 Upload audio<div class="hint">MP3, M4A, WAV</div></div>'
+        + '<div class="upload-zone" id="mlocAudioRecordBtn">🎙 Record live<div class="hint">Tap to record</div></div>'
+        + '</div>';
+      document.getElementById('mlocAudioUploadBtn').onclick = function(){ document.getElementById('mlocAudioInput').click(); };
+      document.getElementById('mlocAudioRecordBtn').onclick = function(){ openRecorder(function(url){ mlocAudioUrl = url; mlocRenderAudioZone(); note(document.getElementById('mlocNote'), 'Recording added \u2014 remember to save the location.', true); }); };
+    }
+  }
+
+  function mlocUploadFile(e, kind){
+    var file = e.target.files[0];
+    if (!file) return;
+    var sizeMB = file.size / (1024 * 1024);
+    if (sizeMB > 25){ alert('This file is ' + sizeMB.toFixed(1) + 'MB, which is too large. Try a smaller file.'); e.target.value = ''; return; }
+
+    note(document.getElementById('mlocNote'), 'Uploading ' + file.name + '...', true);
+    fileToDataURL(file).then(function(dataUrl){
+      return cloudUploadMedia(dataUrl, 'mloc-' + kind);
+    }).then(function(url){
+      if (kind === 'image'){ mlocImageUrl = url; mlocRenderImageZone(); }
+      else { mlocAudioUrl = url; mlocRenderAudioZone(); }
+      note(document.getElementById('mlocNote'), 'Uploaded \u2014 remember to save the location.', true);
+    }).catch(function(err){
+      note(document.getElementById('mlocNote'), 'Upload failed: ' + (err.message || err), false);
+    }).finally(function(){
+      e.target.value = '';
+    });
+  }
+
+  function mlocUpdateCoordsLabel(){
+    var el = document.getElementById('mlocCoords');
+    el.textContent = (mlocLat != null && mlocLng != null)
+      ? ('Location set: ' + mlocLat.toFixed(5) + ', ' + mlocLng.toFixed(5))
+      : 'No location set yet.';
+  }
+
+  function mlocSetPin(lng, lat, fly){
+    mlocLat = lat; mlocLng = lng;
+    if (!mlocMarker){
+      mlocMarker = new mapboxgl.Marker({ color: '#e6b85c', draggable: true })
+        .setLngLat([lng, lat]).addTo(mlocMap);
+      mlocMarker.on('dragend', function(){
+        var p = mlocMarker.getLngLat();
+        mlocLat = p.lat; mlocLng = p.lng;
+        mlocUpdateCoordsLabel();
+      });
+    } else {
+      mlocMarker.setLngLat([lng, lat]);
+    }
+    if (fly) mlocMap.flyTo({ center: [lng, lat], zoom: 14, duration: 600 });
+    mlocUpdateCoordsLabel();
+  }
+
+  function mlocInitMap(){
+    if (mlocMap) return;
+    mapboxgl.accessToken = MAPBOX_TOKEN;
+    mlocMap = new mapboxgl.Map({
+      container: 'mlocMiniMap',
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [-111.3803, 56.7266],
+      zoom: 11
+    });
+    mlocMap.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+    mlocMap.on('click', function(e){ mlocSetPin(e.lngLat.lng, e.lngLat.lat, false); });
+  }
+
+  document.getElementById('mlocFindAddr').onclick = function(){
+    var q = (document.getElementById('mlocAddress').value || '').trim();
+    if (!q){ note(document.getElementById('mlocNote'), 'Type an address first.', false); return; }
+    var url = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(q)
+      + '.json?proximity=-111.3803,56.7266&access_token=' + MAPBOX_TOKEN;
+    note(document.getElementById('mlocNote'), 'Searching...', true);
+    fetch(url).then(function(res){ return res.json(); }).then(function(data){
+      var f = data.features && data.features[0];
+      if (!f){ note(document.getElementById('mlocNote'), 'Couldn\u2019t find that address \u2014 try tapping the map instead.', false); return; }
+      mlocSetPin(f.center[0], f.center[1], true);
+      note(document.getElementById('mlocNote'), 'Found it \u2014 adjust the pin if needed, then save.', true);
+    }).catch(function(){
+      note(document.getElementById('mlocNote'), 'Search failed \u2014 try tapping the map instead.', false);
+    });
+  };
+
+  function mlocClearForm(){
+    document.getElementById('mlocTitle').value = '';
+    document.getElementById('mlocCategory').selectedIndex = 0;
+    document.getElementById('mlocAddress').value = '';
+    document.getElementById('mlocSummary').value = '';
+    document.getElementById('mlocOnNow').checked = false;
+    document.getElementById('mlocNotify').checked = false;
+    document.getElementById('mlocNotifyLabel').value = '';
+    mlocImageUrl = ''; mlocAudioUrl = '';
+    mlocRenderImageZone(); mlocRenderAudioZone();
+    mlocLat = null; mlocLng = null;
+    if (mlocMarker){ mlocMarker.remove(); mlocMarker = null; }
+    mlocUpdateCoordsLabel();
+    mlocEditIndex = null;
+    document.getElementById('mlocSave').textContent = 'Save location';
+  }
+
+  document.getElementById('mlocSave').onclick = function(){
+    var title = (document.getElementById('mlocTitle').value || '').trim();
+    var category = document.getElementById('mlocCategory').value;
+    var summary = (document.getElementById('mlocSummary').value || '').trim();
+    var onNow = document.getElementById('mlocOnNow').checked;
+    var notify = document.getElementById('mlocNotify').checked;
+    var notifyLabel = (document.getElementById('mlocNotifyLabel').value || '').trim();
+
+    if (!title){ note(document.getElementById('mlocNote'), 'Give it a name first.', false); return; }
+    if (mlocLat == null || mlocLng == null){ note(document.getElementById('mlocNote'), 'Set a location \u2014 find an address or tap the map.', false); return; }
+
+    var mapUrl = 'https://www.google.com/maps/search/?api=1&query=' + mlocLat + ',' + mlocLng;
+    var entry = { title: title, category: category, summary: summary, lat: mlocLat, lng: mlocLng, image: mlocImageUrl, audio: mlocAudioUrl, map: mapUrl, onNow: onNow, notify: notify, notifyLabel: notifyLabel };
+
+    var next = mlocList.slice();
+    if (mlocEditIndex != null) next[mlocEditIndex] = entry; else next.push(entry);
+
+    note(document.getElementById('mlocNote'), 'Saving...', true);
+    mlocCloudPush(next).then(function(ok){
+      note(document.getElementById('mlocNote'), ok ? 'Saved \u2014 live on the map now.' : 'Publishing failed. Check your connection and try again.', ok);
+      if (ok){ mlocList = next; mlocRenderList(); mlocClearForm(); }
+    });
+  };
+
+  function mlocEdit(i){
+    var item = mlocList[i];
+    document.getElementById('mlocTitle').value = item.title || '';
+    document.getElementById('mlocCategory').value = item.category || '';
+    document.getElementById('mlocSummary').value = item.summary || '';
+    document.getElementById('mlocOnNow').checked = !!item.onNow;
+    document.getElementById('mlocNotify').checked = !!item.notify;
+    document.getElementById('mlocNotifyLabel').value = item.notifyLabel || '';
+    mlocImageUrl = item.image || ''; mlocAudioUrl = item.audio || '';
+    mlocRenderImageZone(); mlocRenderAudioZone();
+    mlocSetPin(item.lng, item.lat, true);
+    mlocEditIndex = i;
+    document.getElementById('mlocSave').textContent = 'Update location';
+    document.getElementById('mlocTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function mlocRemove(i){
+    var next = mlocList.slice(0, i).concat(mlocList.slice(i + 1));
+    note(document.getElementById('mlocNote'), 'Removing...', true);
+    mlocCloudPush(next).then(function(ok){
+      note(document.getElementById('mlocNote'), ok ? 'Removed.' : 'Couldn\u2019t save that \u2014 check your connection and try again.', ok);
+      if (ok){ mlocList = next; mlocRenderList(); }
+    });
+  }
+
+  function mlocRenderList(){
+    var wrap = document.getElementById('mlocList');
+    if (!mlocList.length){ wrap.innerHTML = '<p class="muted" style="margin:0">No map-only locations yet.</p>'; return; }
+    wrap.innerHTML = mlocList.map(function(item, i){
+      return '<div class="mloc-item">'
+        + '<div class="ttl">' + esc(item.title) + (item.onNow ? '<span class="onnow-badge">On Now</span>' : '') + '</div>'
+        + '<div class="cat">' + esc(item.category) + '</div>'
+        + (item.summary ? '<div class="sum">' + esc(item.summary) + '</div>' : '')
+        + '<div class="row" style="margin-top:10px">'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" data-edit="' + i + '">Edit</button>'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" data-remove="' + i + '">Remove</button>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+    wrap.querySelectorAll('[data-edit]').forEach(function(btn){
+      btn.onclick = function(){ mlocEdit(parseInt(btn.getAttribute('data-edit'), 10)); };
+    });
+    wrap.querySelectorAll('[data-remove]').forEach(function(btn){
+      btn.onclick = function(){ mlocRemove(parseInt(btn.getAttribute('data-remove'), 10)); };
+    });
+  }
+
+  function mlocPopulate(){
+    mlocBuildCategorySelect();
+    mlocInitMap();
+    mlocUpdateCoordsLabel();
+    mlocRenderAudioZone();
+    mlocCloudPull().then(function(list){ mlocList = list; mlocRenderList(); });
+  }
+
+  // ---- Tours ----
+  var TOUR_CLOUD_KEY = 'map_tours';
+  var TOUR_ADMIN_PIN = HL_ADMIN_PIN; // same admin PIN used for the other Supabase-backed content
+
+  function tourCloudPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(TOUR_CLOUD_KEY) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : []; })
+      .catch(function(err){ console.warn('[cloud] tours pull failed:', err); return []; });
+  }
+  function tourCloudPush(list){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: TOUR_ADMIN_PIN, p_key: TOUR_CLOUD_KEY, p_data: list })
+    }).then(function(res){
+      if (!res.ok) console.warn('[cloud] tours push failed:', res.status);
+      return res.ok;
+    }).catch(function(err){ console.warn('[cloud] tours push failed:', err); return false; });
+  }
+
+  var tourList = [];
+  var tourEditIndex = null;
+  var tourCurrentStops = [];
+  var tourMap, tourMarker, tourStopLat = null, tourStopLng = null;
+  var tourStopImageUrl = '', tourStopAudioUrl = '';
+
+  function tourStopRenderImageZone(){
+    var zone = document.getElementById('tourStopImageZone');
+    zone.innerHTML = tourStopImageUrl
+      ? '<img class="preview-img" src="' + esc(tourStopImageUrl) + '"><div style="margin-top:8px; font-size:12.5px; color:var(--gold)">Tap to replace</div>'
+      : '📷 Tap to upload a photo';
+  }
+  function tourStopRenderAudioZone(){
+    var zone = document.getElementById('tourStopAudioZone');
+    if (tourStopAudioUrl){
+      zone.innerHTML = '<audio controls src="' + esc(tourStopAudioUrl) + '" style="width:100%"></audio>'
+        + '<div class="row" style="margin-top:10px">'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" id="tourStopAudioReplace">Replace</button>'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" id="tourStopAudioRemove">Remove</button>'
+        + '</div>';
+      document.getElementById('tourStopAudioReplace').onclick = function(){ tourStopAudioUrl = ''; tourStopRenderAudioZone(); };
+      document.getElementById('tourStopAudioRemove').onclick = function(){ tourStopAudioUrl = ''; tourStopRenderAudioZone(); };
+    } else {
+      zone.innerHTML = '<div class="media-row">'
+        + '<div class="upload-zone" id="tourStopAudioUploadBtn">🎤 Upload audio<div class="hint">MP3, M4A, WAV</div></div>'
+        + '<div class="upload-zone" id="tourStopAudioRecordBtn">🎙 Record live<div class="hint">Tap to record</div></div>'
+        + '</div>';
+      document.getElementById('tourStopAudioUploadBtn').onclick = function(){ document.getElementById('tourStopAudioInput').click(); };
+      document.getElementById('tourStopAudioRecordBtn').onclick = function(){ openRecorder(function(url){ tourStopAudioUrl = url; tourStopRenderAudioZone(); note(document.getElementById('tourNote'), 'Recording added to this stop.', true); }); };
+    }
+  }
+  function tourStopUploadFile(e, kind){
+    var file = e.target.files[0];
+    if (!file) return;
+    var sizeMB = file.size / (1024 * 1024);
+    if (sizeMB > 25){ alert('This file is ' + sizeMB.toFixed(1) + 'MB, which is too large. Try a smaller file.'); e.target.value = ''; return; }
+    note(document.getElementById('tourNote'), 'Uploading ' + file.name + '...', true);
+    fileToDataURL(file).then(function(dataUrl){
+      return cloudUploadMedia(dataUrl, 'tourstop-' + kind);
+    }).then(function(url){
+      if (kind === 'image'){ tourStopImageUrl = url; tourStopRenderImageZone(); }
+      else { tourStopAudioUrl = url; tourStopRenderAudioZone(); }
+      note(document.getElementById('tourNote'), 'Uploaded.', true);
+    }).catch(function(err){
+      note(document.getElementById('tourNote'), 'Upload failed: ' + (err.message || err), false);
+    }).finally(function(){
+      e.target.value = '';
+    });
+  }
+
+  function tourUpdateStopCoordsLabel(){
+    var el = document.getElementById('tourStopCoords');
+    el.textContent = (tourStopLat != null && tourStopLng != null)
+      ? ('Location set: ' + tourStopLat.toFixed(5) + ', ' + tourStopLng.toFixed(5))
+      : 'No location set for this stop yet.';
+  }
+
+  function tourSetStopPin(lng, lat, fly){
+    tourStopLat = lat; tourStopLng = lng;
+    if (!tourMarker){
+      tourMarker = new mapboxgl.Marker({ color: '#e6b85c', draggable: true }).setLngLat([lng, lat]).addTo(tourMap);
+      tourMarker.on('dragend', function(){
+        var p = tourMarker.getLngLat();
+        tourStopLat = p.lat; tourStopLng = p.lng;
+        tourUpdateStopCoordsLabel();
+      });
+    } else {
+      tourMarker.setLngLat([lng, lat]);
+    }
+    if (fly) tourMap.flyTo({ center: [lng, lat], zoom: 14, duration: 600 });
+    tourUpdateStopCoordsLabel();
+  }
+
+  function tourInitMap(){
+    if (tourMap) return;
+    mapboxgl.accessToken = MAPBOX_TOKEN;
+    tourMap = new mapboxgl.Map({
+      container: 'tourMiniMap',
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [-111.3803, 56.7266],
+      zoom: 11
+    });
+    tourMap.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+    tourMap.on('click', function(e){ tourSetStopPin(e.lngLat.lng, e.lngLat.lat, false); });
+  }
+
+  document.getElementById('tourStopFind').onclick = function(){
+    var q = (document.getElementById('tourStopAddress').value || '').trim();
+    if (!q){ note(document.getElementById('tourNote'), 'Type an address first.', false); return; }
+    var url = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(q)
+      + '.json?proximity=-111.3803,56.7266&access_token=' + MAPBOX_TOKEN;
+    note(document.getElementById('tourNote'), 'Searching...', true);
+    fetch(url).then(function(res){ return res.json(); }).then(function(data){
+      var f = data.features && data.features[0];
+      if (!f){ note(document.getElementById('tourNote'), 'Couldn\u2019t find that address \u2014 try tapping the map instead.', false); return; }
+      tourSetStopPin(f.center[0], f.center[1], true);
+      note(document.getElementById('tourNote'), 'Found it \u2014 adjust the pin if needed, then add the stop.', true);
+    }).catch(function(){
+      note(document.getElementById('tourNote'), 'Search failed \u2014 try tapping the map instead.', false);
+    });
+  };
+
+  function tourRenderStops(){
+    var wrap = document.getElementById('tourStopsWrap');
+    if (!tourCurrentStops.length){ wrap.innerHTML = '<p class="muted" style="margin:0">No stops added yet.</p>'; return; }
+    wrap.innerHTML = tourCurrentStops.map(function(s, i){
+      return '<div class="tour-stop-row">'
+        + '<div class="num">' + (i + 1) + '</div>'
+        + '<div class="nm">' + esc(s.name) + '</div>'
+        + '<div class="ctrls">'
+        +   (i > 0 ? '<button type="button" data-up="' + i + '">\u2191</button>' : '')
+        +   (i < tourCurrentStops.length - 1 ? '<button type="button" data-down="' + i + '">\u2193</button>' : '')
+        +   '<button type="button" data-del="' + i + '">Remove</button>'
+        + '</div></div>';
+    }).join('');
+    wrap.querySelectorAll('[data-up]').forEach(function(btn){
+      btn.onclick = function(){
+        var i = parseInt(btn.getAttribute('data-up'), 10);
+        var tmp = tourCurrentStops[i - 1]; tourCurrentStops[i - 1] = tourCurrentStops[i]; tourCurrentStops[i] = tmp;
+        tourRenderStops();
+      };
+    });
+    wrap.querySelectorAll('[data-down]').forEach(function(btn){
+      btn.onclick = function(){
+        var i = parseInt(btn.getAttribute('data-down'), 10);
+        var tmp = tourCurrentStops[i + 1]; tourCurrentStops[i + 1] = tourCurrentStops[i]; tourCurrentStops[i] = tmp;
+        tourRenderStops();
+      };
+    });
+    wrap.querySelectorAll('[data-del]').forEach(function(btn){
+      btn.onclick = function(){
+        var i = parseInt(btn.getAttribute('data-del'), 10);
+        tourCurrentStops.splice(i, 1);
+        tourRenderStops();
+      };
+    });
+  }
+
+  document.getElementById('tourAddStop').onclick = function(){
+    try {
+      var name = (document.getElementById('tourStopName').value || '').trim();
+      if (!name){ note(document.getElementById('tourNote'), 'Give the stop a name first.', false); return; }
+      if (tourStopLat == null || tourStopLng == null){ note(document.getElementById('tourNote'), 'Set a location \u2014 find an address or tap the map.', false); return; }
+      tourCurrentStops.push({ name: name, lat: tourStopLat, lng: tourStopLng, image: tourStopImageUrl, audio: tourStopAudioUrl });
+      tourRenderStops();
+      document.getElementById('tourStopName').value = '';
+      document.getElementById('tourStopAddress').value = '';
+      tourStopLat = null; tourStopLng = null;
+      tourStopImageUrl = ''; tourStopAudioUrl = '';
+      tourStopRenderImageZone(); tourStopRenderAudioZone();
+      if (tourMarker){ tourMarker.remove(); tourMarker = null; }
+      tourUpdateStopCoordsLabel();
+      note(document.getElementById('tourNote'), 'Stop added (' + tourCurrentStops.length + ' so far). Add another, or save the tour once you have at least 2.', true);
+    } catch (err) {
+      console.error('[tour] add stop failed:', err);
+      note(document.getElementById('tourNote'), 'Something went wrong adding that stop: ' + (err.message || err), false);
+    }
+  };
+
+  function tourClearForm(){
+    document.getElementById('tourTitle').value = '';
+    document.getElementById('tourDesc').value = '';
+    tourCurrentStops = [];
+    tourRenderStops();
+    tourEditIndex = null;
+    document.getElementById('tourSave').textContent = 'Save tour';
+  }
+
+  document.getElementById('tourSave').onclick = function(){
+    var title = (document.getElementById('tourTitle').value || '').trim();
+    var description = (document.getElementById('tourDesc').value || '').trim();
+    if (!title){ note(document.getElementById('tourNote'), 'Give the tour a name first.', false); return; }
+    if (tourCurrentStops.length < 2){ note(document.getElementById('tourNote'), 'Add at least 2 stops.', false); return; }
+
+    var entry = { title: title, description: description, stops: tourCurrentStops.slice() };
+    var next = tourList.slice();
+    if (tourEditIndex != null) next[tourEditIndex] = entry; else next.push(entry);
+
+    note(document.getElementById('tourNote'), 'Saving...', true);
+    tourCloudPush(next).then(function(ok){
+      note(document.getElementById('tourNote'), ok ? 'Saved \u2014 live on the map now.' : 'Publishing failed. Check your connection and try again.', ok);
+      if (ok){ tourList = next; tourRenderList(); tourClearForm(); }
+    });
+  };
+
+  function tourEdit(i){
+    var t = tourList[i];
+    document.getElementById('tourTitle').value = t.title || '';
+    document.getElementById('tourDesc').value = t.description || '';
+    tourCurrentStops = (t.stops || []).slice();
+    tourRenderStops();
+    tourEditIndex = i;
+    document.getElementById('tourSave').textContent = 'Update tour';
+    document.getElementById('tourTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function tourRemove(i){
+    var next = tourList.slice(0, i).concat(tourList.slice(i + 1));
+    note(document.getElementById('tourNote'), 'Removing...', true);
+    tourCloudPush(next).then(function(ok){
+      note(document.getElementById('tourNote'), ok ? 'Removed.' : 'Couldn\u2019t save that \u2014 check your connection and try again.', ok);
+      if (ok){ tourList = next; tourRenderList(); }
+    });
+  }
+
+  function tourRenderList(){
+    var wrap = document.getElementById('tourList');
+    if (!tourList.length){ wrap.innerHTML = '<p class="muted" style="margin:0">No tours yet.</p>'; return; }
+    wrap.innerHTML = tourList.map(function(t, i){
+      var n = (t.stops || []).length;
+      return '<div class="tour-item">'
+        + '<div class="ttl">' + esc(t.title) + '</div>'
+        + '<div class="cnt">' + n + ' stop' + (n === 1 ? '' : 's') + '</div>'
+        + (t.description ? '<div class="sum" style="font-size:13.5px; color:var(--mist)">' + esc(t.description) + '</div>' : '')
+        + '<div class="row" style="margin-top:10px">'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" data-edit="' + i + '">Edit</button>'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" data-remove="' + i + '">Remove</button>'
+        + '</div></div>';
+    }).join('');
+    wrap.querySelectorAll('[data-edit]').forEach(function(btn){
+      btn.onclick = function(){ tourEdit(parseInt(btn.getAttribute('data-edit'), 10)); };
+    });
+    wrap.querySelectorAll('[data-remove]').forEach(function(btn){
+      btn.onclick = function(){ tourRemove(parseInt(btn.getAttribute('data-remove'), 10)); };
+    });
+  }
+
+  function tourPopulate(){
+    tourInitMap();
+    tourRenderStops();
+    tourUpdateStopCoordsLabel();
+    tourStopRenderImageZone();
+    tourStopRenderAudioZone();
+    tourCloudPull().then(function(list){ tourList = list; tourRenderList(); });
+  }
+
+  // ---- Coupon Partners ----
+  var COUPON_CLOUD_KEY = 'coupon_offers';
+  var COUPON_ADMIN_PIN = HL_ADMIN_PIN; // same admin PIN used for the other Supabase-backed content
+  var PLACES_CLOUD_KEY = 'places_items';
+  var PLACES_ADMIN_PIN = HL_ADMIN_PIN; // matches places.html's own PLACES_ADMIN_PIN
+
+  // Redemption counts come from a public view (coupon_redemption_counts) over
+  // the locked-down coupon_redemptions table — see coupon-redemption-limits-setup.sql.
+  function couponCountsPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/coupon_redemption_counts?select=coupon_id,redeemed_count', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : []; })
+      .then(function(rows){
+        var map = {};
+        (rows || []).forEach(function(r){ map[r.coupon_id] = r.redeemed_count; });
+        return map;
+      }).catch(function(err){ console.warn('[cloud] coupon counts pull failed:', err); return {}; });
+  }
+
+  function couponCloudPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(COUPON_CLOUD_KEY) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : []; })
+      .catch(function(err){ console.warn('[cloud] coupons pull failed:', err); return []; });
+  }
+  function couponCloudPush(list){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: COUPON_ADMIN_PIN, p_key: COUPON_CLOUD_KEY, p_data: list })
+    }).then(function(res){
+      if (!res.ok) console.warn('[cloud] coupons push failed:', res.status);
+      return res.ok;
+    }).catch(function(err){ console.warn('[cloud] coupons push failed:', err); return false; });
+  }
+
+  // Read-only pull of the Places list, used to (a) populate the business
+  // picker without retyping business names, and (b) flag couponPartner on
+  // the matching business record when a coupon is first published for it.
+  function couponPlacesPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(PLACES_CLOUD_KEY) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : []; })
+      .catch(function(err){ console.warn('[cloud] places pull failed:', err); return []; });
+  }
+
+  function couponBuildBusinessSelect(){
+    var sel = document.getElementById('couponBusiness');
+    var names = couponPlacesList.map(function(p){ return p.title; }).filter(Boolean).sort(function(a, b){ return a.localeCompare(b); });
+    sel.innerHTML = '<option value="">Choose a business&hellip;</option>' + names.map(function(n){ return '<option value="' + esc(n) + '">' + esc(n) + '</option>'; }).join('');
+  }
+
+  // Flags the matching business as a Coupon Partner (fire-and-forget — the
+  // coupon itself already saved successfully by the time this runs, so a
+  // failure here just gets logged rather than blocking the admin's save).
+  function couponFlagPartner(businessName){
+    var idx = couponPlacesList.findIndex(function(p){ return p.title === businessName; });
+    if (idx === -1) return;
+    if (couponPlacesList[idx].couponPartner && couponPlacesList[idx].couponPartner.active) return;
+    var next = couponPlacesList.slice();
+    next[idx] = Object.assign({}, next[idx], {
+      couponPartner: {
+        active: true,
+        subscribedSince: (next[idx].couponPartner && next[idx].couponPartner.subscribedSince) || new Date().toISOString()
+      }
+    });
+    fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: PLACES_ADMIN_PIN, p_key: PLACES_CLOUD_KEY, p_data: next })
+    }).then(function(res){
+      if (res.ok) couponPlacesList = next;
+      else console.warn('[cloud] could not flag Coupon Partner on places_items:', res.status);
+    }).catch(function(err){ console.warn('[cloud] could not flag Coupon Partner on places_items:', err); });
+  }
+
+  // Fires the same instant push send-push.js already expects from a real
+  // Supabase DB webhook — calling it directly here means you don't have to
+  // set one up in the Supabase dashboard.
+  function couponFirePush(businessName){
+    fetch('/.netlify/functions/send-push?topic=coupon_offers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ record: { business_name: businessName } })
+    }).catch(function(err){ console.warn('[push] coupon push failed to fire:', err); });
+  }
+
+  var couponList = [];
+  var couponPlacesList = [];
+  var couponCounts = {};
+  var couponEditIndex = null;
+  var couponImageUrl = '';
+
+  function couponRenderImageZone(){
+    var zone = document.getElementById('couponImageZone');
+    zone.innerHTML = couponImageUrl
+      ? '<img class="preview-img" src="' + esc(couponImageUrl) + '"><div style="margin-top:8px; font-size:12.5px; color:var(--gold)">Tap to replace</div>'
+      : '📷 Tap to upload a photo';
+  }
+
+  function couponUploadFile(e){
+    var file = e.target.files[0];
+    if (!file) return;
+    var sizeMB = file.size / (1024 * 1024);
+    if (sizeMB > 25){ alert('This file is ' + sizeMB.toFixed(1) + 'MB, which is too large. Try a smaller file.'); e.target.value = ''; return; }
+
+    note(document.getElementById('couponNote'), 'Uploading ' + file.name + '...', true);
+    fileToDataURL(file).then(function(dataUrl){
+      return cloudUploadMedia(dataUrl, 'coupon-image');
+    }).then(function(url){
+      couponImageUrl = url; couponRenderImageZone();
+      note(document.getElementById('couponNote'), 'Uploaded — remember to save.', true);
+    }).catch(function(err){
+      note(document.getElementById('couponNote'), 'Upload failed: ' + (err.message || err), false);
+    }).finally(function(){
+      e.target.value = '';
+    });
+  }
+
+  // Free-text name wins over the dropdown, so typing a new business name
+  // works even for one that isn't in Places at all.
+  function couponResolveBusinessName(){
+    var typed = (document.getElementById('couponBusinessOther').value || '').trim();
+    return typed || document.getElementById('couponBusiness').value;
+  }
+  // Keep the two inputs from disagreeing silently — picking one clears the other.
+  document.getElementById('couponBusiness').addEventListener('change', function(){
+    if (this.value) document.getElementById('couponBusinessOther').value = '';
+  });
+  document.getElementById('couponBusinessOther').addEventListener('input', function(){
+    if (this.value.trim()) document.getElementById('couponBusiness').selectedIndex = 0;
+  });
+
+  function couponClearForm(){
+    document.getElementById('couponBusiness').selectedIndex = 0;
+    document.getElementById('couponBusinessOther').value = '';
+    document.getElementById('couponDiscount').value = '';
+    document.getElementById('couponDesc').value = '';
+    document.getElementById('couponLocation').value = '';
+    document.getElementById('couponEmail').value = '';
+    document.getElementById('couponWebsite').value = '';
+    document.getElementById('couponSponsor').selectedIndex = 0;
+    document.getElementById('couponExpires').value = '';
+    document.getElementById('couponLimit').value = '';
+    document.getElementById('couponActive').checked = true;
+    couponImageUrl = '';
+    couponRenderImageZone();
+    couponEditIndex = null;
+    document.getElementById('couponSave').textContent = 'Save & publish';
+  }
+
+  document.getElementById('couponSave').onclick = function(){
+    var businessName = couponResolveBusinessName();
+    var discountText = (document.getElementById('couponDiscount').value || '').trim();
+    var description = (document.getElementById('couponDesc').value || '').trim();
+    var location = (document.getElementById('couponLocation').value || '').trim();
+    var email = (document.getElementById('couponEmail').value || '').trim();
+    var website = (document.getElementById('couponWebsite').value || '').trim();
+    if (website && !/^https?:\/\//i.test(website)) website = 'https://' + website;
+    var sponsorOrg = document.getElementById('couponSponsor').value || '';
+    var expiresAt = document.getElementById('couponExpires').value || '';
+    var limitRaw = (document.getElementById('couponLimit').value || '').trim();
+    var limit = limitRaw ? parseInt(limitRaw, 10) : null;
+    var active = document.getElementById('couponActive').checked;
+
+    if (!businessName){ note(document.getElementById('couponNote'), 'Pick a business, or type a name, first.', false); return; }
+    if (!discountText){ note(document.getElementById('couponNote'), 'Enter the discount/offer text.', false); return; }
+    if (limitRaw && (isNaN(limit) || limit <= 0)){ note(document.getElementById('couponNote'), 'Claim limit should be a positive number, or left blank for unlimited.', false); return; }
+
+    var wasActiveBefore = couponEditIndex != null ? !!couponList[couponEditIndex].active : false;
+    var entry = {
+      id: couponEditIndex != null ? couponList[couponEditIndex].id : ('cp-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8)),
+      businessName: businessName,
+      discountText: discountText,
+      description: description,
+      location: location,
+      email: email,
+      website: website,
+      sponsorOrg: sponsorOrg,
+      image: couponImageUrl,
+      expiresAt: expiresAt,
+      limit: limit,
+      active: active,
+      createdAt: couponEditIndex != null ? couponList[couponEditIndex].createdAt : new Date().toISOString()
+    };
+
+    var next = couponList.slice();
+    if (couponEditIndex != null) next[couponEditIndex] = entry; else next.push(entry);
+
+    note(document.getElementById('couponNote'), 'Saving...', true);
+    couponCloudPush(next).then(function(ok){
+      if (!ok){ note(document.getElementById('couponNote'), 'Publishing failed. Check your connection and try again.', false); return; }
+      couponList = next;
+      couponRenderList();
+      couponFlagPartner(businessName);
+      if (active && !wasActiveBefore) couponFirePush(businessName);
+      note(document.getElementById('couponNote'), 'Saved — live on the Coupons page now.', true);
+      couponClearForm();
+    });
+  };
+
+  function couponEdit(i){
+    var item = couponList[i];
+    var inPlaces = couponPlacesList.some(function(p){ return p.title === item.businessName; });
+    document.getElementById('couponBusiness').value = inPlaces ? (item.businessName || '') : '';
+    document.getElementById('couponBusinessOther').value = inPlaces ? '' : (item.businessName || '');
+    document.getElementById('couponDiscount').value = item.discountText || '';
+    document.getElementById('couponDesc').value = item.description || '';
+    document.getElementById('couponLocation').value = item.location || '';
+    document.getElementById('couponEmail').value = item.email || '';
+    document.getElementById('couponWebsite').value = item.website || '';
+    document.getElementById('couponSponsor').value = item.sponsorOrg || '';
+    document.getElementById('couponExpires').value = item.expiresAt || '';
+    document.getElementById('couponLimit').value = item.limit ? String(item.limit) : '';
+    document.getElementById('couponActive').checked = !!item.active;
+    couponImageUrl = item.image || '';
+    couponRenderImageZone();
+    couponEditIndex = i;
+    document.getElementById('couponSave').textContent = 'Update coupon';
+    document.getElementById('couponBusiness').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function couponRemove(i){
+    var next = couponList.slice(0, i).concat(couponList.slice(i + 1));
+    note(document.getElementById('couponNote'), 'Removing...', true);
+    couponCloudPush(next).then(function(ok){
+      note(document.getElementById('couponNote'), ok ? 'Removed.' : 'Couldn’t save that — check your connection and try again.', ok);
+      if (ok){ couponList = next; couponRenderList(); }
+    });
+  }
+
+  function couponRenderList(){
+    var wrap = document.getElementById('couponList');
+    if (!couponList.length){ wrap.innerHTML = '<p class="muted" style="margin:0">No coupons yet.</p>'; return; }
+    wrap.innerHTML = couponList.map(function(item, i){
+      var claimed = couponCounts[item.id] || 0;
+      var claimLine = item.limit
+        ? '<div class="sum">' + claimed + ' of ' + item.limit + ' claimed' + (claimed >= item.limit ? ' — limit reached' : '') + '</div>'
+        : '<div class="sum">' + claimed + ' claimed (no limit set)</div>';
+      return '<div class="mloc-item">'
+        + '<div class="ttl">' + esc(item.businessName) + (item.active ? '' : ' <span style="color:var(--mist);font-weight:400">(hidden)</span>') + '</div>'
+        + '<div class="cat">' + esc(item.discountText) + '</div>'
+        + claimLine
+        + (item.expiresAt ? '<div class="sum">Expires ' + esc(item.expiresAt) + '</div>' : '')
+        + (item.sponsorOrg ? '<div class="sum">Sponsored by ' + esc(item.sponsorOrg) + '</div>' : '')
+        + (item.email ? '<div class="sum">Email: ' + esc(item.email) + '</div>' : '')
+        + (item.website ? '<div class="sum">Website: ' + esc(item.website) + '</div>' : '')
+        + '<div class="row" style="margin-top:10px">'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" data-edit="' + i + '">Edit</button>'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" data-remove="' + i + '">Remove</button>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+    wrap.querySelectorAll('[data-edit]').forEach(function(btn){
+      btn.onclick = function(){ couponEdit(parseInt(btn.getAttribute('data-edit'), 10)); };
+    });
+    wrap.querySelectorAll('[data-remove]').forEach(function(btn){
+      btn.onclick = function(){ couponRemove(parseInt(btn.getAttribute('data-remove'), 10)); };
+    });
+  }
+
+  function couponPopulate(){
+    couponRenderImageZone();
+    couponPlacesPull().then(function(list){ couponPlacesList = list; couponBuildBusinessSelect(); });
+    couponCloudPull().then(function(list){ couponList = list; couponRenderList(); });
+    couponCountsPull().then(function(map){ couponCounts = map; couponRenderList(); });
+  }
+
+  // ---- Sponsor Organizations ----
+  // Nonprofits/youth groups that refer businesses to Coupon Partner. Each
+  // gets a short "code" used in the public signup link (coupon-signup.html?ref=<code>)
+  // so a business scanning that group's card/QR arrives with the sponsor
+  // already locked in — no dropdown for them to get wrong.
+  var SPONSOR_CLOUD_KEY = 'coupon_sponsor_orgs';
+  var SPONSOR_ADMIN_PIN = HL_ADMIN_PIN;
+  var sponsorOrgsList = [];
+
+  function sponsorCloudPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(SPONSOR_CLOUD_KEY) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : []; })
+      .catch(function(err){ console.warn('[cloud] sponsor orgs pull failed:', err); return []; });
+  }
+  function sponsorCloudPush(list){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: SPONSOR_ADMIN_PIN, p_key: SPONSOR_CLOUD_KEY, p_data: list })
+    }).then(function(res){
+      if (!res.ok) console.warn('[cloud] sponsor orgs push failed:', res.status);
+      return res.ok;
+    }).catch(function(err){ console.warn('[cloud] sponsor orgs push failed:', err); return false; });
+  }
+
+  function sponsorSlugify(name){
+    var base = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 24) || 'group';
+    var code = base, n = 2;
+    while (sponsorOrgsList.some(function(o){ return o.code === code; })){ code = base + '-' + n; n++; }
+    return code;
+  }
+
+  function sponsorSignupUrl(code){
+    return window.location.origin + '/coupon-signup.html?ref=' + encodeURIComponent(code);
+  }
+
+  function sponsorBuildSelects(){
+    var active = sponsorOrgsList.filter(function(o){ return o.active !== false; });
+    var opts = active.map(function(o){ return '<option value="' + esc(o.name) + '">' + esc(o.name) + '</option>'; }).join('');
+    document.getElementById('couponSponsor').innerHTML = '<option value="">No sponsor</option>' + opts;
+  }
+
+  function sponsorRenderList(){
+    var wrap = document.getElementById('sponsorList');
+    if (!sponsorOrgsList.length){ wrap.innerHTML = '<p class="muted" style="margin:0">No sponsor organizations yet.</p>'; return; }
+    wrap.innerHTML = sponsorOrgsList.map(function(o, i){
+      return '<div class="mloc-item">'
+        + '<div class="ttl">' + esc(o.name) + (o.active === false ? ' <span style="color:var(--mist);font-weight:400">(inactive)</span>' : '') + '</div>'
+        + '<div class="sum" style="word-break:break-all">' + esc(sponsorSignupUrl(o.code)) + '</div>'
+        + '<div class="row" style="margin-top:10px">'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" data-copy="' + i + '">Copy signup link</button>'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" data-toggle="' + i + '">' + (o.active === false ? 'Reactivate' : 'Deactivate') + '</button>'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" data-remove="' + i + '">Remove</button>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+
+    wrap.querySelectorAll('[data-copy]').forEach(function(btn){
+      btn.onclick = function(){
+        var o = sponsorOrgsList[parseInt(btn.getAttribute('data-copy'), 10)];
+        var url = sponsorSignupUrl(o.code);
+        var done = function(ok){ note(document.getElementById('sponsorNote'), ok ? 'Link copied — put this on ' + o.name + '’s cards/QR code.' : 'Couldn’t copy automatically — link shown above, copy it by hand.', ok); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function(){ done(true); }).catch(function(){ done(false); });
+        else done(false);
+      };
+    });
+    wrap.querySelectorAll('[data-toggle]').forEach(function(btn){
+      btn.onclick = function(){
+        var i = parseInt(btn.getAttribute('data-toggle'), 10);
+        var next = sponsorOrgsList.slice();
+        next[i] = Object.assign({}, next[i], { active: next[i].active === false ? true : false });
+        note(document.getElementById('sponsorNote'), 'Saving...', true);
+        sponsorCloudPush(next).then(function(ok){
+          note(document.getElementById('sponsorNote'), ok ? 'Saved.' : 'Couldn’t save that — check your connection and try again.', ok);
+          if (ok){ sponsorOrgsList = next; sponsorRenderList(); sponsorBuildSelects(); }
+        });
+      };
+    });
+    wrap.querySelectorAll('[data-remove]').forEach(function(btn){
+      btn.onclick = function(){
+        var i = parseInt(btn.getAttribute('data-remove'), 10);
+        var next = sponsorOrgsList.slice(0, i).concat(sponsorOrgsList.slice(i + 1));
+        note(document.getElementById('sponsorNote'), 'Removing...', true);
+        sponsorCloudPush(next).then(function(ok){
+          note(document.getElementById('sponsorNote'), ok ? 'Removed.' : 'Couldn’t save that — check your connection and try again.', ok);
+          if (ok){ sponsorOrgsList = next; sponsorRenderList(); sponsorBuildSelects(); }
+        });
+      };
+    });
+  }
+
+  document.getElementById('sponsorAdd').onclick = function(){
+    var name = (document.getElementById('sponsorName').value || '').trim();
+    if (!name){ note(document.getElementById('sponsorNote'), 'Enter an organization name first.', false); return; }
+    var next = sponsorOrgsList.concat([{ code: sponsorSlugify(name), name: name, active: true }]);
+    note(document.getElementById('sponsorNote'), 'Saving...', true);
+    sponsorCloudPush(next).then(function(ok){
+      note(document.getElementById('sponsorNote'), ok ? 'Added — copy its signup link below.' : 'Couldn’t save that — check your connection and try again.', ok);
+      if (ok){ sponsorOrgsList = next; sponsorRenderList(); sponsorBuildSelects(); document.getElementById('sponsorName').value = ''; }
+    });
+  };
+
+  function sponsorPopulate(){
+    sponsorCloudPull().then(function(list){ sponsorOrgsList = list; sponsorRenderList(); sponsorBuildSelects(); });
+  }
+
+  // ---- Coupon Signups (pending self-serve review queue) ----
+  // A business fills out coupon-signup.html itself and lands here as a
+  // pending item — nothing publishes until you Approve & publish (after
+  // confirming the Stripe payment came in), same manual-confirm step you
+  // already use everywhere else on this site.
+  var COUPON_SIGNUPS_KEY = 'coupon_signup_requests';
+  var COUPON_SIGNUPS_PIN = HL_ADMIN_PIN;
+  var couponSignupsList = [];
+
+  function couponSignupsCloudPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(COUPON_SIGNUPS_KEY) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : []; })
+      .catch(function(err){ console.warn('[cloud] coupon signups pull failed:', err); return []; });
+  }
+  function couponSignupsCloudPush(list){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: COUPON_SIGNUPS_PIN, p_key: COUPON_SIGNUPS_KEY, p_data: list })
+    }).then(function(res){
+      if (!res.ok) console.warn('[cloud] coupon signups push failed:', res.status);
+      return res.ok;
+    }).catch(function(err){ console.warn('[cloud] coupon signups push failed:', err); return false; });
+  }
+
+  function couponSignupsRender(){
+    var wrap = document.getElementById('couponSignupList');
+    if (!couponSignupsList.length){ wrap.innerHTML = '<p class="muted" style="margin:0">No pending coupon signups.</p>'; return; }
+    wrap.innerHTML = couponSignupsList.map(function(r, i){
+      var when = r.submittedAt ? new Date(r.submittedAt).toLocaleDateString() : '';
+      return '<div style="border:1px solid var(--line); border-radius:11px; padding:12px 13px; margin-bottom:10px">'
+        + '<div style="font-weight:700; font-size:15px">' + esc(r.businessName) + '</div>'
+        + '<div class="muted" style="margin:2px 0 6px">' + (when ? 'Submitted ' + when : '') + (r.sponsorOrg ? ' &middot; sponsored by ' + esc(r.sponsorOrg) : '') + '</div>'
+        + '<div style="font-size:13.5px; margin-bottom:3px">' + esc(r.discountText) + '</div>'
+        + (r.location ? '<div style="font-size:13px; color:var(--mist); margin-bottom:3px">📍 ' + esc(r.location) + '</div>' : '')
+        + (r.expiresAt ? '<div style="font-size:13px; color:var(--mist); margin-bottom:3px">Expires ' + esc(r.expiresAt) + '</div>' : '')
+        + (r.limit ? '<div style="font-size:13px; color:var(--mist); margin-bottom:3px">Limit: ' + esc(String(r.limit)) + '</div>' : '')
+        + (r.billingPeriod ? '<div style="font-size:13px; color:var(--mist); margin-bottom:3px">Billing: ' + (r.billingPeriod === 'annual' ? '$200/yr' : '$20/mo') + '</div>' : '')
+        + '<div style="font-size:13px; color:var(--gold)">' + esc(r.contact) + '</div>'
+        + '<div class="row" style="margin-top:10px">'
+        +   '<button class="btn" style="margin-top:0" type="button" data-approve="' + i + '">Approve &amp; publish</button>'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" data-reject="' + i + '">Reject</button>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+
+    wrap.querySelectorAll('[data-approve]').forEach(function(btn){
+      btn.onclick = function(){
+        var idx = parseInt(btn.getAttribute('data-approve'), 10);
+        var r = couponSignupsList[idx];
+        var nextPending = couponSignupsList.slice(0, idx).concat(couponSignupsList.slice(idx + 1));
+        note(document.getElementById('couponSignupNote'), 'Publishing...', true);
+        couponCloudPull().then(function(live){
+          var published = {
+            id: r.id || ('cp-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8)),
+            editToken: r.editToken || '',
+            businessName: r.businessName,
+            discountText: r.discountText,
+            description: '',
+            location: r.location || '',
+            website: r.website || '',
+            email: r.email || '',
+            sponsorOrg: r.sponsorOrg || '',
+            image: '',
+            expiresAt: r.expiresAt || '',
+            limit: r.limit || null,
+            active: true,
+            createdAt: new Date().toISOString()
+          };
+          var nextLive = live.concat([published]);
+          couponCloudPush(nextLive).then(function(okLive){
+            if (!okLive){ note(document.getElementById('couponSignupNote'), 'Couldn’t publish — check your connection and try again.', false); return; }
+            couponList = nextLive;
+            couponRenderList();
+            couponFlagPartner(r.businessName);
+            couponFirePush(r.businessName);
+            couponSignupsCloudPush(nextPending).then(function(okPending){
+              note(document.getElementById('couponSignupNote'), okPending ? 'Published — live on the Coupons page now.' : 'Published, but couldn’t clear it from the queue — refresh to check.', true);
+              if (okPending){ couponSignupsList = nextPending; couponSignupsRender(); }
+            });
+          });
+        });
+      };
+    });
+    wrap.querySelectorAll('[data-reject]').forEach(function(btn){
+      btn.onclick = function(){
+        var idx = parseInt(btn.getAttribute('data-reject'), 10);
+        var next = couponSignupsList.slice(0, idx).concat(couponSignupsList.slice(idx + 1));
+        note(document.getElementById('couponSignupNote'), 'Rejecting...', true);
+        couponSignupsCloudPush(next).then(function(ok){
+          note(document.getElementById('couponSignupNote'), ok ? 'Rejected.' : 'Couldn’t save that — check your connection and try again.', ok);
+          if (ok){ couponSignupsList = next; couponSignupsRender(); }
+        });
+      };
+    });
+  }
+
+  function loadCouponSignups(){
+    couponSignupsCloudPull().then(function(list){ couponSignupsList = list; couponSignupsRender(); });
+  }
+
+  // ---- Placement Signups (Top Pick / Featured / Ambassador pending review queue) ----
+  // A business fills out placement-signup.html (either picking their existing
+  // Places listing or entering a brand-new one) and lands here as a pending
+  // item. Approve either bumps an existing places_items entry's tier, or
+  // creates a new places_items entry with that tier already set.
+  var PLACEMENT_SIGNUPS_KEY = 'placement_signup_requests';
+  var PLACEMENT_SIGNUPS_PIN = HL_ADMIN_PIN;
+  var placementSignupsList = [];
+  var TIER_LABELS = { topPick: 'Top Pick', featured: 'Featured', ambassador: 'Ambassador' };
+
+  function placementSignupsCloudPull(){
+    return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(PLACEMENT_SIGNUPS_KEY) + '&select=data', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(rows){ return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : []; })
+      .catch(function(err){ console.warn('[cloud] placement signups pull failed:', err); return []; });
+  }
+  function placementSignupsCloudPush(list){
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_pin: PLACEMENT_SIGNUPS_PIN, p_key: PLACEMENT_SIGNUPS_KEY, p_data: list })
+    }).then(function(res){
+      if (!res.ok) console.warn('[cloud] placement signups push failed:', res.status);
+      return res.ok;
+    }).catch(function(err){ console.warn('[cloud] placement signups push failed:', err); return false; });
+  }
+
+  function placementSignupsRender(){
+    var wrap = document.getElementById('placementSignupList');
+    if (!placementSignupsList.length){ wrap.innerHTML = '<p class="muted" style="margin:0">No pending placement signups.</p>'; return; }
+    wrap.innerHTML = placementSignupsList.map(function(r, i){
+      var when = r.submittedAt ? new Date(r.submittedAt).toLocaleDateString() : '';
+      var tierLabel = TIER_LABELS[r.tier] || r.tier;
+      var billing = r.billingPeriod === 'annual' ? 'Annual' : (r.billingPeriod === 'oneTime' ? 'One-time' : 'Monthly');
+      var name = r.mode === 'existing' ? r.businessName : (r.newListing && r.newListing.title);
+      var ad = r.adContent || {};
+      return '<div style="border:1px solid var(--line); border-radius:11px; padding:12px 13px; margin-bottom:10px">'
+        + '<div style="font-weight:700; font-size:15px">' + esc(name || '(no name)') + '</div>'
+        + '<div class="muted" style="margin:2px 0 6px">' + (when ? 'Submitted ' + when : '') + ' &middot; ' + esc(tierLabel) + ' &middot; ' + billing + '</div>'
+        + '<div style="font-size:13px; color:var(--mist); margin-bottom:3px">Category: ' + esc(r.category || '') + '</div>'
+        + '<div style="font-size:13px; color:var(--mist); margin-bottom:3px">' + (r.mode === 'existing' ? 'Boosting an existing listing' : 'New business &mdash; needs a listing created') + '</div>'
+        + (ad.description ? '<div style="font-size:13px; color:var(--mist); margin-bottom:3px">' + esc(ad.description) + '</div>' : '')
+        + (ad.website ? '<div style="font-size:13px; color:var(--mist); margin-bottom:3px">Website: ' + esc(ad.website) + '</div>' : '')
+        + (ad.image ? '<div style="margin-bottom:6px"><img src="' + esc(ad.image) + '" style="max-width:160px; border-radius:8px; display:block"></div>' : '')
+        + '<div style="font-size:13px; color:var(--gold)">' + esc(r.contact || '') + '</div>'
+        + '<div class="row" style="margin-top:10px">'
+        +   '<button class="btn" style="margin-top:0" type="button" data-approve="' + i + '">Approve &amp; publish</button>'
+        +   '<button class="btn ghost" style="margin-top:0" type="button" data-reject="' + i + '">Reject</button>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+
+    wrap.querySelectorAll('[data-approve]').forEach(function(btn){
+      btn.onclick = function(){
+        var idx = parseInt(btn.getAttribute('data-approve'), 10);
+        var r = placementSignupsList[idx];
+        var nextPending = placementSignupsList.slice(0, idx).concat(placementSignupsList.slice(idx + 1));
+        note(document.getElementById('placementSignupNote'), 'Publishing...', true);
+        couponPlacesPull().then(function(live){
+          var next;
+          var ad = r.adContent || {};
+          if (r.mode === 'existing'){
+            var pos = live.findIndex(function(p){ return p.title === r.businessName; });
+            if (pos === -1){
+              note(document.getElementById('placementSignupNote'), 'Couldn\u2019t find that business in Places anymore \u2014 check the name and update it manually.', false);
+              return;
+            }
+            next = live.slice();
+            var updated = Object.assign({}, next[pos], { tier: TIER_LABELS[r.tier] || 'Standard' });
+            if (ad.description) { updated.details = ad.description; updated.summary = ad.summary || updated.summary || ad.description; }
+            if (ad.website) updated.website = ad.website;
+            if (ad.image) updated.map = ad.image;
+            next[pos] = updated;
+          } else {
+            var nl = r.newListing || {};
+            var entry = {
+              title: nl.title || '(untitled)',
+              category: r.category || 'Other',
+              tier: TIER_LABELS[r.tier] || 'Standard',
+              onNow: false, notify: false, notifyLabel: '',
+              website: ad.website || '',
+              summary: ad.description || '',
+              details: ad.description || '',
+              button: 'Official / Source',
+              map: ad.image || '',
+              location: 'Fort McMurray Wood Buffalo',
+              phone: ''
+            };
+            next = live.concat([entry]);
+          }
+          fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+            method: 'POST',
+            headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ p_pin: PLACES_ADMIN_PIN, p_key: PLACES_CLOUD_KEY, p_data: next })
+          }).then(function(okLiveRes){
+            if (!okLiveRes.ok){ note(document.getElementById('placementSignupNote'), 'Couldn\u2019t publish \u2014 check your connection and try again.', false); return; }
+            couponPlacesList = next;
+            placementSignupsCloudPush(nextPending).then(function(okPending){
+              note(document.getElementById('placementSignupNote'), okPending ? 'Published \u2014 live in Places now.' : 'Published, but couldn\u2019t clear it from the queue \u2014 refresh to check.', true);
+              if (okPending){ placementSignupsList = nextPending; placementSignupsRender(); }
+            });
+          });
+        });
+      };
+    });
+    wrap.querySelectorAll('[data-reject]').forEach(function(btn){
+      btn.onclick = function(){
+        var idx = parseInt(btn.getAttribute('data-reject'), 10);
+        var next = placementSignupsList.slice(0, idx).concat(placementSignupsList.slice(idx + 1));
+        note(document.getElementById('placementSignupNote'), 'Rejecting...', true);
+        placementSignupsCloudPush(next).then(function(ok){
+          note(document.getElementById('placementSignupNote'), ok ? 'Rejected.' : 'Couldn\u2019t save that \u2014 check your connection and try again.', ok);
+          if (ok){ placementSignupsList = next; placementSignupsRender(); }
+        });
+      };
+    });
+  }
+
+  function loadPlacementSignups(){
+    placementSignupsCloudPull().then(function(list){ placementSignupsList = list; placementSignupsRender(); });
+  }
+
+  // If unlocked elsewhere this session, skip the PIN gate
+  if (window.BTH && BTH.isAdminUnlocked()){
+    document.getElementById('gate').classList.add('hide');
+    document.getElementById('panel').classList.remove('hide');
+    document.getElementById('panel2').classList.remove('hide');
+    document.getElementById('panel3').classList.remove('hide');
+    document.getElementById('panel4').classList.remove('hide');
+    document.getElementById('panel5').classList.remove('hide');
+    document.getElementById('panel5b').classList.remove('hide');
+    document.getElementById('panel6').classList.remove('hide');
+    document.getElementById('panel7').classList.remove('hide');
+    document.getElementById('panel8').classList.remove('hide');
+    document.getElementById('panel9').classList.remove('hide');
+    document.getElementById('panel10').classList.remove('hide');
+    document.getElementById('panel11').classList.remove('hide');
+    document.getElementById('panel12').classList.remove('hide');
+    document.getElementById('panel13').classList.remove('hide');
+    document.getElementById('panel15').classList.remove('hide');
+    document.getElementById('panel18').classList.remove('hide');
+    document.getElementById('panel19').classList.remove('hide');
+    document.getElementById('panel20').classList.remove('hide');
+    document.getElementById('panel21').classList.remove('hide');
+      document.getElementById('panel22').classList.remove('hide');
+    loadListingRequests();
+    loadRecommendations();
+    loadPlaceEdits();
+    loadLbizEdits();
+    document.getElementById('tip').value = BTH.getSettings().tip25 || '';
+    hlPopulate();
+    cbPopulate();
+    aePopulate();
+    mapPopulate();
+    lhPopulate();
+    onPopulate();
+    fpPopulate();
+    lnPopulate();
+    lnTilePopulate();
+    mlocPopulate();
+    tourPopulate();
+    sponsorPopulate();
+    couponPopulate();
+    loadCouponSignups();
+  }
+</script>
+<script src="visitor-tracker.js" defer></script>
+</body>
+</html>

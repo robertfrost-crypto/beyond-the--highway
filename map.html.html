@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Beyond the Highway — Map (Section Filter Test)</title>
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; width: 100%; overflow: hidden; overscroll-behavior: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  #map { position: absolute; inset: 0; }
+
+  .topbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 10;
+    padding: 14px 16px 8px;
+    background: linear-gradient(to bottom, rgba(20,40,50,0.8), rgba(20,40,50,0));
+    pointer-events: none;
+  }
+  .topbar h1 {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+  .topbar p {
+    color: rgba(255,255,255,0.85);
+    font-size: 11px;
+    margin-top: 2px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+
+  /* ---- Two-step chip nav ---- */
+  .chipRow {
+    position: absolute;
+    left: 0; right: 0;
+    z-index: 10;
+    display: flex;
+    gap: 8px;
+    padding: 0 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x;
+    scrollbar-width: none;
+  }
+  .chipRow::-webkit-scrollbar { display: none; }
+  .chipRow.sections { top: 56px; }
+  .chipRow.subcats { top: 100px; display: none; }
+  .chipRow.subcats.show { display: flex; }
+
+  .chip {
+    flex: 0 0 auto;
+    background: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2b6b4f;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .chip.active {
+    background: #ffcb3d;
+    color: #5a3d00;
+  }
+  .chip:active { transform: scale(0.95); }
+
+  .chipRow.subcats .chip {
+    padding: 6px 12px;
+    font-size: 12px;
+    background: rgba(255,255,255,0.92);
+  }
+  .chipRow.subcats .chip.active {
+    background: #6dd0a3;
+    color: #0f3322;
+  }
+
+  .card {
+    position: absolute;
+    left: 12px; right: 12px; bottom: 16px;
+    z-index: 10;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    padding: 14px 16px;
+    display: none;
+    align-items: center;
+    gap: 12px;
+  }
+  .card.show { display: flex; }
+  .card .icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: #ffe27a;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex: 0 0 auto;
+  }
+  .card .info { flex: 1; min-width: 0; }
+  .card .info .name { font-size: 15px; font-weight: 700; color: #1a3a2e; }
+  .card .info .cat { font-size: 10.5px; font-weight: 700; color: #6dd0a3; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 1px; }
+  .card .info .desc { font-size: 12px; color: #5f7a70; margin-top: 3px; line-height: 1.35; }
+  .card .go {
+    flex: 0 0 auto;
+    background: #2b6b4f;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .proxBanner {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translate(-50%, -140%);
+    z-index: 30;
+    background: #1a3a2e;
+    color: #fff;
+    border-radius: 999px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+    cursor: pointer;
+    max-width: 88%;
+    transition: transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+  .proxBanner.show { transform: translate(-50%, 0); }
+  .proxBanner .txt { font-size: 13.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .proxBanner .arrow { flex: 0 0 auto; font-size: 15px; }
+  .proxBanner .closeX {
+    flex: 0 0 auto;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  .pin {
+    width: 34px; height: 34px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+    cursor: pointer;
+    border: 2px solid #fff;
+  }
+  .pin span { transform: rotate(45deg); font-size: 15px; }
+
+  .note {
+    position: absolute;
+    left: 12px;
+    z-index: 9;
+    background: rgba(20,40,50,0.85);
+    color: #fff;
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    max-width: 240px;
+    line-height: 1.4;
+    transition: top 0.2s ease;
+  }
+  .note.narrow { top: 100px; }
+  .note.wide { top: 144px; }
+
+  .toursBtn {
+    background: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 14px;
+    flex: 0 0 auto;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a3a2e;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .toursBackdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 19;
+    background: rgba(0,0,0,0.01);
+    display: none;
+  }
+  .toursBackdrop.show { display: block; }
+
+  .toursPanel {
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 78%;
+    max-width: 300px;
+    background: #fff;
+    z-index: 20;
+    box-shadow: -6px 0 20px rgba(0,0,0,0.25);
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    padding: 60px 18px 18px;
+    overflow-y: auto;
+  }
+  .toursPanel.open { transform: translateX(0); }
+  .toursPanel h2 { font-size: 16px; color: #1a3a2e; margin-bottom: 4px; }
+  .toursPanel .sub { font-size: 12px; color: #6b8478; margin-bottom: 16px; }
+  .tourOption {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #f3faf4;
+    margin-bottom: 10px;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+  .tourOption.active { border-color: #35c07a; background: #e6f9ec; }
+  .tourOption .dot { width: 30px; height: 30px; border-radius: 50%; background: #35c07a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px; flex: 0 0 auto; }
+  .tourOption .t { flex: 1; }
+  .tourOption .t .n { font-size: 13.5px; font-weight: 700; color: #1a3a2e; }
+  .tourOption .t .d { font-size: 11.5px; color: #6b8478; margin-top: 1px; }
+  .closeTours {
+    position: absolute;
+    top: 14px; left: 14px;
+    background: #eef4f0;
+    border: none;
+    border-radius: 50%;
+    width: 32px; height: 32px;
+    font-size: 15px;
+    cursor: pointer;
+    color: #1a3a2e;
+  }
+
+  .stopNum {
+    background: #ff5d7a;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    position: absolute;
+    top: -6px; right: -6px;
+    border: 2px solid #fff;
+  }
+
+  .topLeftBtns {
+    position: absolute;
+    top: 14px; left: 14px;
+    z-index: 12;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .homeBtn {
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 38px; height: 38px;
+    flex: 0 0 auto;
+    font-size: 17px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #1a3a2e;
+    text-decoration: none;
+  }
+
+  .trailBtn {
+    background: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 14px;
+    flex: 0 0 auto;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a3a2e;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .trailBtn.recording { background: #ff5d7a; color: #fff; }
+  .trailBtn.recording .dotBlink { animation: blink 1s infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .startBtn {
+    background: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 14px;
+    flex: 0 0 auto;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a3a2e;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .startBtn.marked { background: #2b6b4f; color: #fff; }
+
+  .trailModal {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: rgba(20,40,50,0.75);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .trailModal.show { display: flex; }
+  .trailCard {
+    background: #fff;
+    border-radius: 18px;
+    padding: 18px;
+    max-width: 340px;
+    width: 100%;
+    text-align: center;
+  }
+  .trailCard h3 { color: #1a3a2e; font-size: 16px; margin-bottom: 10px; }
+  .trailCard img { width: 100%; border-radius: 12px; margin-bottom: 12px; border: 1px solid #eee; }
+  .trailCard .stats { font-size: 12px; color: #5f7a70; margin-bottom: 14px; }
+  .trailCard .row { display: flex; gap: 8px; }
+  .trailCard button {
+    flex: 1;
+    background: #2b6b4f; color: #fff; border: none;
+    border-radius: 10px; padding: 10px 12px; font-size: 13px; font-weight: 700;
+    cursor: pointer;
+  }
+  .trailCard button.secondary { background: #eef4f0; color: #1a3a2e; }
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<div class="chipRow sections" id="sectionChips"></div>
+<div class="chipRow subcats" id="subcatChips"></div>
+
+<div class="note narrow" id="note">Tap a section to narrow the map. Tap a pin to preview the card.</div>
+
+<button class="toursBtn" id="toursBtn">🥾 Tours</button>
+<div class="topLeftBtns">
+  <a class="homeBtn" href="index.html" title="Back to Beyond the Highway">‹</a>
+  <button class="trailBtn" id="trailBtn"><span class="dotBlink">⚪</span> Trace My Steps</button>
+  <button class="startBtn" id="startBtn">📍 Mark Start</button>
+</div>
+
+<div class="trailModal" id="trailModal">
+  <div class="trailCard">
+    <h3>Trail complete!</h3>
+    <img id="trailImg" src="" alt="Your walked trail">
+    <div class="stats" id="trailStats"></div>
+    <div class="row">
+      <button class="secondary" id="trailClose">Close</button>
+      <button id="trailDownload">Save Image</button>
+    </div>
+  </div>
+</div>
+
+<div class="toursBackdrop" id="toursBackdrop"></div>
+<div class="toursPanel" id="toursPanel">
+  <button class="closeTours" id="closeTours">✕</button>
+  <h2>Tours</h2>
+  <div class="sub">Pick a tour to draw its path on the map</div>
+  <div id="tourOptionsWrap"></div>
+</div>
+
+<div class="proxBanner" id="proxBanner">
+  <span class="txt" id="proxBannerText"></span>
+  <span class="arrow">→</span>
+  <span class="closeX" id="proxBannerClose">✕</span>
+</div>
+
+<div class="card" id="card">
+  <div class="icon" id="cardIcon">☕</div>
+  <div class="info">
+    <div class="cat" id="cardCat">Cafés</div>
+    <div class="name" id="cardName">Sample Café</div>
+    <img id="cardImage" style="display:none; width:100%; max-height:90px; object-fit:cover; border-radius:8px; margin:6px 0" alt="">
+    <div class="desc" id="cardDesc">Sample write-up text pulled from the listing.</div>
+    <audio id="cardAudio" controls style="display:none; width:100%; margin-top:6px; height:32px"></audio>
+  </div>
+  <button class="go" id="cardGo">Directions</button>
+</div>
+
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoiYmV5b25kdGhlaHd5IiwiYSI6ImNtczkwOXh0azBqbmsyeHB4NHNqanA1dG8ifQ.-kQIDXdfDz9OYH-J-nhvIA';
+
+/* ---- 7-section / subcategory structure, matching places.html's CAT_GROUPS ---- */
+/* (Realtors folded into Services; On Now added as its own 7th section) */
+const SECTIONS = [
+  { key: 'onnow', label: 'On Now', icon: '🎤', color: '#ff5d7a',
+    subcats: [
+      { key: 'This Week', icon: '🎤' }
+    ]
+  },
+  { key: 'food', label: 'Food & Drink', icon: '🍽️', color: '#ff9d3d',
+    subcats: [
+      { key: 'Fine Dining', icon: '🍷' },
+      { key: 'Restaurants', icon: '🍜' },
+      { key: 'Cafés', icon: '☕' },
+      { key: 'Fast Food', icon: '🍔' },
+      { key: 'Pizza & Donair', icon: '🍕' },
+      { key: 'Bars & Nightlife', icon: '🍺' }
+    ]
+  },
+  { key: 'family', label: 'Family & Fun', icon: '🎉', color: '#35c07a',
+    subcats: [
+      { key: 'Family Fun', icon: '🎠' },
+      { key: 'Theatres', icon: '🎭' },
+      { key: 'Museums', icon: '🏛️' },
+      { key: 'Festivals', icon: '🎪' },
+      { key: 'Parks & Playgrounds', icon: '🌳' },
+      { key: 'Spray Parks', icon: '💦' },
+      { key: 'Skate Parks', icon: '🛹' },
+      { key: 'Outdoor Rinks', icon: '⛸️' }
+    ]
+  },
+  { key: 'adventure', label: 'Adventure & Outdoors', icon: '🌲', color: '#2fb8a8',
+    subcats: [
+      { key: 'Lakes', icon: '🏞️' },
+      { key: 'Lakes & Outfitters', icon: '🛶' },
+      { key: 'Trails', icon: '🥾' },
+      { key: 'Winter', icon: '❄️' },
+      { key: 'Golf', icon: '⛳' },
+      { key: 'Provincial Parks', icon: '🌲' },
+      { key: 'Campgrounds', icon: '⛺' }
+    ]
+  },
+  { key: 'shopping', label: 'Shopping', icon: '🛍️', color: '#6a8bff',
+    subcats: [
+      { key: 'Sporting Goods', icon: '🏒' },
+      { key: 'Gift & Novelty', icon: '🎁' },
+      { key: 'Florists', icon: '💐' },
+      { key: 'Trophies & Engraving', icon: '🏆' },
+      { key: 'Art & Galleries', icon: '🎨' }
+    ]
+  },
+  { key: 'services', label: 'Services', icon: '🏦', color: '#8a7a5c',
+    subcats: [
+      { key: 'Grocery Stores', icon: '🛒' },
+      { key: 'Gas Stations', icon: '⛽' },
+      { key: 'Convenience Stores', icon: '🏪' },
+      { key: 'Pharmacies', icon: '💊' },
+      { key: 'Banks & ATMs', icon: '🏦' },
+      { key: 'Hospital & Health', icon: '🏥' },
+      { key: 'Realtors', icon: '🏠' }
+    ]
+  },
+  { key: 'travel', label: 'Travel & Stay', icon: '🏨', color: '#a35dff',
+    subcats: [
+      { key: 'Hotels & Stays', icon: '🏨' },
+      { key: 'Air Travel', icon: '✈️' },
+      { key: 'Taxis', icon: '🚕' }
+    ]
+  }
+];
+
+/* ---- Live data: pulled from the same Supabase places_items blob places.html uses ---- */
+const SUPABASE_URL = 'https://ceipylnjdidjqidamkpw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlaXB5bG5qZGlkanFpZGFta3B3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyOTQ1MjAsImV4cCI6MjA5ODg3MDUyMH0.TGZYRcjscN3ysRfTT5iHSl2pTOIhvMF6dCd-elm7L7g';
+
+async function loadPlacesFromSupabase() {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/bth_content?key=eq.places_items&select=data`,
+    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+  );
+  const rows = await res.json();
+  return rows.length ? rows[0].data : [];
+}
+
+// Map-only locations, added via the admin panel — pins that aren't full
+// places.html listings (a mural, a viewpoint, a tour stop, etc.).
+async function loadMapLocationsFromSupabase() {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/bth_content?key=eq.map_locations&select=data`,
+    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+  );
+  const rows = await res.json();
+  return rows.length ? rows[0].data : [];
+}
+
+// On Now venues have no saved coordinates — just a venue name and a Google
+// Maps search link — so they're geocoded by name each time the map loads.
+// On Now venues are matched by name against curated map-only locations
+// (flagged onNow: true in admin) rather than geocoded live — a raw venue
+// name alone isn't reliable enough to geocode correctly, and this way only
+// pre-approved regular venues ever get the On Now treatment.
+async function loadOnNowVenuesForMatching() {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/bth_content?key=eq.onnow_content&select=data`,
+    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+  );
+  const rows = await res.json();
+  return (rows.length && rows[0].data && Array.isArray(rows[0].data.venues)) ? rows[0].data.venues : [];
+}
+
+function findOnNowLineup(venueName, onNowVenues) {
+  const match = onNowVenues.find(v => (v.venue || '').trim().toLowerCase() === (venueName || '').trim().toLowerCase());
+  if (!match) return null;
+  const eventNames = (match.events || []).map(e => e.n).filter(Boolean);
+  return eventNames.length ? eventNames.join(' • ') : 'This week\u2019s lineup — tap to see details';
+}
+
+function findCategoryMeta(category) {
+  for (const sec of SECTIONS) {
+    const sub = sec.subcats.find(s => s.key === category);
+    if (sub) return { sectionKey: sec.key, icon: sub.icon };
+  }
+  return null;
+}
+
+// Only items that were successfully geocoded (have lat/lng) and whose
+// category matches one of the 7 sections get a pin. Anything else (skipped
+// activity entries, unmatched addresses) is silently left off the map.
+function transformItems(raw, onNowVenues) {
+  const out = [];
+  raw.forEach((item, idx) => {
+    if (!item.lat || !item.lng) return;
+    const meta = findCategoryMeta(item.category);
+    if (!meta) return;
+
+    const isOnNowVenue = !!item.onNow;
+    const lineup = isOnNowVenue ? findOnNowLineup(item.title, onNowVenues || []) : null;
+
+    out.push({
+      id: idx,
+      name: item.title,
+      section: meta.sectionKey,
+      cat: item.category,
+      icon: meta.icon,
+      lng: item.lng,
+      lat: item.lat,
+      desc: lineup || item.summary || '',
+      mapUrl: item.map || null,
+      isOnNowVenue: isOnNowVenue,
+      onNowUrl: isOnNowVenue ? 'onnow.html' : null,
+      notify: !!item.notify,
+      notifyLabel: item.notifyLabel || ''
+    });
+  });
+  return out;
+}
+
+// Same shape as transformItems, but for map-only locations (already have
+// lat/lng set directly by the admin form, no geocoding needed here).
+function transformMapLocations(raw, onNowVenues) {
+  const out = [];
+  raw.forEach((item, idx) => {
+    if (item.lat == null || item.lng == null) return;
+    const meta = findCategoryMeta(item.category);
+    if (!meta) return;
+
+    const isOnNowVenue = !!item.onNow;
+    const lineup = isOnNowVenue ? findOnNowLineup(item.title, onNowVenues || []) : null;
+
+    out.push({
+      id: 'mloc-' + idx,
+      name: item.title,
+      section: meta.sectionKey,
+      cat: item.category,
+      icon: meta.icon,
+      lng: item.lng,
+      lat: item.lat,
+      desc: lineup || item.summary || '',
+      mapUrl: item.map || null,
+      image: item.image || null,
+      audio: item.audio || null,
+      mapOnly: true,
+      isOnNowVenue: isOnNowVenue,
+      onNowUrl: isOnNowVenue ? 'onnow.html' : null,
+      notify: !!item.notify,
+      notifyLabel: item.notifyLabel || ''
+    });
+  });
+  return out;
+}
+
+let places = [];
+
+const markers = [];
+
+function sectionOf(key){ return SECTIONS.find(s => s.key === key); }
+
+let currentCardMapUrl = null;
+
+function showCard(place) {
+  document.getElementById('cardIcon').textContent = place.icon;
+  document.getElementById('cardName').textContent = place.name;
+  document.getElementById('cardCat').textContent = place.cat;
+  document.getElementById('cardDesc').textContent = place.desc;
+
+  const imgEl = document.getElementById('cardImage');
+  if (place.image) { imgEl.src = place.image; imgEl.style.display = 'block'; }
+  else { imgEl.style.display = 'none'; imgEl.removeAttribute('src'); }
+
+  const audioEl = document.getElementById('cardAudio');
+  if (place.audio) { audioEl.src = place.audio; audioEl.style.display = 'block'; }
+  else { audioEl.pause(); audioEl.style.display = 'none'; audioEl.removeAttribute('src'); }
+
+  const goBtn = document.getElementById('cardGo');
+  if (place.isOnNowVenue && place.onNowUrl) {
+    goBtn.textContent = '🎤 See who\u2019s playing';
+    currentCardMapUrl = place.onNowUrl;
+  } else {
+    goBtn.textContent = 'Directions';
+    currentCardMapUrl = place.mapUrl;
+  }
+  document.getElementById('card').classList.add('show');
+}
+
+document.getElementById('cardGo').addEventListener('click', () => {
+  if (currentCardMapUrl) window.location.href = currentCardMapUrl;
+});
+
+let map; // set after init below
+
+function buildPins() {
+  const alreadyBuilt = new Set(markers.map(m => m.id));
+  places.forEach(p => {
+    if (alreadyBuilt.has(p.id)) return;
+    try {
+      const sec = sectionOf(p.section);
+      if (!sec) {
+        console.warn('Skipping pin — unknown section for category:', p.cat, p.name);
+        return;
+      }
+      const el = document.createElement('div');
+      el.className = 'pin';
+      el.style.background = sec.color;
+      el.innerHTML = '<span>' + p.icon + '</span>';
+      el.addEventListener('click', () => showCard(p));
+      const marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
+        .setLngLat([p.lng, p.lat])
+        .addTo(map);
+      markers.push({ id: p.id, marker, section: p.section, extraSection: p.isOnNowVenue ? 'onnow' : null, cat: p.cat, el });
+    } catch (err) {
+      console.error('Failed to build pin for', p && p.name, err);
+    }
+  });
+}
+
+/* ---- Two-step section/subcategory nav ---- */
+let activeSection = null;
+let activeSubcat = null;
+
+function renderSectionChips() {
+  const row = document.getElementById('sectionChips');
+  row.innerHTML = '';
+  const allChip = document.createElement('button');
+  allChip.className = 'chip active';
+  allChip.textContent = 'All';
+  allChip.addEventListener('click', () => selectSection(null));
+  row.appendChild(allChip);
+
+  SECTIONS.forEach((sec, i) => {
+    const chip = document.createElement('button');
+    chip.className = 'chip';
+    chip.innerHTML = sec.icon + ' ' + sec.label;
+    chip.dataset.key = sec.key;
+    chip.addEventListener('click', () => selectSection(sec.key));
+    row.appendChild(chip);
+
+    // Tours button sits right after "On Now" (the first section) in the row
+    if (i === 0) {
+      row.appendChild(document.getElementById('toursBtn'));
+    }
+  });
+}
+
+function renderSubcatChips(sec) {
+  const row = document.getElementById('subcatChips');
+  row.innerHTML = '';
+  if (!sec) { row.classList.remove('show'); return; }
+
+  const allChip = document.createElement('button');
+  allChip.className = 'chip active';
+  allChip.textContent = 'All ' + sec.label;
+  allChip.addEventListener('click', () => selectSubcat(null));
+  row.appendChild(allChip);
+
+  sec.subcats.forEach(sub => {
+    const chip = document.createElement('button');
+    chip.className = 'chip';
+    chip.innerHTML = sub.icon + ' ' + sub.key;
+    chip.dataset.key = sub.key;
+    chip.addEventListener('click', () => selectSubcat(sub.key));
+    row.appendChild(chip);
+  });
+
+  row.classList.add('show');
+}
+
+let tourStopMarkers = [];
+
+function clearTour() {
+  if (map.getSource('tour-route')) {
+    map.getSource('tour-route').setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: [] } });
+  }
+  // Remove the tour's own numbered stop pins
+  tourStopMarkers.forEach(m => m.remove());
+  tourStopMarkers = [];
+  // Restore visibility of the regular pins a tour hides while active
+  markers.forEach(m => {
+    m.el.style.display = 'flex';
+    const badge = m.el.querySelector('.stopNum');
+    if (badge) badge.remove();
+  });
+  applyFilter();
+}
+
+function selectSection(key) {
+  clearTour();
+  activeSection = key;
+  activeSubcat = null;
+  document.querySelectorAll('#sectionChips .chip').forEach(c => {
+    c.classList.toggle('active', key === null ? !c.dataset.key : c.dataset.key === key);
+  });
+  const sec = key ? sectionOf(key) : null;
+  renderSubcatChips(sec);
+  document.getElementById('note').classList.toggle('wide', !!sec);
+  document.getElementById('note').classList.toggle('narrow', !sec);
+  applyFilter();
+  document.getElementById('card').classList.remove('show');
+}
+
+function selectSubcat(catKey) {
+  activeSubcat = catKey;
+  document.querySelectorAll('#subcatChips .chip').forEach(c => {
+    c.classList.toggle('active', catKey === null ? !c.dataset.key : c.dataset.key === catKey);
+  });
+  applyFilter();
+  document.getElementById('card').classList.remove('show');
+}
+
+function applyFilter() {
+  markers.forEach(m => {
+    let visible = true;
+    if (activeSection) visible = m.section === activeSection || m.extraSection === activeSection;
+    if (visible && activeSubcat) visible = m.cat === activeSubcat || (activeSection === 'onnow' && m.extraSection === 'onnow');
+    m.el.style.display = visible ? 'flex' : 'none';
+  });
+}
+
+/* ---- Map init ---- */
+map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/streets-v12',
+  center: [-111.3803, 56.7266], // downtown Fort McMurray, approx
+  zoom: 14.5,
+  pitch: 0,
+  attributionControl: false
+});
+
+map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
+map.addControl(new mapboxgl.AttributionControl({ compact: true }));
+
+// Keep the screen awake while the map is open (e.g. mounted on a dash while
+// driving around town). Not supported on every browser — fails silently
+// where it isn't. The lock is released by the OS/browser if the tab goes
+// to background, so it's re-requested automatically once the tab is
+// visible again.
+let wakeLock = null;
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+  } catch (err) {
+    console.warn('Wake lock request failed:', err);
+  }
+}
+requestWakeLock();
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') requestWakeLock();
+});
+
+// Shows the person's own location as a live dot, tracks as they move/turn
+const geolocate = new mapboxgl.GeolocateControl({
+  positionOptions: { enableHighAccuracy: true },
+  trackUserLocation: true,
+  showUserHeading: true,
+  showAccuracyCircle: true
+});
+map.addControl(geolocate, 'bottom-right');
+
+// Prompt for location and center the map on it as soon as possible, rather
+// than waiting for the person to tap Trace My Steps. Triggered on a short
+// delay (not tied to the map's style-load event) since the control itself
+// is ready as soon as it's added, and waiting on 'load' was sometimes
+// delaying or missing the prompt.
+setTimeout(() => geolocate.trigger(), 300);
+
+geolocate.on('error', (err) => {
+  console.warn('Geolocation prompt failed or was denied:', err);
+});
+
+// GeolocateControl.trigger() is a TOGGLE — calling it while tracking is
+// already active turns tracking OFF instead of keeping it on. Since we
+// auto-start tracking on page load, we track the real on/off state here
+// so later trigger() calls only fire when it's actually off.
+let geoTracking = false;
+geolocate.on('trackuserlocationstart', () => { geoTracking = true; });
+geolocate.on('trackuserlocationend', () => { geoTracking = false; });
+
+renderSectionChips();
+document.getElementById('note').textContent = 'Loading listings…';
+
+async function initPlaces() {
+  try {
+    const [placesRaw, mlocRaw, onNowVenues] = await Promise.all([
+      loadPlacesFromSupabase().catch(err => { console.error('places_items load failed:', err); return []; }),
+      loadMapLocationsFromSupabase().catch(err => { console.error('map_locations load failed:', err); return []; }),
+      loadOnNowVenuesForMatching().catch(err => { console.error('onnow_content load failed (On Now bridging skipped):', err); return []; })
+    ]);
+    places = transformItems(placesRaw, onNowVenues).concat(transformMapLocations(mlocRaw, onNowVenues));
+  } catch (err) {
+    console.error('Failed to load places from Supabase:', err);
+    places = [];
+  }
+  buildPins();
+  document.getElementById('note').textContent =
+    places.length
+      ? 'Tap a section to narrow the map. Tap a pin to preview the card.'
+      : 'No geocoded listings found yet.';
+}
+
+/* ---- Proximity "nearby" banners ----
+   Foreground-only by nature (see note in the code below) — while this page
+   is open with the screen on, watches live position and pops a small
+   banner when the person comes within ~200m of anything flagged "notify"
+   in the admin panel or the Stories editor. Each spot only banners once
+   per visit. Tapping the banner jumps to that pin/story; it also
+   auto-dismisses after a few seconds if ignored. */
+const NOTIFY_RADIUS_METERS = 200;
+
+function haversineMeters(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+async function loadStoriesForNotify() {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/bth_content?key=eq.stories&select=data`,
+      { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    );
+    const rows = await res.json();
+    const stories = (rows.length && Array.isArray(rows[0].data)) ? rows[0].data : [];
+    return stories
+      .filter(s => s.notify && s.notifyLabel && s.geocache && s.geocache.lat != null && s.geocache.lng != null)
+      .map((s, idx) => ({
+        id: 'story-' + idx,
+        lat: s.geocache.lat,
+        lng: s.geocache.lng,
+        label: s.notifyLabel,
+        kind: 'story'
+      }));
+  } catch (err) {
+    console.warn('Loading stories for proximity notify failed:', err);
+    return [];
+  }
+}
+
+let notifyTargets = [];
+const notifiedIds = new Set();
+let bannerQueue = [];
+let bannerShowing = false;
+
+function queueBanner(target) {
+  if (notifiedIds.has(target.id)) return;
+  notifiedIds.add(target.id);
+  bannerQueue.push(target);
+  showNextBanner();
+}
+
+function showNextBanner() {
+  if (bannerShowing || !bannerQueue.length) return;
+  const target = bannerQueue.shift();
+  bannerShowing = true;
+
+  const banner = document.getElementById('proxBanner');
+  document.getElementById('proxBannerText').textContent = target.label;
+  banner.classList.add('show');
+
+  const hide = () => {
+    banner.classList.remove('show');
+    bannerShowing = false;
+    setTimeout(showNextBanner, 400);
+  };
+
+  const autoHide = setTimeout(hide, 6000);
+
+  document.getElementById('proxBannerClose').onclick = (e) => {
+    e.stopPropagation();
+    clearTimeout(autoHide);
+    hide();
+  };
+
+  banner.onclick = () => {
+    clearTimeout(autoHide);
+    hide();
+    if (target.kind === 'story') {
+      window.location.href = 'stories.html';
+    } else {
+      const p = places.find(pl => pl.id === target.id);
+      if (p) {
+        map.flyTo({ center: [p.lng, p.lat], zoom: 15, duration: 700 });
+        showCard(p);
+      }
+    }
+  };
+}
+
+async function initProximityNotify() {
+  if (!navigator.geolocation) return;
+  const storyTargets = await loadStoriesForNotify();
+  const pinTargets = places
+    .filter(p => p.notify && p.notifyLabel)
+    .map(p => ({ id: p.id, lat: p.lat, lng: p.lng, label: p.notifyLabel, kind: 'pin' }));
+  notifyTargets = pinTargets.concat(storyTargets);
+  if (!notifyTargets.length) return;
+
+  navigator.geolocation.watchPosition(
+    (pos) => {
+      const { latitude, longitude } = pos.coords;
+      notifyTargets.forEach(target => {
+        if (notifiedIds.has(target.id)) return;
+        const d = haversineMeters(latitude, longitude, target.lat, target.lng);
+        if (d <= NOTIFY_RADIUS_METERS) queueBanner(target);
+      });
+    },
+    (err) => { console.warn('Proximity notify position watch error:', err); },
+    { enableHighAccuracy: true, maximumAge: 10000 }
+  );
+}
+
+// Proximity targets depend on `places` being loaded first
+initPlaces().then(() => initProximityNotify());
+
+
+// Breadcrumb trail: recording state
+let trailCoords = [];
+let recording = false;
+let trailWatchId = null;
+const trailBtn = document.getElementById('trailBtn');
+const trailModal = document.getElementById('trailModal');
+
+trailBtn.addEventListener('click', () => {
+  if (!recording) {
+    if (!navigator.geolocation) {
+      alert('Location isn\'t available on this device/browser.');
+      return;
+    }
+    recording = true;
+    trailCoords = [];
+    trailBtn.classList.add('recording');
+    trailBtn.innerHTML = '<span class="dotBlink">🔴</span> Stop Tracing';
+    if (map.getSource('breadcrumb-trail')) {
+      map.getSource('breadcrumb-trail').setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: [] } });
+    }
+    // Show the visual blue dot too, but recording itself doesn't depend on
+    // this control — it uses its own independent position watch below, so
+    // panning the map or the control's own state changes can't silently
+    // stop the trail from recording.
+    if (!geoTracking) geolocate.trigger();
+
+    trailWatchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        trailCoords.push([pos.coords.longitude, pos.coords.latitude]);
+        if (map.getSource('breadcrumb-trail')) {
+          map.getSource('breadcrumb-trail').setData({
+            type: 'Feature',
+            geometry: { type: 'LineString', coordinates: trailCoords }
+          });
+        }
+      },
+      (err) => { console.warn('Trail position watch error:', err); },
+      { enableHighAccuracy: true, maximumAge: 0 }
+    );
+  } else {
+    recording = false;
+    trailBtn.classList.remove('recording');
+    trailBtn.innerHTML = '<span class="dotBlink">⚪</span> Trace My Steps';
+    if (trailWatchId != null) { navigator.geolocation.clearWatch(trailWatchId); trailWatchId = null; }
+    finishTrail();
+  }
+});
+
+let startMarker = null;
+const startBtn = document.getElementById('startBtn');
+
+startBtn.addEventListener('click', () => {
+  if (!navigator.geolocation) {
+    alert('Location isn\'t available on this device/browser.');
+    return;
+  }
+  startBtn.textContent = '📍 Marking…';
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const { longitude, latitude } = { longitude: pos.coords.longitude, latitude: pos.coords.latitude };
+      if (startMarker) startMarker.remove();
+      startMarker = new mapboxgl.Marker({ color: '#e8412c' })
+        .setLngLat([longitude, latitude])
+        .addTo(map);
+      startBtn.textContent = '📍 Start Marked';
+      startBtn.classList.add('marked');
+      setTimeout(() => {
+        startBtn.textContent = '📍 Mark Start';
+        startBtn.classList.remove('marked');
+      }, 2500);
+    },
+    () => {
+      startBtn.textContent = '📍 Mark Start';
+      alert('Could not get your location — check location permissions and try again.');
+    }
+  );
+});
+
+function roughDistanceMeters(coords) {
+  let total = 0;
+  const R = 6371000;
+  for (let i = 1; i < coords.length; i++) {
+    const [lon1, lat1] = coords[i - 1];
+    const [lon2, lat2] = coords[i];
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+    total += R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+  return Math.round(total);
+}
+
+function finishTrail() {
+  if (trailCoords.length < 2) {
+    alert('Not enough movement recorded to save a trail yet — try walking a bit further next time.');
+    return;
+  }
+  const dist = roughDistanceMeters(trailCoords);
+  document.getElementById('trailStats').textContent =
+    trailCoords.length + ' points recorded · roughly ' + dist + 'm walked';
+  const dataUrl = map.getCanvas().toDataURL('image/png');
+  document.getElementById('trailImg').src = dataUrl;
+  trailModal.classList.add('show');
+}
+
+document.getElementById('trailClose').addEventListener('click', () => {
+  trailModal.classList.remove('show');
+});
+
+document.getElementById('trailDownload').addEventListener('click', () => {
+  const link = document.createElement('a');
+  link.download = 'my-trail.png';
+  link.href = document.getElementById('trailImg').src;
+  link.click();
+});
+
+// Tours panel — lists real tours saved via the admin panel, and draws the
+// walking route for whichever one is picked.
+const toursPanel = document.getElementById('toursPanel');
+const toursBackdrop = document.getElementById('toursBackdrop');
+
+function openTours() {
+  toursPanel.classList.add('open');
+  toursBackdrop.classList.add('show');
+}
+function closeTours() {
+  toursPanel.classList.remove('open');
+  toursBackdrop.classList.remove('show');
+}
+
+document.getElementById('toursBtn').addEventListener('click', openTours);
+document.getElementById('closeTours').addEventListener('click', closeTours);
+toursBackdrop.addEventListener('click', closeTours);
+
+async function loadToursFromSupabase() {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/bth_content?key=eq.map_tours&select=data`,
+    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+  );
+  const rows = await res.json();
+  return rows.length && Array.isArray(rows[0].data) ? rows[0].data : [];
+}
+
+let savedTours = [];
+
+function renderTourOptions() {
+  const wrap = document.getElementById('tourOptionsWrap');
+  if (!savedTours.length) {
+    wrap.innerHTML = '<p style="font-size:13px; color:#6b8478;">No tours have been built yet.</p>';
+    return;
+  }
+  wrap.innerHTML = '';
+  savedTours.forEach((tour, i) => {
+    const opt = document.createElement('div');
+    opt.className = 'tourOption';
+    const n = (tour.stops || []).length;
+    opt.innerHTML = `<div class="dot">🚶</div><div class="t"><div class="n">${tour.title}</div><div class="d">${tour.description || (n + ' stops')}</div></div>`;
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.tourOption').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      selectSection(null);
+      const stops = (tour.stops || []).map(s => ({ lng: s.lng, lat: s.lat, name: s.name, image: s.image, audio: s.audio }));
+      try {
+        if (stops.length < 2) return;
+        drawTour(stops);
+      } catch (err) {
+        console.error('Tour draw failed:', err);
+      } finally {
+        closeTours();
+      }
+    });
+    wrap.appendChild(opt);
+  });
+}
+
+loadToursFromSupabase().then(list => { savedTours = list; renderTourOptions(); }).catch(err => {
+  console.error('Failed to load tours:', err);
+  renderTourOptions();
+});
+
+function setRouteLine(coords) {
+  const geojson = { type: 'Feature', geometry: { type: 'LineString', coordinates: coords } };
+  if (map.getSource('tour-route')) {
+    map.getSource('tour-route').setData(geojson);
+  } else {
+    map.addSource('tour-route', { type: 'geojson', data: geojson });
+    map.addLayer({
+      id: 'tour-route-line',
+      type: 'line',
+      source: 'tour-route',
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: {
+        'line-color': '#ff5d7a',
+        'line-width': 4,
+        'line-dasharray': [0.2, 1.6]
+      }
+    });
+  }
+}
+
+// Mapbox Directions API supports up to 25 waypoints per request for the
+// walking profile. Returns the real street/path-following route coordinates,
+// or null if the lookup fails (e.g. a stop is unreachable on foot, or the
+// request errors) so the caller can keep the straight-line fallback instead.
+async function fetchWalkingRoute(coords) {
+  if (coords.length < 2 || coords.length > 25) return null;
+  const coordStr = coords.map(c => c[0] + ',' + c[1]).join(';');
+  const url = 'https://api.mapbox.com/directions/v5/mapbox/walking/' + coordStr
+    + '?geometries=geojson&overview=full&access_token=' + mapboxgl.accessToken;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const data = await res.json();
+  const route = data.routes && data.routes[0];
+  return route ? route.geometry.coordinates : null;
+}
+
+async function drawTour(stops) {
+  const coords = stops.map(p => [p.lng, p.lat]);
+
+  // A tour shows ONLY its own stops — hide every other pin on the map first.
+  markers.forEach(m => { m.el.style.display = 'none'; });
+  tourStopMarkers.forEach(m => m.remove());
+  tourStopMarkers = [];
+
+  // Draw the straight-line version immediately so something shows right away,
+  // then swap it for a real walking route once the Directions API responds.
+  setRouteLine(coords);
+
+  stops.forEach((p, i) => {
+    const el = document.createElement('div');
+    el.className = 'pin';
+    el.style.background = '#ff5d7a';
+    el.innerHTML = '<span>📍</span>';
+    const badge = document.createElement('div');
+    badge.className = 'stopNum';
+    badge.textContent = i + 1;
+    el.appendChild(badge);
+    if (p.name || p.desc || p.image || p.audio) {
+      el.addEventListener('click', () => showCard({
+        icon: '📍', name: p.name || ('Stop ' + (i + 1)), cat: 'Tour stop',
+        desc: p.desc || '', image: p.image || null, audio: p.audio || null,
+        mapUrl: `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`
+      }));
+    }
+    const marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' }).setLngLat([p.lng, p.lat]).addTo(map);
+    tourStopMarkers.push(marker);
+  });
+
+  const bounds = coords.reduce((b, c) => b.extend(c), new mapboxgl.LngLatBounds(coords[0], coords[0]));
+  map.fitBounds(bounds, { padding: 80, duration: 800 });
+
+  try {
+    const routeCoords = await fetchWalkingRoute(coords);
+    if (routeCoords) setRouteLine(routeCoords);
+  } catch (err) {
+    console.warn('Walking route lookup failed, keeping the straight-line path:', err);
+  }
+}
+
+
+// Recolor the base style toward a brighter, more playful palette once loaded
+map.on('load', () => {
+  map.addSource('breadcrumb-trail', {
+    type: 'geojson',
+    data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [] } }
+  });
+  map.addLayer({
+    id: 'breadcrumb-trail-line',
+    type: 'line',
+    source: 'breadcrumb-trail',
+    layout: { 'line-join': 'round', 'line-cap': 'round' },
+    paint: {
+      'line-color': '#1f6feb',
+      'line-width': 5,
+      'line-opacity': 0.9
+    }
+  });
+
+  const setIfExists = (layerId, prop, value) => {
+    if (map.getLayer(layerId)) {
+      try { map.setPaintProperty(layerId, prop, value); } catch (e) {}
+    }
+  };
+
+  setIfExists('land', 'background-color', '#8FE38F');
+  setIfExists('background', 'background-color', '#8FE38F');
+  setIfExists('landuse', 'fill-color', '#6FD07A');
+  setIfExists('landuse-park', 'fill-color', '#6FD07A');
+  setIfExists('national-park', 'fill-color', '#6FD07A');
+  setIfExists('water', 'fill-color', '#4FC7E0');
+  setIfExists('waterway', 'line-color', '#4FC7E0');
+  ['road-motorway', 'road-trunk', 'road-primary', 'road-secondary-tertiary', 'road-street', 'road-minor'].forEach(l => {
+    setIfExists(l, 'line-color', '#FFD84D');
+  });
+  ['road-motorway-case', 'road-trunk-case', 'road-primary-case', 'road-secondary-tertiary-case'].forEach(l => {
+    setIfExists(l, 'line-color', '#E0A020');
+  });
+  setIfExists('building', 'fill-color', '#FFF3DA');
+  setIfExists('building', 'fill-outline-color', '#F0DDB0');
+
+  setTimeout(() => {
+    document.getElementById('note').style.opacity = '0';
+  }, 4500);
+});
+</script>
+
+</body>
+</html>

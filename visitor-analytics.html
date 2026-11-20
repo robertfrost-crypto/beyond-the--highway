@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visitor Analytics | Beyond the Highway</title>
+<style>
+  :root{--bg:#04120b;--panel:rgba(255,255,255,.04);--line:rgba(140,255,92,.32);--lineSoft:rgba(255,255,255,.12);--text:#eafff0;--accent:#9bdc75;--gold:#e0a850;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:18px;}
+  .wrap{max-width:900px;margin:0 auto;}
+  a.back{display:inline-flex;align-items:center;gap:7px;margin-bottom:14px;padding:9px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(6,29,20,.85);color:var(--accent);text-decoration:none;font-size:14px;font-weight:600;}
+  h1{font-size:20px;margin:6px 0 2px;}
+  .sub{color:#b9d9c4;font-size:13px;margin-bottom:16px;}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
+  select,button{background:rgba(0,0,0,.3);border:1px solid var(--lineSoft);color:var(--text);padding:9px 12px;border-radius:10px;font-size:14px;}
+  button{cursor:pointer;border-color:var(--line);color:var(--accent);font-weight:600;}
+  button:hover{background:rgba(140,255,92,.1);}
+  .statGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px;}
+  .stat{background:var(--panel);border:1px solid var(--lineSoft);border-radius:14px;padding:14px;}
+  .stat .num{font-size:26px;font-weight:700;color:var(--accent);}
+  .stat .lbl{font-size:12px;color:#b9d9c4;margin-top:2px;}
+  .panel{background:var(--panel);border:1px solid var(--lineSoft);border-radius:14px;padding:14px;margin-bottom:16px;}
+  .panel h2{font-size:15px;margin:0 0 4px;}
+  .panel .hint{font-size:12px;color:#b9d9c4;margin:0 0 10px;line-height:1.45;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--lineSoft);}
+  th{color:#b9d9c4;font-weight:600;}
+  .bar{height:8px;background:rgba(140,255,92,.18);border-radius:4px;overflow:hidden;margin-top:4px;}
+  .bar > div{height:100%;background:var(--accent);}
+  .tierRow td:first-child{font-weight:700;}
+  .tTop{color:var(--gold)} .tFeat{color:var(--accent)} .tAmb{color:#e0a850} .tStd{color:#b9d9c4}
+  .srcDirect{color:var(--accent)} .srcSearch{color:#7cc8ff} .srcSocial{color:#ff9ecb} .srcReferral{color:var(--gold)} .srcCampaign{color:#c9a6ff}
+  .srcAI{color:#ffd166}
+  .loading,.empty{color:#b9d9c4;font-size:13px;padding:20px 0;text-align:center;}
+  @media print{
+    body{background:#fff;color:#111;padding:0;}
+    a.back,.controls,button{display:none !important;}
+    .stat,.panel{border:1px solid #ccc;background:#fff;}
+    .stat .num{color:#0a6b2f;}
+    .bar > div{background:#0a6b2f;}
+    .panel .hint,.sub,th{color:#555;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">&larr;&nbsp;Beyond the Highway</a>
+  <h1>Visitor Analytics</h1>
+  <div class="sub" id="rangeLabel">Loading…</div>
+
+  <div class="controls">
+    <select id="rangeSelect">
+      <option value="7">Last 7 days</option>
+      <option value="30" selected>Last 30 days</option>
+      <option value="90">Last 90 days</option>
+      <option value="365">Last 12 months</option>
+      <option value="0">All time</option>
+    </select>
+    <button id="refreshBtn" type="button">Refresh</button>
+    <button id="printBtn" type="button">Export / Print to PDF</button>
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#b9d9c4;">
+      <input type="checkbox" id="botFilterToggle" checked>
+      Exclude likely bot traffic
+    </label>
+  </div>
+
+  <div id="content">
+    <div class="loading">Loading data…</div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://ceipylnjdidjqidamkpw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlaXB5bG5qZGlkanFpZGFta3B3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyOTQ1MjAsImV4cCI6MjA5ODg3MDUyMH0.TGZYRcjscN3ysRfTT5iHSl2pTOIhvMF6dCd-elm7L7g';
+
+const $ = id => document.getElementById(id);
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+
+async function fetchRows(table, select, days){
+  let url = `${SUPABASE_URL}/rest/v1/${table}?select=${select}&order=created_at.desc&limit=20000`;
+  if (days > 0) {
+    const since = new Date(Date.now() - days*24*60*60*1000).toISOString();
+    url += `&created_at=gte.${encodeURIComponent(since)}`;
+  }
+  const res = await fetch(url, { headers:{ apikey:SUPABASE_ANON_KEY, Authorization:'Bearer '+SUPABASE_ANON_KEY } });
+  if (!res.ok) throw new Error(table + ' fetch failed: ' + res.status);
+  return res.json();
+}
+
+function topN(map, n){ return Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,n); }
+function renderBars(rows, total){
+  return rows.map(([label,count])=>{
+    const pct = total ? Math.round((count/total)*100) : 0;
+    return `<tr><td>${esc(label)}</td><td>${count}</td><td style="width:40%"><div class="bar"><div style="width:${pct}%"></div></div></td></tr>`;
+  }).join('');
+}
+
+const TIER_ORDER = ['Top Pick','Featured','Ambassador','Standard'];
+const TIER_CLASS = {'Top Pick':'tTop','Featured':'tFeat','Ambassador':'tAmb','Standard':'tStd'};
+const TIER_LABEL = {
+  'Top Pick':'Beyond the Highway Top Pick',
+  'Featured':'Beyond the Highway Featured',
+  'Ambassador':'Beyond the Highway Ambassador',
+  'Standard':'No badge (free listing)'
+};
+
+const SOURCE_ORDER = ['Direct','Search','Social','Referral','Campaign'];
+const SOURCE_CLASS = {'Direct':'srcDirect','Search':'srcSearch','Social':'srcSocial','Referral':'srcReferral','Campaign':'srcCampaign'};
+const SOURCE_LABEL = {
+  'Direct':'Direct (typed URL, bookmark, app icon)',
+  'Search':'Search engines (Google, Bing, etc.)',
+  'Social':'Social media',
+  'Referral':'Other websites linking in',
+  'Campaign':'Tagged links (utm_source)'
+};
+
+// Known AI assistant / chatbot domains. Matched against referrer_domain
+// regardless of how source_type already bucketed the row (Search/Referral/etc),
+// since the underlying tracker has no dedicated "AI" category yet.
+// Only unambiguous AI-assistant domains are included here — general search
+// engine domains (e.g. bing.com, google.com) are deliberately left out
+// because their AI-answer surfaces can't be distinguished from plain search
+// using domain alone.
+const AI_DOMAINS = {
+  'chatgpt.com':'ChatGPT',
+  'chat.openai.com':'ChatGPT',
+  'perplexity.ai':'Perplexity',
+  'copilot.microsoft.com':'Copilot',
+  'gemini.google.com':'Gemini',
+  'bard.google.com':'Gemini',
+  'claude.ai':'Claude',
+  'you.com':'You.com',
+  'phind.com':'Phind',
+  'deepseek.com':'DeepSeek',
+  'chat.deepseek.com':'DeepSeek',
+  'grok.com':'Grok',
+  'x.ai':'Grok'
+};
+// Friendly names for page traffic — visitors (and the people you're showing
+// this to) don't know raw filenames, and "On Now — 64 visits" reads a lot
+// better than "onnow.html — 64 visits". Keyed WITHOUT the extension: older
+// visits were logged as "onnow" (Netlify strips .html from the URL on a
+// normal link click) while newer ones are normalized to "onnow.html" at
+// the source — stripping the extension here makes both match the same row
+// instead of splitting into two.
+function pageBase(p){
+  let s = String(p || 'index.html').replace(/^\/+/, '').split(/[?#]/)[0];
+  if (!s) s = 'index.html';
+  return s.replace(/\.html?$/i, '');
+}
+const PAGE_LABEL = {
+  'index':'Home',
+  'onnow':'On Now',
+  'places':'Things to Do',
+  'stories':'Stories',
+  'trails':'Trails',
+  'mystery-tours':'Mystery Tours',
+  'mystery':'Mystery Destination',
+  'aboriginal-experiences':'Aboriginal Experiences',
+  'local-hub':'Local Hub',
+  'local-news':'Local News',
+  'local-business':'Local Business Directory',
+  'coupons':'Coupons',
+  'sports':'Sports',
+  'recommend':'Recommendations',
+  'map':'Maps',
+  'advertise':'Advertise (business page)'
+};
+function pageLabel(p){ const b = pageBase(p); return PAGE_LABEL[b] || b; }
+
+// Internal/back-office pages — this is you loading your own admin panel or
+// this analytics view, not a visitor. Excluded everywhere below (not just
+// from the page list) so your own admin sessions don't skew city, source,
+// or visit-count numbers either. Matched by base name (see pageBase above)
+// so this catches "admin" and "admin.html" alike.
+const INTERNAL_PAGES = new Set(['admin','visitor-analytics']);
+
+function matchAI(domain){
+  if (!domain) return null;
+  const d = String(domain).toLowerCase().replace(/^www\./,'');
+  for (const key in AI_DOMAINS) {
+    if (d === key || d.endsWith('.'+key)) return AI_DOMAINS[key];
+  }
+  return null;
+}
+
+// ---- Bot detection ----
+// Mirrors the blocklist in visitor-tracker.js. Rows logged by the updated
+// tracker carry user_agent and are already filtered at the source, but this
+// re-checks (in case the blocklist here gets extended later) and also catches
+// two things the tracker can't: rows logged before this update (no
+// user_agent stored), and JS-capable bots that don't identify themselves in
+// their UA string — caught instead by a burst-pattern heuristic below.
+const BOT_UA_REGEX = new RegExp([
+  'bot','crawl','spider','slurp','archiver',
+  'headlesschrome','phantomjs','puppeteer','playwright','selenium',
+  'python-requests','python-urllib','curl','wget','scrapy','axios',
+  'go-http-client','java/','okhttp',
+  'facebookexternalhit','whatsapp','telegrambot','discordbot',
+  'linkedinbot','pinterest','skypeuripreview','slackbot',
+  'ahrefsbot','semrushbot','mj12bot','dotbot','petalbot','bytespider',
+  'gptbot','claudebot','anthropic','ccbot','perplexitybot',
+  'google-inspectiontool','adsbot-google','apis-google','feedfetcher',
+  'uptimerobot','pingdom','statuscake','site24x7','newrelic','datadog',
+  'bingpreview','yandexbot','baiduspider','duckduckbot'
+].join('|'), 'i');
+function isBotUA(ua){ return !!ua && BOT_UA_REGEX.test(ua); }
+
+// Speed heuristic: flags a key (visitor_id or ip_address) if it has a run of
+// 4+ CONSECUTIVE hits each less than 3 seconds apart. This measures speed,
+// not volume — a real person browsing 10 listings in 10 minutes is normal
+// and won't trip this; nobody reads and taps in under 3 seconds, repeatedly.
+function detectRapidFireIds(rows, keyField){
+  const byKey = {};
+  rows.forEach(v=>{
+    const key = v[keyField];
+    if(!key) return;
+    (byKey[key] = byKey[key] || []).push(new Date(v.created_at).getTime());
+  });
+  const suspects = new Set();
+  Object.entries(byKey).forEach(([key, times])=>{
+    times.sort((a,b)=>a-b);
+    let streak = 1;
+    for(let i=1;i<times.length;i++){
+      if(times[i]-times[i-1] < 3000) streak++; else streak = 1;
+      if(streak >= 4){ suspects.add(key); break; }
+    }
+  });
+  return suspects;
+}
+
+// Volume fallback: still useful for slow-but-steady scripted traffic that
+// paces itself just above the speed threshold. Set high on purpose so it
+// only fires on genuinely abnormal volume, not an engaged real visitor.
+function detectHighVolumeIds(rows, keyField, windowMs, minCount){
+  const byKey = {};
+  rows.forEach(v=>{
+    const key = v[keyField];
+    if(!key) return;
+    (byKey[key] = byKey[key] || []).push(new Date(v.created_at).getTime());
+  });
+  const suspects = new Set();
+  Object.entries(byKey).forEach(([key, times])=>{
+    times.sort((a,b)=>a-b);
+    for(let i=0;i<times.length;i++){
+      let count=1;
+      for(let j=i+1;j<times.length && times[j]-times[i] < windowMs; j++) count++;
+      if(count>=minCount){ suspects.add(key); break; }
+    }
+  });
+  return suspects;
+}
+
+function computeBotFlags(visits){
+  const uaBotIds = new Set(visits.filter(v=>isBotUA(v.user_agent)).map(v=>v.visitor_id));
+
+  const rapidVisitorIds = detectRapidFireIds(visits, 'visitor_id');
+  const rapidIPs = detectRapidFireIds(visits.filter(v=>v.ip_address), 'ip_address');
+  const volumeIPs = detectHighVolumeIds(visits.filter(v=>v.ip_address), 'ip_address', 10*60*1000, 25);
+
+  // Map flagged IPs back to every visitor_id that IP touched — this is what
+  // catches bots that get a fresh visitor_id every hit (no persisted
+  // localStorage) but keep coming from the same address.
+  const flaggedIPs = new Set([...rapidIPs, ...volumeIPs]);
+  const idsFromFlaggedIPs = new Set(
+    visits.filter(v => v.ip_address && flaggedIPs.has(v.ip_address)).map(v => v.visitor_id)
+  );
+
+  const allBotIds = new Set([...uaBotIds, ...rapidVisitorIds, ...idsFromFlaggedIPs]);
+  return { uaBotIds, rapidVisitorIds, flaggedIPs, allBotIds };
+}
+
+async function load(){
+  const days = Number($('rangeSelect').value);
+  $('content').innerHTML = '<div class="loading">Loading data…</div>';
+  try {
+    const [visitsFetched, clicksRaw] = await Promise.all([
+      fetchRows('site_visits','created_at,entry_page,country,region,city,ip_address,visitor_id,location_source,in_town,distance_km,referrer_domain,referrer_page,source_type,utm_source,utm_campaign,user_agent', days),
+      fetchRows('place_clicks','created_at,place_title,category,tier,click_type,visitor_id,user_agent', days).catch(()=>[])
+    ]);
+    // Drop admin/analytics page-loads before anything else touches this data.
+    const visitsRaw = visitsFetched.filter(v => !INTERNAL_PAGES.has(pageBase(v.entry_page)));
+
+    const label = days === 0 ? 'All time' : `Last ${days} days`;
+    $('rangeLabel').textContent = `${label} · generated ${new Date().toLocaleString()}`;
+
+    if (!visitsRaw.length && !clicksRaw.length) {
+      $('content').innerHTML = '<div class="empty">No data recorded yet for this range.</div>';
+      return;
+    }
+
+    // ---- Bot filtering ----
+    const { uaBotIds, rapidVisitorIds, flaggedIPs, allBotIds } = computeBotFlags(visitsRaw);
+    const excludeBots = $('botFilterToggle').checked;
+    const visits = excludeBots ? visitsRaw.filter(v => !allBotIds.has(v.visitor_id)) : visitsRaw;
+    const clicks = excludeBots ? clicksRaw.filter(c => !allBotIds.has(c.visitor_id)) : clicksRaw;
+
+    const rawTotal = visitsRaw.filter(v => (v.location_source||'ip')==='ip').length;
+    const flaggedTotal = visitsRaw.filter(v => (v.location_source||'ip')==='ip' && allBotIds.has(v.visitor_id)).length;
+    const flaggedPct = rawTotal ? Math.round((flaggedTotal/rawTotal)*100) : 0;
+    const preDatingCount = visitsRaw.filter(v => (v.location_source||'ip')==='ip' && !v.user_agent).length;
+
+    const botPanel = `
+      <div class="panel">
+        <h2>Bot filtering</h2>
+        <p class="hint">${flaggedTotal} of ${rawTotal} visits (${flaggedPct}%) in this range look like bot/crawler traffic and are ${excludeBots ? 'excluded from' : 'included in'} the numbers below. Detected by: ${uaBotIds.size} visitor(s) with a known bot user-agent, ${rapidVisitorIds.size} visitor(s) with superhuman click speed (4+ hits under 3 seconds apart), and ${flaggedIPs.size} IP address(es) with bot-like patterns — this last one is what catches bots that reset their visitor ID on every hit, since it groups by IP instead.</p>
+        <p class="hint">This measures speed and IP-level patterns, not page-view volume — an engaged real visitor browsing many listings in one sitting won't get flagged.</p>
+        ${preDatingCount ? `<p class="hint">${preDatingCount} visit${preDatingCount===1?'':'s'} in this range predate the bot-aware tracker update and have no user-agent or IP on file — those can only be caught if they happen to share timing/IP with newer flagged rows.</p>` : ''}
+        <p class="hint">Limit worth knowing: a bot that visits slowly and patiently over days, with a normal-looking user-agent, from a rotating IP, won't be caught by anything client-side like this — that would need server-side IP reputation data, which this static-site setup doesn't have.</p>
+      </div>`;
+
+    // ---- Visits (IP-level rows only, so GPS rows don't double-count) ----
+    const ipVisits = visits.filter(v => (v.location_source||'ip') === 'ip');
+    const gpsVisits = visits.filter(v => v.location_source === 'gps');
+    const uniqueVisitors = new Set(visits.map(v=>v.visitor_id)).size;
+
+    const byCountry={}, byRegion={}, byCity={}, byPage={};
+    ipVisits.forEach(v=>{
+      const country=v.country||'Unknown';
+      const region=v.region?`${v.region}, ${v.country||''}`.replace(/, $/,''):'Unknown';
+      const city=v.city?`${v.city}, ${v.region||''}`.replace(/, $/,''):'Unknown';
+      const page=pageLabel(v.entry_page||'index.html');
+      byCountry[country]=(byCountry[country]||0)+1;
+      byRegion[region]=(byRegion[region]||0)+1;
+      byCity[city]=(byCity[city]||0)+1;
+      byPage[page]=(byPage[page]||0)+1;
+    });
+    const totalVisits = ipVisits.length;
+
+    // ---- Internal navigation: which of your own pages sent people to
+    // Local News (button/tile on On Now vs the homepage tile vs elsewhere).
+    // Only rows logged since the referrer_page column was added will have
+    // this — earlier visits show up under "not recorded (older visit)".
+    const localNewsVisits = ipVisits.filter(v => pageBase(v.entry_page) === 'local-news');
+    let localNewsPanel = '';
+    if (localNewsVisits.length) {
+      const byRefPage = {};
+      localNewsVisits.forEach(v=>{
+        let label;
+        if (v.source_type === 'Internal') {
+          label = v.referrer_page ? pageLabel(v.referrer_page) : 'Internal link (not recorded — older visit)';
+        } else {
+          label = v.source_type ? SOURCE_LABEL[v.source_type] || v.source_type : 'Direct / unknown';
+        }
+        byRefPage[label] = (byRefPage[label]||0)+1;
+      });
+      localNewsPanel = `
+        <div class="panel">
+          <h2>How people reached Local News</h2>
+          <p class="hint">${localNewsVisits.length} visit${localNewsVisits.length===1?'':'s'} to Local News in this range, broken down by where the click came from.</p>
+          <table><tr><th>Came from</th><th>Visits</th><th></th></tr>${renderBars(topN(byRefPage,10), localNewsVisits.length)}</table>
+        </div>`;
+    }
+
+    // ---- How people found us (source_type, excludes internal site nav) ----
+    const sourced = ipVisits.filter(v => v.source_type);
+    const external = sourced.filter(v => v.source_type !== 'Internal');
+    const bySource={}, byReferrer={}, byCampaign={};
+    external.forEach(v=>{
+      const s = v.source_type || 'Direct';
+      bySource[s]=(bySource[s]||0)+1;
+      if (v.source_type === 'Referral' && v.referrer_domain) {
+        byReferrer[v.referrer_domain]=(byReferrer[v.referrer_domain]||0)+1;
+      }
+      if (v.source_type === 'Campaign' && v.utm_campaign) {
+        byCampaign[v.utm_campaign]=(byCampaign[v.utm_campaign]||0)+1;
+      }
+    });
+
+    let sourcePanel;
+    if (!sourced.length) {
+      sourcePanel = `<div class="panel"><h2>How people found us</h2><p class="hint">No source data yet for this range — this starts filling in once the updated tracker is live and visitors arrive.</p></div>`;
+    } else {
+      const sourceRows = SOURCE_ORDER.filter(s=>bySource[s]).map(s=>{
+        const pct = external.length ? Math.round((bySource[s]/external.length)*100) : 0;
+        return `<tr><td class="${SOURCE_CLASS[s]}">${esc(SOURCE_LABEL[s])}</td><td>${bySource[s]}</td><td style="width:35%"><div class="bar"><div style="width:${pct}%"></div></div></td></tr>`;
+      }).join('');
+      sourcePanel = `
+        <div class="panel">
+          <h2>How people found us</h2>
+          <p class="hint">Based on ${external.length} visit${external.length===1?'':'s'} with a known source (site-to-site navigation between your own pages isn't counted here).</p>
+          <table><tr><th>Source</th><th>Visits</th><th></th></tr>${sourceRows}</table>
+        </div>`;
+      if (Object.keys(byReferrer).length) {
+        sourcePanel += `
+        <div class="panel">
+          <h2>Top referring sites</h2>
+          <p class="hint">Other websites sending traffic your way — not search or social.</p>
+          <table><tr><th>Site</th><th>Visits</th><th></th></tr>${renderBars(topN(byReferrer,10), external.length)}</table>
+        </div>`;
+      }
+      if (Object.keys(byCampaign).length) {
+        sourcePanel += `
+        <div class="panel">
+          <h2>Tagged campaigns</h2>
+          <p class="hint">From links you built with utm_campaign (e.g. a rack card QR code or a specific post).</p>
+          <table><tr><th>Campaign</th><th>Visits</th><th></th></tr>${renderBars(topN(byCampaign,10), external.length)}</table>
+        </div>`;
+      }
+    }
+
+    // ---- AI assistant traffic (ChatGPT, Perplexity, Copilot, etc.) ----
+    // Scanned across ALL ip visits with a referrer_domain, independent of
+    // which source_type bucket the tracker already put them in — this is
+    // the only way to isolate them today since there's no dedicated
+    // "AI" source_type value yet.
+    const aiVisits = ipVisits.filter(v => matchAI(v.referrer_domain));
+    let aiPanel;
+    if (!aiVisits.length) {
+      aiPanel = `<div class="panel">
+          <h2>AI assistant traffic</h2>
+          <p class="hint">No visits with a recognized AI-assistant referrer (ChatGPT, Perplexity, Copilot, Gemini, Claude, etc.) in this range. This only catches visits where the AI tool passed a referrer on click-through — many AI answers are read without a click, or the app strips the referrer, so this is a floor, not a full picture of AI visibility.</p>
+        </div>`;
+    } else {
+      const byAITool = {};
+      const byAIBucket = {}; // how the tracker currently classifies these rows
+      aiVisits.forEach(v=>{
+        const tool = matchAI(v.referrer_domain);
+        byAITool[tool] = (byAITool[tool]||0)+1;
+        const bucket = v.source_type || '(no source_type)';
+        byAIBucket[bucket] = (byAIBucket[bucket]||0)+1;
+      });
+      const toolRows = renderBars(topN(byAITool, 10), aiVisits.length);
+      const bucketRows = renderBars(topN(byAIBucket, 10), aiVisits.length);
+      const pctOfTotal = totalVisits ? Math.round((aiVisits.length/totalVisits)*100) : 0;
+      aiPanel = `
+        <div class="panel">
+          <h2>AI assistant traffic</h2>
+          <p class="hint">${aiVisits.length} of ${totalVisits} visits (${pctOfTotal}%) arrived via a link from a known AI assistant. Detected by referrer domain, not by a dedicated tracker field — see note below.</p>
+          <table><tr><th>AI assistant</th><th>Visits</th><th></th></tr>${toolRows}</table>
+        </div>
+        <div class="panel">
+          <h2>Where AI traffic currently gets counted</h2>
+          <p class="hint">The tracker has no separate "AI" bucket yet, so these visits are folded into one of the existing source categories above. This shows which one, so the numbers in "How people found us" can be read correctly until a dedicated AI category is added.</p>
+          <table><tr><th>Current source_type</th><th>Visits</th><th></th></tr>${bucketRows}</table>
+        </div>`;
+    }
+
+    // ---- In-town vs away (GPS only, one reading per visitor) ----
+    const perVisitor = {};
+    gpsVisits.forEach(v=>{ if(!(v.visitor_id in perVisitor)) perVisitor[v.visitor_id] = v; });
+    const gpsPeople = Object.values(perVisitor);
+    const inTown = gpsPeople.filter(v=>v.in_town===true).length;
+    const away   = gpsPeople.filter(v=>v.in_town===false).length;
+
+    const locationPanel = gpsPeople.length
+      ? `<div class="panel">
+          <h2>In Fort McMurray vs elsewhere</h2>
+          <p class="hint">Based on precise location from visitors who allowed it (asked once, from their second visit onward). IP city data above can't tell these apart — cell connections often report as Edmonton even when the person is in town.</p>
+          <table>
+            <tr><th>Where they actually were</th><th>People</th><th></th></tr>
+            ${renderBars([['In / near Fort McMurray (within 35 km)',inTown],['Elsewhere',away]], gpsPeople.length)}
+          </table>
+          <p class="hint" style="margin-top:10px">${gpsPeople.length} of ${uniqueVisitors} visitors shared precise location.</p>
+        </div>`
+      : `<div class="panel">
+          <h2>In Fort McMurray vs elsewhere</h2>
+          <p class="hint">No precise-location readings yet. Visitors are asked once, starting on their second visit — this fills in as people come back.</p>
+        </div>`;
+
+    // ---- Clicks by tier ----
+    let clicksPanel = '';
+    if (clicks.length) {
+      const byTier={}, listingsPerTier={}, byListing={}, byType={};
+      clicks.forEach(c=>{
+        const tier=c.tier||'Standard';
+        byTier[tier]=(byTier[tier]||0)+1;
+        (listingsPerTier[tier] = listingsPerTier[tier] || new Set()).add(c.place_title);
+        byListing[c.place_title||'(unknown)']=(byListing[c.place_title||'(unknown)']||0)+1;
+        byType[c.click_type||'card_open']=(byType[c.click_type||'card_open']||0)+1;
+      });
+
+      const tierRows = TIER_ORDER.filter(t=>byTier[t]).map(t=>{
+        const total=byTier[t], listings=listingsPerTier[t].size;
+        const avg = listings ? (total/listings).toFixed(1) : '0';
+        return `<tr class="tierRow"><td class="${TIER_CLASS[t]}">${esc(TIER_LABEL[t])}</td><td>${listings}</td><td>${total}</td><td>${avg}</td></tr>`;
+      }).join('');
+
+      clicksPanel = `
+        <div class="panel">
+          <h2>Clicks by placement tier</h2>
+          <p class="hint">The "avg per listing" column is the sales number — it compares like with like, since there are far more free listings than paid ones.</p>
+          <table>
+            <tr><th>Tier</th><th>Listings</th><th>Total clicks</th><th>Avg per listing</th></tr>
+            ${tierRows}
+          </table>
+        </div>
+        <div class="panel">
+          <h2>Most-clicked listings</h2>
+          <table><tr><th>Listing</th><th>Clicks</th><th></th></tr>${renderBars(topN(byListing,15), clicks.length)}</table>
+        </div>
+        <div class="panel">
+          <h2>What they clicked</h2>
+          <table><tr><th>Action</th><th>Count</th><th></th></tr>${renderBars(topN(byType,6), clicks.length)}</table>
+        </div>`;
+    } else {
+      clicksPanel = `<div class="panel"><h2>Clicks by placement tier</h2><p class="hint">No listing clicks recorded yet for this range.</p></div>`;
+    }
+
+    $('content').innerHTML = `
+      <div class="statGrid">
+        <div class="stat"><div class="num">${totalVisits}</div><div class="lbl">Total visits</div></div>
+        <div class="stat"><div class="num">${uniqueVisitors}</div><div class="lbl">Unique visitors</div></div>
+        <div class="stat"><div class="num">${clicks.length}</div><div class="lbl">Listing clicks</div></div>
+        <div class="stat"><div class="num">${Object.keys(byCity).length}</div><div class="lbl">Cities/regions</div></div>
+      </div>
+      ${botPanel}
+      ${sourcePanel}
+      ${aiPanel}
+      ${locationPanel}
+      ${clicksPanel}
+      <div class="panel">
+        <h2>Top cities (IP-based)</h2>
+        <p class="hint">Useful as a catchment picture, not a headcount — cell traffic often resolves to the carrier's regional hub rather than where the person is standing.</p>
+        <table><tr><th>City</th><th>Visits</th><th></th></tr>${renderBars(topN(byCity,10), totalVisits)}</table>
+      </div>
+      <div class="panel">
+        <h2>Top regions</h2>
+        <table><tr><th>Region</th><th>Visits</th><th></th></tr>${renderBars(topN(byRegion,10), totalVisits)}</table>
+      </div>
+      <div class="panel">
+        <h2>Top countries</h2>
+        <table><tr><th>Country</th><th>Visits</th><th></th></tr>${renderBars(topN(byCountry,10), totalVisits)}</table>
+      </div>
+      <div class="panel">
+        <h2>Most-visited pages</h2>
+        <p class="hint">Real visitor traffic, by page — admin/back-office loads aren't counted anywhere on this dashboard.</p>
+        <table><tr><th>Page</th><th>Visits</th><th></th></tr>${renderBars(topN(byPage,15), totalVisits)}</table>
+      </div>
+      ${localNewsPanel}
+    `;
+  } catch (err) {
+    $('content').innerHTML = `<div class="empty">Couldn't load data (${esc(err.message)}). Check the Supabase tables exist and the setup SQL has been run.</div>`;
+  }
+}
+
+$('rangeSelect').onchange = load;
+$('refreshBtn').onclick = load;
+$('botFilterToggle').onchange = load;
+$('printBtn').onclick = () => window.print();
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Submit an event — Beyond the Highway</title>
+<style>
+  :root{--ink:#04100a;--moss:#0f1f17;--moss-2:#162a1d;--line:rgba(224,168,80,.22);
+    --gold:#e6b85c;--green-1:#9be84a;--green-2:#5bc94f;--green-3:#cdfca0;--paper:#f5f1e7;--mist:rgba(245,241,231,.74);
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--sans:"Avenir Next",Avenir,"Segoe UI",system-ui,-apple-system,sans-serif;}
+  *{box-sizing:border-box} html{-webkit-text-size-adjust:100%}
+  body{margin:0;min-height:100dvh;font-family:var(--sans);color:var(--paper);
+    background:radial-gradient(125% 70% at 50% -6%,#0e2818 0%,var(--ink) 60%) fixed,var(--ink);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:560px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 22px) clamp(16px,5vw,24px) calc(env(safe-area-inset-bottom) + 40px)}
+  h1{font-family:var(--serif);font-size:28px;margin:0 0 4px}
+  h1 span{background:linear-gradient(90deg,var(--green-1),var(--green-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lead{color:var(--mist);font-size:15px;margin:0 0 22px}
+  label{display:block;font-size:13px;color:var(--green-3);margin:16px 0 6px;font-weight:700;letter-spacing:.02em}
+  input,textarea{width:100%;padding:13px 14px;border-radius:12px;background:var(--moss);color:var(--paper);
+    border:1px solid var(--line);font-family:var(--sans);font-size:16px}
+  textarea{min-height:84px;resize:vertical}
+  .req{color:var(--gold)}
+  .two{display:flex;gap:12px}.two>div{flex:1}
+  button{margin-top:24px;width:100%;padding:15px;border:0;border-radius:13px;cursor:pointer;
+    font-family:var(--sans);font-weight:700;font-size:16px;color:#eafff0;
+    background:linear-gradient(160deg,#2a8f3a,#1d6e2c);border:1px solid rgba(155,232,74,.4)}
+  button:disabled{opacity:.6}
+  .note{margin-top:14px;font-size:12.5px;color:var(--mist);text-align:center}
+  .msg{margin-top:18px;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--moss);
+    text-align:center;font-family:var(--serif);font-size:16px;display:none}
+  .msg.show{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Submit an <span>event</span></h1>
+  <p class="lead">Hosting something in Fort McMurray? Add it here and we'll feature it on the Beyond the Highway app for visitors in town. We review every submission before it goes live.</p>
+
+  <div id="form">
+    <label>Event name <span class="req">*</span></label>
+    <input id="title" maxlength="80" placeholder="e.g. U18 Volleyball Championship">
+
+    <div class="two">
+      <div><label>Starts <span class="req">*</span></label><input id="starts_on" type="date"></div>
+      <div><label>Ends <span class="req">*</span></label><input id="ends_on" type="date"></div>
+    </div>
+
+    <label>Venue</label>
+    <input id="venue" placeholder="Arena / venue name">
+
+    <label>Schedule link</label>
+    <input id="schedule_url" placeholder="Your schedule, app, or PDF (https://…)">
+
+    <label>About the event</label>
+    <textarea id="blurb" maxlength="400" placeholder="A sentence or two visitors should know."></textarea>
+
+    <label>Your name</label>
+    <input id="organizer_name" placeholder="Organizer name">
+
+    <label>Your email</label>
+    <input id="organizer_email" type="email" placeholder="We'll only use this to reach you">
+
+    <button id="send">Submit event</button>
+    <p class="note">We'll review and post it shortly. Nothing goes live without approval.</p>
+  </div>
+
+  <div class="msg" id="msg"></div>
+</div>
+
+<script>
+  var btn = document.getElementById('send');
+  btn.onclick = async function(){
+    var get = function(id){ return document.getElementById(id).value.trim(); };
+    if (!get('title') || !get('starts_on') || !get('ends_on')) {
+      show("Please add the event name and both dates."); return;
+    }
+    btn.disabled = true; btn.textContent = 'Submitting…';
+    var payload = {
+      community: 'fort-mcmurray',
+      title: get('title'), starts_on: get('starts_on'), ends_on: get('ends_on'),
+      venue: get('venue'), schedule_url: get('schedule_url'), blurb: get('blurb'),
+      organizer_name: get('organizer_name'), organizer_email: get('organizer_email')
+    };
+    try {
+      var res = await fetch('/.netlify/functions/submit-event', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+      });
+      if (res.ok) { document.getElementById('form').style.display = 'none';
+        show("Thanks! Your event has been submitted. We'll review it and it'll appear on the app shortly."); }
+      else { btn.disabled = false; btn.textContent = 'Submit event'; show("Something went wrong — please try again."); }
+    } catch (e) { btn.disabled = false; btn.textContent = 'Submit event'; show("No connection — please try again."); }
+  };
+  function show(t){ var m = document.getElementById('msg'); m.textContent = t; m.classList.add('show'); }
+</script>
+<script src="visitor-tracker.js" defer></script>
+</body>
+</html>

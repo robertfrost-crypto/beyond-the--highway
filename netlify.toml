@@ -1,0 +1,12 @@
+[build]
+  functions = "netlify/functions"
+
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "MAPBOX_TOKEN"
+
+# The onnowymm.com -> onnow.html landing redirect used to live here as a
+# [[redirects]] rule, but Netlify's domain-scoped rewrite wasn't staying
+# limited to the bare "/" path the way it was written — it was also
+# catching /index.html and other real pages on that domain, which broke
+# navigation back to the main site. That behavior now lives as a small
+# script in index.html instead (see the top of its <head>).

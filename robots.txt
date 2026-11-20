@@ -1,0 +1,9 @@
+# Beyond the Highway — robots.txt
+# Public guide: allow all crawlers (search engines and AI) to read it.
+# The admin page is the only thing kept out of the index.
+
+User-agent: *
+Allow: /
+Disallow: /admin.html
+
+Sitemap: https://beyond-the-highway-fmwb.netlify.app/sitemap.xml

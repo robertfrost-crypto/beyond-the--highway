@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local News — Beyond the Highway</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --forest: #16302a;
+    --forest-deep: #0e2019;
+    --cream: #f7f4ec;
+    --paper: #fbf9f3;
+    --ink: #232019;
+    --ink-soft: #58534a;
+    --gold: #c9a227;
+    --ymm-purple: #69288f;
+    --rmwb-navy: #1f3c56;
+    --rule: #e3ddcc;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---- Header ---- */
+  header {
+    background: var(--forest);
+    color: var(--paper);
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .back-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--paper);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.9;
+    transition: opacity 0.15s ease;
+  }
+  .back-link:hover { opacity: 1; }
+  .back-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  .header-title {
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: var(--gold);
+    text-align: right;
+  }
+
+  /* ---- Hero / intro ---- */
+  .intro {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px 28px;
+  }
+
+  .intro h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(32px, 5vw, 44px);
+    line-height: 1.08;
+    margin: 0 0 14px;
+    color: var(--forest-deep);
+  }
+
+  .intro p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin: 0;
+    max-width: 60ch;
+  }
+
+  /* ---- Feed ---- */
+  .feed {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  .entry {
+    border-top: 1px solid var(--rule);
+    padding: 30px 0;
+  }
+  .entry:last-child { border-bottom: 1px solid var(--rule); }
+
+  .entry-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 12px;
+  }
+
+  .source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 5px 11px 5px 9px;
+    border-radius: 999px;
+  }
+  .source-badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .source-badge.ymm {
+    color: var(--ymm-purple);
+    background: rgba(105, 40, 143, 0.09);
+  }
+  .source-badge.rmwb {
+    color: var(--rmwb-navy);
+    background: rgba(31, 60, 86, 0.08);
+  }
+
+  .entry-date {
+    font-size: 13px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .entry h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 23px;
+    line-height: 1.28;
+    margin: 0 0 10px;
+    color: var(--ink);
+  }
+
+  .entry .teaser {
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin: 0 0 16px;
+    max-width: 58ch;
+  }
+
+  .expand-btn {
+    appearance: none;
+    border: 1.5px solid currentColor;
+    background: transparent;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .expand-btn.ymm { color: var(--ymm-purple); }
+  .expand-btn.ymm:hover { background: var(--ymm-purple); color: #fff; }
+  .expand-btn.rmwb { color: var(--rmwb-navy); }
+  .expand-btn.rmwb:hover { background: var(--rmwb-navy); color: #fff; }
+  .expand-btn.primary { background: var(--ymm-purple); color: #fff; }
+  .expand-btn.primary:hover { opacity: 0.9; }
+
+  .expand-btn[aria-expanded="true"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+  }
+
+  /* ---- Expanded content panels ---- */
+  .panel {
+    display: none;
+    margin-top: 22px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+  }
+  .panel.open { display: block; }
+
+  .panel-credit {
+    font-size: 12px;
+    color: var(--ink-soft);
+    padding: 10px 16px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .panel-credit a { color: inherit; text-decoration: underline; }
+  .panel-credit-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .fullscreen-btn {
+    flex-shrink: 0;
+    background: transparent;
+    border: 1.5px solid var(--ymm-purple);
+    color: var(--ymm-purple);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .fullscreen-btn:hover { background: var(--ymm-purple); color: #fff; }
+
+  /* ---- Fullscreen overlay: true edge-to-edge reading view ---- */
+  #lnFullscreenOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #fff;
+  }
+  #lnFullscreenOverlay.open { display: block; }
+  #lnFullscreenOverlay iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+  #lnFullscreenClose {
+    position: fixed;
+    top: max(12px, env(safe-area-inset-top));
+    right: 12px;
+    z-index: 10000;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--forest);
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,.3);
+  }
+
+  iframe.ymm-frame {
+    width: 100%;
+    border: none;
+    display: block;
+    background: #fff;
+  }
+
+  .rmwb-body {
+    background: var(--paper);
+    padding: 22px 24px 26px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+  .rmwb-body h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 18px;
+    margin: 0 0 12px;
+    color: var(--rmwb-navy);
+  }
+  .rmwb-body p { margin: 0 0 14px; }
+  .rmwb-body ul { margin: 0 0 14px; padding-left: 20px; }
+  .rmwb-body strong { color: var(--ink); }
+  .rmwb-body .contact {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--rule);
+    padding-top: 14px;
+    margin-top: 4px;
+  }
+
+  /* ---- Publisher banner: a masthead above the post, not a separate boxed card ---- */
+  .pub-banner {
+    margin-bottom: 18px;
+  }
+  .pub-banner .pub-img { display: block; background: #eee; border-radius: 10px; overflow: hidden; }
+  .pub-banner .pub-img img { width: 100%; display: block; }
+  .pub-banner .pub-body {
+    padding: 14px 2px 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .pub-kicker {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 3px;
+  }
+  .pub-name {
+    font-family: 'Fraunces', serif;
+    font-size: 21px;
+    font-weight: 600;
+    color: var(--ymm-purple);
+    margin: 0 0 4px;
+    line-height: 1.2;
+  }
+  .pub-name span { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: var(--ink-soft); }
+  .pub-tag { font-size: 14px; line-height: 1.5; color: var(--ink-soft); margin: 0 0 12px; }
+  .pub-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pub-btn {
+    display: inline-block;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 999px;
+    text-decoration: none;
+    border: 1.5px solid var(--ymm-purple);
+    color: var(--ymm-purple);
+    background: transparent;
+  }
+  .pub-btn.primary { background: var(--ymm-purple); color: #fff; }
+  .pub-also { font-size: 12.5px; color: var(--ink-soft); margin: 12px 0 0; }
+  .pub-also a { color: var(--ymm-purple); }
+
+  footer {
+    text-align: center;
+    padding: 30px 24px 50px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 520px) {
+    header { padding: 14px 18px; flex-wrap: wrap; }
+    .header-title { font-size: 15px; }
+    .intro { padding: 36px 18px 22px; }
+    .feed { padding: 0 18px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back-link" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    Beyond the Highway
+  </a>
+  <div class="header-title">Local News</div>
+</header>
+
+<div class="intro">
+  <h1>What's happening around Wood Buffalo</h1>
+  <p>News, notices and updates from the people who cover this region — shown here exactly as they published it.</p>
+</div>
+
+<div class="feed" id="feed">
+  <p class="loading-note" id="feedLoading" style="text-align:center;color:var(--ink-soft);padding:40px 0;">Loading the latest local news&hellip;</p>
+
+  </div>
+
+<div id="lnFullscreenOverlay">
+  <button id="lnFullscreenClose" onclick="closeLnFullscreen()" aria-label="Close">&times;</button>
+  <iframe id="lnFullscreenFrame" src="about:blank"></iframe>
+</div>
+
+<footer>Beyond the Highway · Local News is curated from community sources and shared with credit to each publisher.</footer>
+
+<script>
+// ---- Load content from Supabase (no redeploy needed for weekly updates) ----
+var SUPABASE_URL = 'https://ceipylnjdidjqidamkpw.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlaXB5bG5qZGlkanFpZGFta3B3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyOTQ1MjAsImV4cCI6MjA5ODg3MDUyMH0.TGZYRcjscN3ysRfTT5iHSl2pTOIhvMF6dCd-elm7L7g';
+var LN_CLOUD_KEY = 'local_news_content';
+
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+var lnEntries = [];
+
+// ---- Publisher details (shown in the banner above each post from that source) ----
+var LN_PUBLISHERS = {
+  ymm: {
+    name: 'YMM Weekly',
+    from: 'from YMM Media',
+    tagline: 'Fort McMurray’s local news, events and good news — free in your inbox every week.',
+    url: 'https://ymmonline.ca',
+    urlLabel: 'Visit ymmonline.ca',
+    subscribeUrl: 'https://ymmonline.us3.list-manage.com/subscribe?u=e04cc7ca586aea30193f5489c&id=82e18a4068'
+  }
+};
+
+// ---- Newsletter helpers: decode/encode, strip the subscriber's personal info, find the header image ----
+function lnB64Decode(b64){
+  try {
+    var bin = atob(b64), bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  } catch (e) { return ''; }
+}
+function lnB64Encode(str){
+  var bytes = new TextEncoder().encode(str), bin = '';
+  for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+function lnSanitize(html){
+  return html
+    // "This email was sent to someone@..." line in the footer
+    .replace(/This email was sent to\s*<a[^>]*>[\s\S]*?<\/a>/gi, '')
+    // Personal unsubscribe / preferences links -> the public signup page instead
+    .replace(/https?:\/\/[a-z0-9.-]*list-manage\.com\/(unsubscribe|profile)\?[^"'\s>]*/gi, LN_PUBLISHERS.ymm.subscribeUrl)
+    // Personal subscriber ID on every other Mailchimp link (plain and URL-encoded)
+    .replace(/([?&]|&amp;)e=[0-9a-f]{6,}/gi, function(m, pre){ return pre === '?' ? '?_=' : ''; })
+    .replace(/%26e%3D[0-9a-f]{6,}/gi, '')
+    .replace(/mailto:[^"'\s>]*@travtriv\.ca/gi, '#')
+    .replace(/[\w.+-]+@travtriv\.ca/gi, '');
+}
+function lnFindHeaderImg(html){
+  var start = html.indexOf('<body');
+  var m = html.slice(start === -1 ? 0 : start).match(/<img[^>]+src="(https?:\/\/[^"]+)"/i);
+  return m ? m[1] : '';
+}
+
+function renderPublisherBanner(entry){
+  var pub = entry.publisher || LN_PUBLISHERS[entry.badgeClass || 'ymm'];
+  if (!pub || entry.type !== 'iframe') return '';
+  var img = entry.headerImg || '';
+  var html = '<div class="pub-banner">';
+  if (img) html += '<a class="pub-img" href="' + pub.url + '" target="_blank" rel="noopener"><img src="' + img + '" alt="' + esc(pub.name) + '" loading="lazy" onerror="this.parentNode.style.display=\'none\'"></a>';
+  html += '<div class="pub-body">'
+    + '<div class="pub-kicker">Brought to you by</div>'
+    + '<div class="pub-name">' + esc(pub.name) + (pub.from ? ' <span>' + esc(pub.from) + '</span>' : '') + '</div>'
+    + (pub.tagline ? '<p class="pub-tag">' + esc(pub.tagline) + '</p>' : '')
+    + '<div class="pub-actions">'
+    + '<a class="pub-btn" href="' + pub.url + '" target="_blank" rel="noopener">' + esc(pub.urlLabel || 'Visit website') + '</a>'
+    + '</div>';
+  html += '</div></div>';
+  return html;
+}
+
+// Clean each newsletter before showing it (covers copies published before this fix too)
+function lnPrepareEntry(entry){
+  if (entry.type === 'iframe' && entry.html_b64) {
+    var decoded = lnB64Decode(entry.html_b64);
+    if (decoded) {
+      var clean = lnSanitize(decoded);
+      if (!entry.headerImg) entry.headerImg = lnFindHeaderImg(clean);
+      if (clean !== decoded) entry.html_b64 = lnB64Encode(clean);
+    }
+  }
+  return entry;
+}
+
+function renderEntry(entry, idx){
+  var badgeClass = entry.badgeClass || 'ymm';
+  var panelId = 'ln-panel-' + idx;
+  var isIframe = entry.type === 'iframe' && entry.html_b64;
+  var html = '<div class="entry">'
+    + renderPublisherBanner(entry)
+    + '<div class="entry-meta">'
+    +   '<span class="source-badge ' + badgeClass + '"><span class="dot"></span>' + esc(entry.badge || '') + '</span>'
+    +   '<span class="entry-date">' + esc(entry.date || '') + '</span>'
+    + '</div>'
+    + '<h2>' + (entry.headline || '') + '</h2>'
+    + '<p class="teaser">' + (entry.teaser || '') + '</p>';
+
+  if (isIframe) {
+    // One click straight to the full newsletter — no inline preview step first.
+    html += '<button class="expand-btn ' + badgeClass + ' primary" onclick="openLnFullscreen(' + idx + ')">' + esc(entry.expandLabel || 'Read the full newsletter') + '</button>';
+    if (entry.creditHtml) {
+      html += '<div class="panel-credit" style="background:none;border:none;padding:10px 0 0;">' + entry.creditHtml + '</div>';
+    }
+  } else {
+    html += '<button class="expand-btn ' + badgeClass + '" onclick="togglePanel(\'' + panelId + '\', this)" aria-expanded="false">' + esc(entry.expandLabel || 'Read more') + '</button>'
+      + '<div class="panel" id="' + panelId + '">'
+      +   '<div class="panel-credit">' + (entry.creditHtml || '') + '</div>';
+    if (entry.bodyHtml) html += '<div class="rmwb-body">' + entry.bodyHtml + '</div>';
+    html += '</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function openLnFullscreen(idx){
+  var entry = lnEntries[idx];
+  if (!entry || !entry.html_b64) return;
+  document.getElementById('lnFullscreenFrame').src = 'data:text/html;base64,' + entry.html_b64;
+  document.getElementById('lnFullscreenOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLnFullscreen(){
+  document.getElementById('lnFullscreenOverlay').classList.remove('open');
+  document.getElementById('lnFullscreenFrame').src = 'about:blank';
+  document.body.style.overflow = '';
+}
+
+function loadLocalNews(){
+  var feed = document.getElementById('feed');
+  fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(LN_CLOUD_KEY) + '&select=data', {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(rows){
+      var data = (rows && rows[0] && rows[0].data) ? rows[0].data : null;
+      if (!data || !Array.isArray(data.entries) || !data.entries.length) {
+        feed.innerHTML = '<p style="text-align:center;color:var(--ink-soft);padding:40px 0;">No local news posted yet — check back soon.</p>';
+        return;
+      }
+      lnEntries = data.entries.map(lnPrepareEntry);
+      feed.innerHTML = lnEntries.map(renderEntry).join('');
+    })
+    .catch(function(err){
+      console.warn('[local-news] load failed:', err);
+      feed.innerHTML = '<p style="text-align:center;color:var(--ink-soft);padding:40px 0;">Couldn\u2019t load local news right now — try refreshing.</p>';
+    });
+}
+loadLocalNews();
+
+function togglePanel(id, btn) {
+  var panel = document.getElementById(id);
+  var isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open');
+  btn.setAttribute('aria-expanded', String(!isOpen));
+  btn.textContent = isOpen ? btn.textContent.replace('Hide', 'Read') : btn.textContent.replace('Read', 'Hide');
+
+  if (!isOpen) {
+    var iframe = panel.querySelector('iframe');
+    if (iframe) {
+      iframe.onload = function() {
+        try {
+          var h = iframe.contentWindow.document.body.scrollHeight;
+          iframe.style.height = (h + 20) + 'px';
+        } catch (e) {
+          iframe.style.height = '2000px';
+        }
+      };
+      // trigger resize in case already loaded (cached)
+      setTimeout(function() {
+        try {
+          var h = iframe.contentWindow.document.body.scrollHeight;
+          if (h > 100) iframe.style.height = (h + 20) + 'px';
+        } catch (e) {}
+      }, 300);
+    }
+  }
+}
+</script>
+<script src="visitor-tracker.js" defer></script>
+
+</body>
+</html>

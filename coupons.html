@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coupons — Local Deals | Beyond the Highway</title>
+<link rel="stylesheet" href="push-signup.css">
+<style>
+  :root{--bg:#04140d;--panel:#061d14;--green:#7CFF5C;--green-soft:#9bdc75;--soft:rgba(140,255,92,.28);--ink:#eafff0;--mut:#9fc4ad;--gold:#e6b85c}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:
+    radial-gradient(1200px 600px at 50% -10%,#0a2b1c 0%,var(--bg) 55%) fixed;color:var(--ink);
+    -webkit-font-smoothing:antialiased;line-height:1.45}
+  .wrap{max-width:640px;margin:0 auto;padding:0 16px 40px}
+  .topnav{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  a.back{display:inline-flex;align-items:center;gap:7px;margin:14px 2px 2px;padding:9px 14px;border:1px solid var(--soft);
+    border-radius:12px;background:rgba(6,29,20,.85);color:var(--green-soft);text-decoration:none;font-size:14px;font-weight:600}
+  header{margin:13px 2px 4px}
+  .kick{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);
+    border:1px solid var(--soft);border-radius:999px;padding:4px 11px;margin-bottom:10px}
+  h1{margin:.1em 0 .1em;font-size:1.4rem;line-height:1.12}
+  .sub{color:var(--mut);font-size:.9rem;margin:0}
+  .myCouponsBtn{display:inline-flex;align-items:center;gap:6px;margin:10px 2px 0;padding:8px 13px;
+    border:1.5px solid var(--soft);border-radius:11px;background:rgba(140,255,92,.06);color:var(--green-soft);
+    text-decoration:none;font-size:.83rem;font-weight:700}
+
+  /* ---- list ---- */
+  .ccard{display:flex;gap:12px;align-items:center;border:1.5px solid #2f9e5e;border-radius:14px;
+    background:rgba(4,17,11,.72);padding:12px;margin:12px 0;cursor:pointer;text-align:left;width:100%;
+    color:inherit;font:inherit}
+  .ccard:active{background:rgba(124,255,92,.06)}
+  .ccard .thumb{flex:0 0 auto;width:64px;height:64px;border-radius:10px;object-fit:cover;background:#0a2b1c}
+  .ccard .thumb-ph{flex:0 0 auto;width:64px;height:64px;border-radius:10px;background:#0a2b1c;display:flex;
+    align-items:center;justify-content:center;font-size:26px}
+  .ccard .cbody{flex:1;min-width:0}
+  .ccard .biz{font-weight:800;font-size:.98rem;margin:0 0 2px}
+  .ccard .deal{color:var(--green-soft);font-weight:700;font-size:.9rem;margin:0 0 3px}
+  .ccard .exp{color:var(--mut);font-size:.78rem;margin:0}
+  .ccard .arrow{flex:0 0 auto;color:var(--mut);font-size:1.2rem}
+
+  /* ---- detail ---- */
+  #detail{display:none}
+  #detail.open{display:block}
+  #list-view.hidden{display:none}
+  .dhero{width:100%;max-height:220px;object-fit:cover;border-radius:14px;border:1.5px solid #2f9e5e;margin:14px 0 2px}
+  .dbiz{font-family:inherit;font-size:1.3rem;font-weight:800;margin:14px 0 2px}
+  .ddeal{color:var(--green-soft);font-weight:800;font-size:1.05rem;margin:0 0 10px}
+  .dbox{border:1px solid var(--soft);border-radius:12px;background:rgba(6,29,20,.6);padding:12px 13px;margin:10px 0}
+  .dbox .label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin:0 0 4px}
+  .dbox .value{font-size:.95rem}
+  .dbtns{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
+  .dbtn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border:1.5px solid #2f9e5e;border-radius:10px;
+    background:#04140d;color:#eafff0;text-decoration:none;font-size:.85rem;font-weight:700}
+  .about{margin-top:14px}
+  .about h4{margin:0 0 6px;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;color:var(--green)}
+  .about p{margin:0;color:var(--ink);font-size:.95rem}
+
+  .redeem-wrap{margin-top:22px;padding-top:16px;border-top:1px solid var(--soft)}
+  .redeem-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:16px;
+    border:none;border-radius:14px;background:linear-gradient(135deg,#7CFF5C,#39c46a);color:#04140d;font-weight:800;
+    font-size:1.02rem;cursor:pointer;box-shadow:0 6px 20px rgba(57,196,106,.25)}
+  .redeem-btn:disabled{background:#264a35;color:var(--mut);box-shadow:none;cursor:default}
+  .redeem-hint{color:var(--mut);font-size:.8rem;text-align:center;margin:8px 0 0}
+  .confirm-box{margin-top:12px;border:1.5px solid var(--gold);border-radius:12px;background:rgba(230,184,92,.08);
+    padding:14px}
+  .confirm-box p{margin:0 0 12px;font-size:.9rem;color:var(--ink)}
+  .confirm-row{display:flex;gap:8px}
+  .confirm-row button{flex:1;padding:11px;border-radius:10px;border:none;font-weight:700;font-size:.9rem;cursor:pointer}
+  .confirm-row .go{background:linear-gradient(135deg,#7CFF5C,#39c46a);color:#04140d}
+  .confirm-row .cancel{background:var(--panel);color:var(--ink);border:1px solid var(--soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav">
+    <a class="back" href="index.html">&larr;&nbsp;Beyond the Highway</a>
+  </div>
+
+  <div id="list-view">
+    <header>
+      <span class="kick">Coupons</span>
+      <h1>Local Deals</h1>
+      <p class="sub" id="listSub">Offers from Beyond the Highway Coupon Partners.</p>
+      <div id="myCouponsWrap"></div>
+    </header>
+    <div id="listWrap"></div>
+  </div>
+
+  <div id="detail">
+    <div id="detailBody"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   COUPONS — CLOUD-BACKED
+   Coupon content lives in Supabase (bth_content, key
+   "coupon_offers"), managed from admin.html's "Coupon Partners"
+   panel. Redemptions write to a separate table, coupon_redemptions
+   (public insert-only — see coupon-redemptions-setup.sql).
+   ============================================================ */
+var SUPABASE_URL = 'https://ceipylnjdidjqidamkpw.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlaXB5bG5qZGlkanFpZGFta3B3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyOTQ1MjAsImV4cCI6MjA5ODg3MDUyMH0.TGZYRcjscN3ysRfTT5iHSl2pTOIhvMF6dCd-elm7L7g';
+var COUPON_CLOUD_KEY = 'coupon_offers';
+var PLACES_CLOUD_KEY = 'places_items';
+
+var COUPONS = [];
+var PLACES = [];
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+var COUNTS = {};
+
+function couponCloudPull(){
+  return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(COUPON_CLOUD_KEY) + '&select=data', {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(rows){ return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : []; })
+    .catch(function(err){ console.warn('[cloud] coupons pull failed:', err); return []; });
+}
+
+// Claim counts come from a public view (coupon_redemption_counts) over the
+// locked-down coupon_redemptions table — see coupon-redemption-limits-setup.sql.
+function couponCountsPull(){
+  return fetch(SUPABASE_URL + '/rest/v1/coupon_redemption_counts?select=coupon_id,redeemed_count', {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+  }).then(function(res){ return res.ok ? res.json() : []; })
+    .then(function(rows){
+      var map = {};
+      (rows || []).forEach(function(r){ map[r.coupon_id] = r.redeemed_count; });
+      return map;
+    }).catch(function(){ return {}; });
+}
+
+function isSoldOut(coupon){
+  return !!(coupon.limit && (COUNTS[coupon.id] || 0) >= coupon.limit);
+}
+
+// Optional enrichment only — if this fails or is slow, the coupon page
+// still works fine without directions/website links on the detail view.
+function placesCloudPull(){
+  return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(PLACES_CLOUD_KEY) + '&select=data', {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(rows){ return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : []; })
+    .catch(function(){ return []; });
+}
+
+function activeCoupons(){
+  var today = new Date().toISOString().slice(0, 10);
+  return COUPONS.filter(function(c){
+    return c.active && (!c.expiresAt || c.expiresAt >= today);
+  });
+}
+
+function findPlace(businessName){
+  return PLACES.find(function(p){ return p.title === businessName; }) || null;
+}
+
+function renderList(){
+  var wrap = document.getElementById('listWrap');
+  var live = activeCoupons();
+  if (!live.length){
+    wrap.innerHTML = '<p class="empty">No current offers &mdash; check back soon.</p>';
+    return;
+  }
+  wrap.innerHTML = live.map(function(c){
+    var thumb = c.image
+      ? '<img class="thumb" src="' + esc(c.image) + '" alt="">'
+      : '<div class="thumb-ph">🏷️</div>';
+    var soldOut = isSoldOut(c);
+    var claimLine = soldOut
+      ? '<p class="exp">Sold out</p>'
+      : (c.limit ? '<p class="exp">' + (COUNTS[c.id] || 0) + ' of ' + c.limit + ' claimed</p>' : '');
+    var exp = c.expiresAt ? '<p class="exp">Expires ' + esc(c.expiresAt) + '</p>' : '';
+    return '<button class="ccard" type="button" data-id="' + esc(c.id) + '">'
+      + thumb
+      + '<div class="cbody"><p class="biz">' + esc(c.businessName) + '</p><p class="deal">' + esc(c.discountText) + '</p>' + claimLine + exp + '</div>'
+      + '<span class="arrow">&rsaquo;</span>'
+      + '</button>';
+  }).join('');
+  wrap.querySelectorAll('[data-id]').forEach(function(btn){
+    btn.onclick = function(){ openCoupon(btn.getAttribute('data-id'), true); };
+  });
+}
+
+function redeemStorageKey(id){ return 'bth_coupon_redeemed_' + id; }
+
+// Shows an "Edit My Coupon" button only if THIS device remembers signing one
+// up (same localStorage list coupon-signup.html/coupon-edit.html write to).
+// Nothing server-side involved — a different device just won't see it.
+function renderMyCoupons(){
+  var wrap = document.getElementById('myCouponsWrap');
+  var mine = [];
+  try { mine = JSON.parse(localStorage.getItem('bth_my_coupons') || '[]'); } catch(e){}
+  if (!mine.length){ wrap.innerHTML = ''; return; }
+  wrap.innerHTML = mine.map(function(c){
+    return '<a class="myCouponsBtn" href="' + esc(c.editUrl) + '">✏️ Edit ' + esc(c.businessName || 'my coupon') + '</a>';
+  }).join('');
+}
+renderMyCoupons();
+
+
+// Calls a database function (not a plain insert) so the "is there still room
+// under the claim limit?" check and the insert happen together, atomically,
+// on the server — two customers tapping Redeem on the last spot at the same
+// moment can't both get through. Returns 'ok', 'full', or 'error' to onDone.
+function redeemCoupon(coupon, onDone){
+  fetch(SUPABASE_URL + '/rest/v1/rpc/redeem_coupon_if_available', {
+    method: 'POST',
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_coupon_id: coupon.id, p_business_name: coupon.businessName, p_limit: coupon.limit || null })
+  }).then(function(res){
+    if (!res.ok){ onDone('error'); return; }
+    return res.json().then(function(result){ onDone(result === true ? 'ok' : 'full'); });
+  }).catch(function(){ onDone('error'); });
+}
+
+function renderDetail(coupon){
+  var place = findPlace(coupon.businessName);
+  var alreadyRedeemed = false;
+  try { alreadyRedeemed = !!localStorage.getItem(redeemStorageKey(coupon.id)); } catch (e) {}
+
+  var hero = coupon.image ? '<img class="dhero" src="' + esc(coupon.image) + '" alt="">' : '';
+
+  var linkBtns = '';
+  // Prefer the coupon's own location (business-supplied at signup, so it
+  // works even when there's no matching Places record) over a Places match.
+  if (coupon.location){
+    linkBtns += '<a class="dbtn" href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(coupon.location) + '" target="_blank" rel="noopener">📍 Directions</a>';
+  } else if (place && place.map){
+    linkBtns += '<a class="dbtn" href="' + esc(place.map) + '" target="_blank" rel="noopener">📍 Directions</a>';
+  }
+  // Same pattern for website: the coupon's own signup-supplied website
+  // (needed for online/home-based businesses with no Places listing at all,
+  // e.g. TravTriv/LogicLinks) takes priority over a Places match.
+  if (coupon.website){
+    linkBtns += '<a class="dbtn" href="' + esc(coupon.website) + '" target="_blank" rel="noopener">🌐 Website</a>';
+  } else if (place && place.website){
+    linkBtns += '<a class="dbtn" href="' + esc(place.website) + '" target="_blank" rel="noopener">🌐 Website</a>';
+  }
+  // Same pattern for email: the coupon's own signup/admin-supplied email
+  // takes priority over a Places match.
+  if (coupon.email){
+    linkBtns += '<a class="dbtn" href="mailto:' + esc(coupon.email) + '">✉️ Email</a>';
+  } else if (place && place.email){
+    linkBtns += '<a class="dbtn" href="mailto:' + esc(place.email) + '">✉️ Email</a>';
+  }
+  if (place){
+    if (place.phone) linkBtns += '<a class="dbtn" href="tel:' + esc(place.phone.replace(/[^\d+]/g, '')) + '">📞 Call</a>';
+  }
+
+  var expBox = coupon.expiresAt
+    ? '<div class="dbox"><div class="label">Offer expires</div><div class="value">' + esc(coupon.expiresAt) + '</div></div>'
+    : '';
+
+  var availBox = coupon.limit
+    ? '<div class="dbox"><div class="label">Availability</div><div class="value">' + (COUNTS[coupon.id] || 0) + ' of ' + coupon.limit + ' claimed' + (isSoldOut(coupon) ? ' — sold out' : '') + '</div></div>'
+    : '';
+
+  var sponsorLine = coupon.sponsorOrg
+    ? '<div class="dbox"><div class="label">In support of</div><div class="value">' + esc(coupon.sponsorOrg) + '</div></div>'
+    : '';
+
+  var html = ''
+    + hero
+    + '<div class="dbiz">' + esc(coupon.businessName) + '</div>'
+    + '<div class="ddeal">' + esc(coupon.discountText) + '</div>'
+    + (linkBtns ? '<div class="dbtns">' + linkBtns + '</div>' : '')
+    + expBox
+    + availBox
+    + (coupon.description ? '<div class="about"><h4>Details</h4><p>' + esc(coupon.description) + '</p></div>' : '')
+    + sponsorLine
+    + '<div class="redeem-wrap" id="redeemWrap"></div>';
+
+  document.getElementById('detailBody').innerHTML = html;
+  var state = alreadyRedeemed ? 'redeemed' : (isSoldOut(coupon) ? 'full' : 'idle');
+  renderRedeemArea(coupon, state);
+}
+
+function renderRedeemArea(coupon, state){
+  var wrap = document.getElementById('redeemWrap');
+
+  if (state === 'redeemed'){
+    wrap.innerHTML = '<button class="redeem-btn" type="button" disabled>Redeemed ✓</button>'
+      + '<p class="redeem-hint">This offer has already been redeemed on this device.</p>';
+    return;
+  }
+  if (state === 'full'){
+    wrap.innerHTML = '<button class="redeem-btn" type="button" disabled>Sold out</button>'
+      + '<p class="redeem-hint">This offer has reached its claim limit.</p>';
+    return;
+  }
+
+  wrap.innerHTML = '<button class="redeem-btn" type="button" id="redeemBtn">Staff — tap here to redeem</button>'
+    + '<p class="redeem-hint">Show this screen to staff. Only staff should tap the button above.</p>';
+  document.getElementById('redeemBtn').onclick = function(){
+    wrap.innerHTML = '<div class="confirm-box"><p>Confirm: a staff member is redeeming this offer right now.</p>'
+      + '<div class="confirm-row"><button class="cancel" type="button" id="redeemCancel">Cancel</button>'
+      + '<button class="go" type="button" id="redeemConfirm">Redeem</button></div></div>';
+    document.getElementById('redeemCancel').onclick = function(){ renderRedeemArea(coupon, 'idle'); };
+    document.getElementById('redeemConfirm').onclick = function(){
+      document.getElementById('redeemConfirm').disabled = true;
+      document.getElementById('redeemConfirm').textContent = 'Redeeming…';
+      redeemCoupon(coupon, function(result){
+        if (result === 'ok'){
+          try { localStorage.setItem(redeemStorageKey(coupon.id), new Date().toISOString()); } catch (e) {}
+          COUNTS[coupon.id] = (COUNTS[coupon.id] || 0) + 1;
+          renderRedeemArea(coupon, 'redeemed');
+        } else if (result === 'full'){
+          renderRedeemArea(coupon, 'full');
+        } else {
+          wrap.innerHTML = '<p class="redeem-hint">Something went wrong — check your connection and try again.</p>';
+          setTimeout(function(){ renderRedeemArea(coupon, 'idle'); }, 1800);
+        }
+      });
+    };
+  };
+}
+
+function showList(){
+  document.getElementById('list-view').classList.remove('hidden');
+  document.getElementById('detail').classList.remove('open');
+  document.title = 'Coupons — Local Deals | Beyond the Highway';
+}
+
+function showDetailView(){
+  document.getElementById('list-view').classList.add('hidden');
+  document.getElementById('detail').classList.add('open');
+}
+
+function openCoupon(id, pushHistory){
+  var coupon = COUPONS.find(function(c){ return c.id === id; });
+  if (!coupon){ showList(); return; }
+  if (pushHistory) history.pushState({ c: id }, '', 'coupons.html?c=' + encodeURIComponent(id));
+  document.title = coupon.businessName + ' — Coupon | Beyond the Highway';
+  renderDetail(coupon);
+  showDetailView();
+  window.scrollTo(0, 0);
+}
+
+function getCouponIdFromUrl(){
+  return new URLSearchParams(window.location.search).get('c') || '';
+}
+
+window.addEventListener('popstate', function(){
+  var id = getCouponIdFromUrl();
+  if (id) openCoupon(id, false); else showList();
+});
+
+(function(){
+  Promise.all([couponCloudPull(), placesCloudPull(), couponCountsPull()]).then(function(results){
+    COUPONS = results[0];
+    PLACES = results[1];
+    COUNTS = results[2];
+    renderList();
+    var id = getCouponIdFromUrl();
+    if (id) openCoupon(id, false);
+  });
+})();
+</script>
+<script src="visitor-tracker.js" defer></script>
+
+<script src="push-signup.js"></script>
+<script>
+  window.addEventListener('load', () => setTimeout(BTHPush.maybeShowPopup, 1500));
+</script>
+</body>
+</html>

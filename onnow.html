@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YMM On Now — This Weekend | Beyond the Highway</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="YMM On Now">
+<link rel="apple-touch-icon" href="onnow-icon-180.png">
+<link rel="icon" href="onnow-icon-192.png">
+<link rel="stylesheet" href="push-signup.css">
+<style>
+  :root{--bg:#04140d;--panel:#061d14;--green:#7CFF5C;--green-soft:#9bdc75;--soft:rgba(140,255,92,.28);--ink:#eafff0;--mut:#9fc4ad}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:
+    radial-gradient(1200px 600px at 50% -10%,#0a2b1c 0%,var(--bg) 55%) fixed;color:var(--ink);
+    -webkit-font-smoothing:antialiased;line-height:1.45}
+  .wrap{max-width:640px;margin:0 auto;padding:0 16px 40px}
+  .topnav{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  a.back{display:inline-flex;align-items:center;gap:7px;margin:14px 2px 2px;padding:9px 14px;border:1px solid var(--soft);
+    border-radius:12px;background:rgba(6,29,20,.85);color:var(--green-soft);text-decoration:none;font-size:14px;font-weight:600}
+  header{margin:13px 2px 4px}
+  .kick{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);
+    border:1px solid var(--soft);border-radius:999px;padding:4px 11px;margin-bottom:10px}
+  h1{margin:.1em 0 .1em;font-size:1.4rem;line-height:1.12}
+  .range{color:var(--mut);font-size:.9rem;margin:0}
+  .sponsor{display:flex;align-items:center;gap:10px;margin:10px 0 2px;padding:9px 13px;border:1px solid var(--soft);
+    border-radius:12px;background:rgba(6,29,20,.6)}
+  .sponsor-label{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--mut)}
+  .sponsor-logo{margin-left:auto;height:30px;width:auto;display:block}
+  .sponsor-logo-ph{margin-left:auto;font-weight:800;color:var(--green-soft);border:1px dashed var(--soft);
+    border-radius:8px;padding:5px 12px;font-size:.9rem;white-space:nowrap}
+  /* Featured promos (trails, seasonal events). Managed from admin, shown above everything. */
+  .promos{margin:14px 0 0}
+  .promos:empty{display:none}
+  .promo{display:block;border:1.5px solid var(--green);border-radius:16px;overflow:hidden;background:var(--panel);
+    margin:0 0 12px;text-decoration:none;color:inherit;box-shadow:0 8px 26px rgba(0,0,0,.4),0 0 22px rgba(124,255,92,.12)}
+  .promo img{width:100%;display:block}
+  .promo .pb{padding:12px 14px 14px}
+  .promo .pk{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin:0 0 4px;font-weight:700}
+  .promo .pt{font-weight:800;font-size:1.08rem;margin:0 0 5px;color:var(--ink)}
+  .promo .pd{font-size:.9rem;color:var(--mut);line-height:1.5;margin:0 0 10px;white-space:pre-line}
+  .promo .pgo{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;
+    background:linear-gradient(135deg,#7CFF5C,#39c46a);color:#04140d;font-weight:800;font-size:1rem}
+  .onstage-banner{margin:14px 2px 6px;border-radius:14px;overflow:hidden;border:1px solid var(--soft);background:var(--panel)}
+  .onstage-banner img{width:100%;display:block}
+  .onstage-banner .ob-body{padding:12px 14px 14px}
+  .ob-kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin:0 0 4px;font-weight:700}
+  .ob-name{font-weight:800;color:var(--ink);font-size:1rem;margin:0 0 6px}
+  .ob-sub{font-size:.85rem;color:var(--mut);line-height:1.5;margin:0}
+  .cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:11px 0 4px;padding:12px;
+    border:none;border-radius:14px;background:linear-gradient(135deg,#7CFF5C,#39c46a);color:#04140d;font-weight:800;
+    font-size:1rem;text-decoration:none;box-shadow:0 6px 20px rgba(57,196,106,.25)}
+  .secbar{display:flex;align-items:center;gap:7px;margin:13px 2px 3px;padding-bottom:5px;border-bottom:1px solid var(--soft)}
+  .secbar .dot{width:9px;height:9px;border-radius:50%;background:var(--green-soft);opacity:.45}
+  .secbar .wt{margin-left:6px;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--green-soft);font-weight:700}
+  .vcard{border:1.5px solid #2f9e5e;border-radius:12px;background:rgba(4,17,11,.72);padding:8px 12px 8px;margin:8px 0}
+  .venue{font-weight:800;color:var(--ink);font-size:.98rem;margin:0 0 1px}
+  .ev{display:flex;gap:12px;align-items:baseline;padding:4px 0;border-bottom:1px solid rgba(140,255,92,.10)}
+  .ev:last-of-type{border-bottom:none}
+  .ev .n{flex:1;font-size:.92rem}
+  .ev .tag{flex:0 0 auto;color:var(--green-soft);font-weight:700;font-size:.76rem;letter-spacing:.03em;
+    border:1px solid var(--soft);border-radius:999px;padding:3px 10px;white-space:nowrap}
+  .vbtns{display:flex;gap:8px;margin-top:7px;flex-wrap:wrap}
+  .vbtn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border:1.5px solid #2f9e5e;border-radius:10px;
+    background:#04140d;color:#eafff0;text-decoration:none;font-size:.83rem;font-weight:700}
+  .uphead{margin:24px 2px 4px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--green);
+    border-top:1px solid var(--soft);padding-top:14px}
+  .up{display:flex;gap:12px;align-items:baseline;padding:7px 2px}
+  .up .ui{flex:1;font-size:.93rem;color:var(--mut)}
+  .up .ui b{color:var(--ink);font-weight:700}
+  .up .tag{flex:0 0 auto;color:var(--green-soft);font-weight:700;font-size:.76rem;border:1px solid var(--soft);
+    border-radius:999px;padding:3px 10px;white-space:nowrap}
+  .empty{color:var(--mut);text-align:center;padding:22px 0}
+  .newsbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:20px 0 4px;padding:13px;
+    border:1.5px solid var(--green);border-radius:14px;background:rgba(124,255,92,.08);color:var(--ink);
+    font-weight:800;font-size:.98rem;text-decoration:none}
+  .newsbtn svg{flex:0 0 auto;color:var(--green)}
+  footer{margin-top:22px;color:var(--mut);font-size:.82rem;text-align:center}
+  footer a{color:var(--green-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav">
+    <a class="back" href="index.html">&larr;&nbsp;Beyond the Highway</a>
+    <a class="back" href="map.html">Map&nbsp;&rarr;</a>
+  </div>
+
+  <div class="promos" id="promos"></div>
+
+  <div class="onstage-banner">
+    <img src="onstage-banner.jpg" alt="On Stage with Mike Jones">
+    <div class="ob-body">
+      <p class="ob-kicker">Thanks, Mike!</p>
+      <p class="ob-name">On Stage Productions</p>
+      <p class="ob-sub">Keeping this town informed on what's going on takes real work. Mike Jones does it every week. We source this weekend's lineup from his email.</p>
+    </div>
+  </div>
+
+  <header>
+    <span class="kick">On Now</span>
+    <h1>What's Going On This Weekend</h1>
+    <p class="range" id="range">July 17–19, 2026</p>
+  </header>
+
+  <a class="cta" id="ctaTop" href="#" target="_blank" rel="noopener">More info &amp; full poster on YMM Online ↗</a>
+
+  <div class="secbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="wt">This Weekend</span></div>
+  <div id="list"></div>
+
+  <a class="newsbtn" href="local-news.html">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+    More events &amp; local news &rarr;
+  </a>
+
+  <footer>
+    Lineup courtesy of <strong>On Stage Productions</strong> (Mike Jones), updated weekly · <a id="srcBottom" href="#" target="_blank" rel="noopener">More info on YMM Online ↗</a>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   ON NOW — CLOUD-BACKED
+   Data now lives in Supabase (bth_content, key "onnow_content"),
+   edited via admin.html's "On Now" panel — no redeploy needed.
+   ONNOW below is only the fallback shown if the cloud fetch fails
+   (e.g. offline). Update the weekly lineup through the admin
+   panel, not by editing this file.
+   ============================================================ */
+const ONNOW_FALLBACK = {
+  range: "July 17–19, 2026",
+  source: "https://ymmonline.ca/",
+  venues: [
+    {"venue":"YMM Pub Crawl — Seven Bars Downtown","web":"","events":[{"n":"RE/MAX Connect Fort McMurray Food Festival Summer Pub Crawl — 4 themed buses, drink & appetizer samples, stops at EVP, Blackhorse, Boston Pizza, Original Joe's, Kickin' Horse & The Banquet (18+, starts 5pm at Q Social)","d":"Sat"}],"map":"https://www.google.com/maps/search/?api=1&query=Q%20Social%20Fort%20McMurray"},
+    {"venue":"Rivers Casino","web":"","events":[{"n":"Will Randall","d":"Fri & Sat"}],"map":"https://www.google.com/maps/search/?api=1&query=Rivers%20Casino%20Fort%20McMurray"},
+    {"venue":"Kickin' Horse Saloon","web":"","events":[{"n":"90's Rock Music Bingo","d":"Sat"},{"n":"Outliar","d":"Fri & Sat"},{"n":"Open Jam w/ Larry or Summer Karaoke","d":"Tue (rotates)"},{"n":"FREE Line Dancing Lessons","d":"Wed"},{"n":"Music Bingo or Trivia","d":"Thu"}],"map":"https://www.google.com/maps/search/?api=1&query=Kickin%20Horse%20Saloon%20Fort%20McMurray"},
+    {"venue":"Blackhorse Pub","web":"","events":[{"n":"Midlife Crisis","d":"Fri & Sat"},{"n":"Karaoke","d":"Sun"},{"n":"Trivia","d":"Tue"}],"map":"https://www.google.com/maps/search/?api=1&query=Black%20Horse%20Pub%20Fort%20McMurray"},
+    {"venue":"Boston Pizza Timberlea","web":"https://www.bostonpizza.com/en/locations/fort-mcmurray-timberlea.html","events":[{"n":"Max Noseworthy","d":"Sat"},{"n":"Adam Bugden","d":"Sun eve"}],"map":"https://www.google.com/maps/search/?api=1&query=Boston%20Pizza%20Timberlea%20Fort%20McMurray"},
+    {"venue":"Q Social","web":"https://www.qsocial.ca/","events":[{"n":"Karaoke","d":"Thu & Sun"},{"n":"DJ Spinfiyaaa Country Night","d":"Sat"}],"map":"https://www.google.com/maps/search/?api=1&query=Q%20Social%20Fort%20McMurray"},
+    {"venue":"Bailey's Pub","web":"","events":[{"n":"Karaoke","d":"Thu–Sat"}],"map":"https://www.google.com/maps/search/?api=1&query=Baileys%20Pub%20Fort%20McMurray"},
+    {"venue":"Canadian Brewhouse","web":"https://thecanadianbrewhouse.com/locations/fort-mcmurray/","events":[{"n":"Karaoke","d":"Sat"},{"n":"Music Bingo","d":"Wed"}],"map":"https://www.google.com/maps/search/?api=1&query=Canadian%20Brewhouse%20Fort%20McMurray"},
+    {"venue":"Brewskis","web":"","events":[{"n":"The Bennetts","d":"Fri"}],"map":"https://www.google.com/maps/search/?api=1&query=Brewskis%20Pub%20Fort%20McMurray"},
+    {"venue":"East Village Pub & Eatery (EVP)","web":"","events":[{"n":"DJ Shadow","d":"Fri & Sat"},{"n":"QPid Karaoke","d":"Sun"}],"map":"https://www.google.com/maps/search/?api=1&query=East%20Village%20Pub%20and%20Eatery%20Fort%20McMurray"},
+    {"venue":"Tavern on Main","web":"https://tavernonmainymm.com/","events":[{"n":"Open Mic Night","d":"Sat"}],"map":"https://www.google.com/maps/search/?api=1&query=Tavern%20on%20Main%20Fort%20McMurray"},
+    {"venue":"Redpoll Centre","web":"","events":[{"n":"An Evening with Ivan Coyote","d":"Sat"}],"map":"https://www.google.com/maps/search/?api=1&query=Redpoll%20Centre%20Fort%20McMurray"},
+    {"venue":"King Street Theatre","web":"","events":[{"n":"Summer Drama Camp — Teens Edition Showcase","d":"Fri aft"}],"map":"https://www.google.com/maps/search/?api=1&query=King%20Street%20Theatre%20Fort%20McMurray"}
+  ],
+  upcoming: [
+    {"n":"Canadian Wrestling's Elite & Jeff Batchelor present \u201cCruel Summer\u201d","v":"Fort McMurray Royal Canadian Legion","d":"Jul 27"},
+    {"n":"Name That Tune / Chili Cookoff","v":"Kickin' Horse Saloon","d":"Jul 29"},
+    {"n":"WrestleMania Trivia","v":"Canadian Brewhouse","d":"Aug 5"},
+    {"n":"Name That Tune All Genres","v":"Blackhorse Pub","d":"Aug 12"},
+    {"n":"Wood Buffalo Ribfest","v":"Father Merc Field / Centrefire Place","d":"Sep 4–7"}
+  ]
+};
+
+// ---- Supabase (same project used across BTH's admin-edited content) ----
+var SUPABASE_URL = 'https://ceipylnjdidjqidamkpw.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlaXB5bG5qZGlkanFpZGFta3B3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyOTQ1MjAsImV4cCI6MjA5ODg3MDUyMH0.TGZYRcjscN3ysRfTT5iHSl2pTOIhvMF6dCd-elm7L7g';
+var ON_CLOUD_KEY = 'onnow_content';
+
+function onCloudPull(){
+  return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(ON_CLOUD_KEY) + '&select=data', {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(rows){ return (rows && rows[0] && rows[0].data !== undefined) ? rows[0].data : null; })
+    .catch(function(err){ console.warn('[cloud] on now pull failed, using fallback:', err); return null; });
+}
+
+function venueMapUrl(v){
+  // The weekly admin-published data never carries a per-venue "map" field
+  // (confirmed: admin's schema only stores venue + events) — only the
+  // hardcoded fallback above has one. Build the Directions link from the
+  // venue name itself so it always works, whether or not v.map is set.
+  if (v.map) return v.map;
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((v.venue||'') + ' Fort McMurray');
+}
+
+function renderOnNow(ONNOW){
+  document.getElementById('range').textContent = ONNOW.range;
+  ['srcBottom','ctaTop'].forEach(function(id){ document.getElementById(id).href = ONNOW.source || ONNOW_FALLBACK.source; });
+  var list = document.getElementById('list');
+  list.innerHTML = '';
+  var venues = ONNOW.venues||[];
+  if(!venues.some(function(v){return (v.events||[]).length;})){
+    list.innerHTML = '<p class="empty">This weekend\u2019s full lineup is on the poster \u2014 tap the button above.</p>';
+  } else {
+    venues.forEach(function(v){
+      if(!(v.events||[]).length) return;
+      var card=document.createElement('div'); card.className='vcard';
+      var h='<div class="venue">'+v.venue+'</div>';
+      v.events.forEach(function(e){
+        h+='<div class="ev"><div class="n">'+(e.n||'')+'</div>'+(e.d?'<div class="tag">'+e.d+'</div>':'')+'</div>';
+      });
+      h+='<div class="vbtns"><a class="vbtn" href="'+venueMapUrl(v)+'" target="_blank" rel="noopener">\uD83D\uDCCD Directions</a>';
+      if(v.web){ h+='<a class="vbtn" href="'+v.web+'" target="_blank" rel="noopener">\uD83C\uDF10 Website</a>'; }
+      h+='</div>';
+      card.innerHTML=h; list.appendChild(card);
+    });
+  }
+  if((ONNOW.upcoming||[]).length){
+    var uh=document.createElement('div'); uh.className='uphead'; uh.textContent='Upcoming'; list.appendChild(uh);
+    ONNOW.upcoming.forEach(function(u){
+      var row=document.createElement('div'); row.className='up';
+      row.innerHTML='<div class="ui"><b>'+(u.v||'')+'</b> \u2014 '+(u.n||'')+'</div>'+(u.d?'<div class="tag">'+u.d+'</div>':'');
+      list.appendChild(row);
+    });
+  }
+}
+
+/* ============================================================
+   FEATURED PROMOS
+   Supabase bth_content, key "onnow_promos", shape:
+   { items: [ { id, title, blurb, image, url, button, kicker, active, from, until } ] }
+   Edited from admin. Hidden automatically outside from/until
+   (YYYY-MM-DD, Edmonton date) or when active is false.
+   ============================================================ */
+var PROMO_KEY = 'onnow_promos';
+
+function promoPull(){
+  return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(PROMO_KEY) + '&select=data', {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(rows){ return (rows && rows[0] && rows[0].data) ? rows[0].data : null; })
+    .catch(function(){ return null; });
+}
+
+function promoEsc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function promoSafeUrl(u){
+  u = String(u || '').trim();
+  return /^https?:\/\//i.test(u) ? u : '';
+}
+function promoToday(){
+  // YYYY-MM-DD in America/Edmonton so end dates flip at local midnight
+  try { return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Edmonton' }); }
+  catch(e){ return new Date().toISOString().slice(0,10); }
+}
+
+function renderPromos(data){
+  var box = document.getElementById('promos');
+  var items = (data && data.items) || [];
+  var today = promoToday();
+  var html = '';
+  items.forEach(function(p){
+    if (!p || p.active === false) return;
+    if (p.from && today < p.from) return;
+    if (p.until && today > p.until) return;
+    var url = promoSafeUrl(p.url);
+    if (!url || !p.title) return;
+    var img = promoSafeUrl(p.image);
+    html += '<a class="promo" data-title="' + promoEsc(p.title) + '" href="' + promoEsc(url) + '" target="_blank" rel="noopener">' +
+      (img ? '<img src="' + promoEsc(img) + '" alt="' + promoEsc(p.title) + '" loading="lazy">' : '') +
+      '<div class="pb">' +
+        '<p class="pk">' + promoEsc(p.kicker || 'Featured') + '</p>' +
+        '<p class="pt">' + promoEsc(p.title) + '</p>' +
+        (p.blurb ? '<p class="pd">' + promoEsc(p.blurb) + '</p>' : '') +
+        '<div class="pgo">' + promoEsc(p.button || 'Play now') + ' ↗</div>' +
+      '</div></a>';
+  });
+  box.innerHTML = html;
+}
+
+(function(){
+  promoPull().then(renderPromos);
+  // Count taps in the existing place_clicks table (shows up by title in analytics).
+  document.getElementById('promos').addEventListener('click', function(e){
+    var a = e.target.closest ? e.target.closest('a.promo') : null;
+    if (!a) return;
+    try {
+      if (window.BTHTrack) BTHTrack.click({ title: a.getAttribute('data-title'), category: 'On Now Promo', tier: 'Featured', type: 'promo_click' });
+    } catch(err) {}
+  });
+})();
+
+(function(){
+  // Show the fallback immediately so the page never sits blank, then
+  // swap in the live cloud data as soon as it arrives.
+  renderOnNow(ONNOW_FALLBACK);
+  onCloudPull().then(function(cloud){
+    if (cloud && typeof cloud === 'object') renderOnNow(cloud);
+  });
+})();
+</script>
+<script src="visitor-tracker.js" defer></script>
+
+<script src="push-signup.js"></script>
+<script>
+  window.addEventListener('load', () => setTimeout(BTHPush.maybeShowPopup, 1500));
+</script>
+</body>
+</html>

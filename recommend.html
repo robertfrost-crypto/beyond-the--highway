@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Local Recommendations | Beyond the Highway — Fort McMurray</title>
+<meta name="description" content="Recommend a local Fort McMurray Wood Buffalo business and see the spots your neighbours love. Reader recommendations, reviewed before posting.">
+<style>
+:root{
+  --bg:#000b07; --panel:#061d14; --panel2:#082419;
+  --green:#8cff5c; --bright:#7dff3d; --green-soft:#9bdc75;
+  --line:#6df044; --lineSoft:rgba(109,240,68,.42); --soft:rgba(140,255,92,.28);
+  --glow:rgba(109,240,68,.28); --button:#a6ff79;
+  --text:#edf5e9; --muted:#b8c5b1; --gold:#ffe5aa;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at top,#163f24 0,#071c12 40%,#000 100%);font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--text)}
+.wrap{max-width:980px;margin:0 auto;padding:0 14px 40px}
+
+/* ---- Back ---- */
+.backBtn{display:inline-flex;align-items:center;gap:7px;margin:14px 2px 2px;padding:9px 14px;border:1px solid rgba(140,255,92,.32);border-radius:12px;background:rgba(6,29,20,.85);color:#9bdc75;text-decoration:none;font-size:14px;font-weight:600}
+
+/* ---- Brand header ---- */
+.topBrand{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin:10px 0 10px;padding:12px 14px;border-radius:0 0 18px 18px;background:linear-gradient(180deg,#174a2c 0%,#0d351f 100%);box-shadow:0 0 18px rgba(109,240,68,.08);position:relative}
+.brandLeft{display:grid;grid-template-columns:74px 1px minmax(0,1fr);gap:14px;align-items:center;min-width:0}
+.miniLogo{width:74px;height:74px;border-radius:20px;display:grid;place-items:center;font-size:38px;line-height:1;color:var(--gold);box-shadow:0 0 12px rgba(109,240,68,.30);background:radial-gradient(circle at 30% 25%,#0f3a23,#04140d);border:1px solid rgba(109,240,68,.30)}
+.brandDivider{width:1px;height:64px;background:rgba(255,255,255,.18)}
+.brandTitle{min-width:0}
+.brandTitle h1{margin:0;font-family:Georgia,'Times New Roman',serif;font-size:clamp(20px,3vw,28px);line-height:.96;color:#fff;font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,.28)}
+.brandTitle .green{display:block;margin-top:0;color:#9cff62;font-size:clamp(11px,1.5vw,14px);letter-spacing:.11em;font-weight:850}
+.brandTitle .place{display:block;margin-top:3px;color:var(--gold);font-size:clamp(9.5px,1.3vw,12px);letter-spacing:.13em;font-weight:850}
+.topActions{display:flex;gap:7px;align-items:center}
+.topBtn{width:36px;height:36px;border:1px solid rgba(180,255,105,.34);border-radius:50%;background:rgba(0,14,8,.30);color:#f7ffe9;text-decoration:none;font-size:17px;font-weight:900;cursor:pointer;display:grid;place-items:center;line-height:1}
+.topBtn:hover{border-color:#9cff62;box-shadow:0 0 10px rgba(109,240,68,.18)}
+
+/* ---- Hero ---- */
+.hero{border:2px solid #7dff3d;border-radius:26px;overflow:hidden;box-shadow:0 0 14px rgba(125,255,61,.55),0 0 46px rgba(125,255,61,.16);background:#00120c}
+.heroFallback{position:relative;min-height:210px;display:grid;place-items:center;text-align:center;padding:34px 20px;
+  background:radial-gradient(circle at 14% 12%,rgba(111,255,73,.32),transparent 22%),radial-gradient(circle at 80% 14%,rgba(111,255,73,.28),transparent 24%),linear-gradient(118deg,rgba(20,128,66,.55),transparent 36%),linear-gradient(180deg,#0a1b17,#020906)}
+.heroFallback:after{content:"";position:absolute;inset:0;background-image:radial-gradient(#fff 1px,transparent 1px);background-size:30px 30px;opacity:.14;pointer-events:none}
+.heroFallback .eyebrow{position:relative;font-size:13px;letter-spacing:.2em;text-transform:uppercase;font-weight:900;color:#dff6d5}
+.heroFallback h2{position:relative;margin:8px 0 6px;font-size:clamp(30px,8vw,58px);line-height:.9;text-transform:uppercase;font-style:italic;font-weight:1000;color:#fff;text-shadow:0 0 16px rgba(109,240,68,.46),0 8px 20px #000}
+.heroFallback h2 span{color:#d5ffc8}
+.heroFallback p{position:relative;margin:8px auto 0;max-width:520px;color:#eff7ec;font-size:13.5px;line-height:1.45}
+
+/* ---- Section title ---- */
+.sectionTitle{display:flex;align-items:center;gap:10px;justify-content:center;margin:26px 0 12px;color:#e8f5e1;letter-spacing:.15em;text-transform:uppercase;font-weight:900;font-size:clamp(18px,5vw,30px);text-shadow:0 0 10px rgba(109,240,68,.18);text-align:center}
+.sectionTitle:before,.sectionTitle:after{content:"";height:3px;width:54px;background:linear-gradient(90deg,transparent,var(--line),transparent);flex:0 0 auto}
+.subNote{margin:0 4px 14px;color:#a9bca0;font-size:12px;line-height:1.4;text-align:center}
+
+/* ---- Card (shared) ---- */
+.card{border:1px solid var(--soft);border-radius:18px;background:linear-gradient(180deg,rgba(6,33,22,.86),rgba(1,14,9,.94));padding:16px;box-shadow:inset 0 0 26px rgba(125,255,61,.06);margin-bottom:16px}
+
+/* ---- Picks ---- */
+.picks{display:flex;flex-direction:column;gap:10px}
+.pick{border:1.5px solid var(--lineSoft);border-radius:16px;background:linear-gradient(180deg,rgba(8,44,28,.82),rgba(4,27,18,.9));box-shadow:inset 0 0 18px rgba(109,240,68,.035),0 0 16px rgba(0,0,0,.32);padding:13px 14px}
+.pick-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.pick h3{margin:0;color:#fff;font-size:16px;line-height:1.15;font-weight:850}
+.pick .area{margin:3px 0 0;color:var(--green-soft);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.stars{font-size:14px;letter-spacing:1px;white-space:nowrap;flex:0 0 auto}
+.stars .on{color:var(--gold);text-shadow:0 0 6px rgba(255,229,170,.35)}
+.stars .off{color:rgba(255,255,255,.18)}
+.pick .blurb{margin:9px 0 0;color:#e7f1e2;font-size:13px;line-height:1.45}
+.pick .by{margin:8px 0 0;color:#9fb098;font-size:11px;font-style:italic}
+.tag{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:850;vertical-align:middle;border:1px solid var(--lineSoft);color:var(--green-soft);background:rgba(109,240,68,.07)}
+.emptyPicks{color:#bbc9b5;font-size:13px;line-height:1.5;text-align:center;padding:8px 4px}
+
+/* ---- Form ---- */
+.formHead{margin:0 0 4px;color:#fff;font-size:18px;font-weight:850}
+.formIntro{margin:0 0 14px;color:#d7e4d0;font-size:12.5px;line-height:1.45}
+.field{margin-bottom:13px}
+.field label{display:block;margin:0 0 5px;color:#fff;font-size:11.5px;font-weight:850;text-transform:uppercase;letter-spacing:.07em}
+.field label .opt{color:#8fb985;font-weight:700;letter-spacing:.04em;text-transform:none}
+.field input,.field textarea,.field select{width:100%;padding:11px 12px;border-radius:11px;border:1px solid var(--lineSoft);background:#020c08;color:#fff;font-size:14px;outline:none;font-family:inherit}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--line);box-shadow:0 0 9px rgba(125,255,61,.22)}
+.field textarea{min-height:96px;resize:vertical}
+.field select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--green-soft) 50%),linear-gradient(135deg,var(--green-soft) 50%,transparent 50%);background-position:calc(100% - 18px) 19px,calc(100% - 13px) 19px;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+
+/* star picker */
+.rateRow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.starPick{display:inline-flex;gap:4px}
+.starPick button{background:none;border:none;cursor:pointer;font-size:26px;line-height:1;color:rgba(255,255,255,.2);padding:0;transition:.12s}
+.starPick button.lit{color:var(--gold);text-shadow:0 0 8px rgba(255,229,170,.4)}
+.starPick button:focus-visible{outline:2px solid var(--line);outline-offset:2px;border-radius:4px}
+.rateClear{background:none;border:none;color:#8fb985;font-size:11px;cursor:pointer;text-decoration:underline;text-transform:uppercase;letter-spacing:.06em;font-weight:700;padding:4px}
+.rateClear[hidden]{display:none}
+
+.btn{display:inline-flex;align-items:center;gap:7px;text-decoration:none;border:1px solid rgba(137,255,77,.75);border-radius:10px;padding:12px 18px;color:var(--button);font-size:12px;font-weight:850;text-transform:uppercase;letter-spacing:.075em;background:rgba(137,255,77,.07);box-shadow:inset 0 0 10px rgba(137,255,77,.04);cursor:pointer;font-family:inherit}
+.btn.gold{border-color:rgba(255,211,106,.7);color:var(--gold);background:rgba(255,211,106,.07)}
+.btn:disabled{opacity:.55;cursor:default}
+
+.thanks{display:none;text-align:center;padding:18px 6px}
+.thanks.show{display:block}
+.thanks .big{font-size:40px;line-height:1;margin-bottom:8px}
+.thanks h3{margin:0 0 6px;color:#fff;font-size:19px}
+.thanks p{margin:0 auto;max-width:440px;color:#dfeada;font-size:13px;line-height:1.5}
+.formErr{display:none;margin-top:10px;color:#ffd0a0;font-size:12px;line-height:1.4}
+.formErr.show{display:block}
+
+.foot{margin:26px 4px 0;padding:16px 0 0;border-top:1px solid rgba(109,240,68,.25);color:#cbd8c5;font-size:12px;line-height:1.5;text-align:center}
+
+@media(max-width:720px){
+  .wrap{padding:0 10px 34px}
+  .topBrand{padding:10px 10px;border-radius:0 0 16px 16px}
+  .brandLeft{grid-template-columns:58px 1px minmax(0,1fr);gap:10px}
+  .miniLogo{width:58px;height:58px;border-radius:15px;font-size:30px}
+  .brandDivider{height:50px}
+  .heroFallback{min-height:180px;padding:28px 16px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="backBtn" href="index.html">&larr;&nbsp;Beyond the Highway</a>
+
+  <div class="topBrand">
+    <div class="brandLeft">
+      <!-- Swap this ★ div for <img class="miniLogo" src="data:image/...;base64,..."> when the badge is ready -->
+      <div class="miniLogo" aria-hidden="true">&#9733;</div>
+      <div class="brandDivider" aria-hidden="true"></div>
+      <div class="brandTitle">
+        <h1>
+          <span class="green">LOCAL RECOMMENDATIONS</span>
+          <span class="place">WOOD BUFFALO &middot; FORT McMURRAY</span>
+        </h1>
+      </div>
+    </div>
+    <div class="topActions">
+      <a class="topBtn" href="#share" title="Recommend a place" aria-label="Recommend a place">&#9998;</a>
+    </div>
+  </div>
+
+  <section class="hero" aria-label="Local Recommendations hero">
+    <div class="heroFallback">
+      <div class="eyebrow">Recommended by locals</div>
+      <h2>LOCALS&rsquo; <span>PICKS</span></h2>
+      <p>The spots your neighbours love &mdash; and your chance to add your own. Tell us about a great local business, a new place that just opened, or one to take off the list.</p>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       LOCALS' PICKS  —  replace ONLY this block each week
+       Each pick: { name, area, stars (1-5 or null), blurb, by, date, example:false }
+       Set example:false on real picks. Delete the example entries.
+       ========================================================= -->
+  <script>
+  const PICKS = [
+    {
+      name: "Example: Tim's Bakehouse",
+      area: "Downtown",
+      stars: 5,
+      blurb: "Best butter tarts in town and the staff remember your order. Cozy spot to work from too.",
+      by: "Sarah",
+      date: "2026",
+      example: true
+    },
+    {
+      name: "Example: Birchwood Trails entrance",
+      area: "Thickwood",
+      stars: 4,
+      blurb: "Great quiet walk right in the city. Quick loop before work, well kept in winter.",
+      by: "A local",
+      date: "2026",
+      example: true
+    }
+  ];
+  </script>
+
+  <div class="sectionTitle">Locals&rsquo; Picks</div>
+  <p class="subNote">Reader recommendations, reviewed before posting. Updated regularly &mdash; check back for new spots.</p>
+
+  <div class="picks" id="picksList"></div>
+
+  <!-- ===================== SUBMISSION FORM ===================== -->
+  <div class="card" id="share" style="margin-top:8px">
+    <div id="formWrap">
+      <h2 class="formHead">Recommend a place</h2>
+      <p class="formIntro">Know a Fort Mac gem? Tell us about it. We read every submission and add the good ones to Locals&rsquo; Picks. Only the business name and your note are required.</p>
+
+      <form name="local-recommendations" method="POST" id="recForm">
+        <p hidden><label>Leave this empty: <input name="bot-field"></label></p>
+
+        <div class="field">
+          <label for="business">Business / place name</label>
+          <input id="business" name="business" type="text" required placeholder="e.g. The Keg, Birchwood Trails, a new shop downtown">
+        </div>
+
+        <div class="field">
+          <label>Your rating <span class="opt">(optional)</span></label>
+          <div class="rateRow">
+            <div class="starPick" id="starPick" role="group" aria-label="Star rating">
+              <button type="button" data-v="1" aria-label="1 star">&#9733;</button>
+              <button type="button" data-v="2" aria-label="2 stars">&#9733;</button>
+              <button type="button" data-v="3" aria-label="3 stars">&#9733;</button>
+              <button type="button" data-v="4" aria-label="4 stars">&#9733;</button>
+              <button type="button" data-v="5" aria-label="5 stars">&#9733;</button>
+            </div>
+            <button type="button" class="rateClear" id="rateClear" hidden>Clear</button>
+          </div>
+          <input type="hidden" name="rating" id="rating" value="">
+        </div>
+
+        <div class="field">
+          <label for="reason">What&rsquo;s great about it?</label>
+          <textarea id="reason" name="reason" required placeholder="A sentence or two on why locals should know about this place."></textarea>
+        </div>
+
+        <div class="field">
+          <label for="area">Neighbourhood / area <span class="opt">(optional)</span></label>
+          <input id="area" name="area" type="text" placeholder="e.g. Thickwood, Timberlea, Downtown, Gregoire">
+        </div>
+
+        <div class="field">
+          <label for="firstname">Your first name <span class="opt">(optional)</span></label>
+          <input id="firstname" name="firstname" type="text" placeholder="So we can credit your pick">
+        </div>
+
+        <div class="field">
+          <label for="type">What&rsquo;s this about? <span class="opt">(optional)</span></label>
+          <select id="type" name="type">
+            <option value="I recommend this place">I recommend this place</option>
+            <option value="New / just-opened spot">A new spot that just opened</option>
+            <option value="Closed or moved">This place has closed or moved</option>
+          </select>
+        </div>
+
+        <button class="btn gold" type="submit" id="submitBtn">Send recommendation</button>
+        <p class="formErr" id="formErr">Something went wrong sending that. Please try again in a moment.</p>
+      </form>
+    </div>
+
+    <div class="thanks" id="thanks" aria-live="polite">
+      <div class="big">&#127881;</div>
+      <h3>Thanks for the recommendation!</h3>
+      <p>We&rsquo;ll take a look and add the good ones to Locals&rsquo; Picks. Got another spot in mind? Refresh the page to send another.</p>
+    </div>
+  </div>
+
+  <div class="foot">
+    Locals&rsquo; Picks are reader recommendations, reviewed before posting.<br>
+    Powered by Ask Mac and LogicLinksAI, the AI division of TravTriv Inc.
+  </div>
+
+</div>
+
+<script>
+/* ---------- Supabase (shared cloud content) ---------- */
+const SUPABASE_URL = 'https://ceipylnjdidjqidamkpw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlaXB5bG5qZGlkanFpZGFta3B3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyOTQ1MjAsImV4cCI6MjA5ODg3MDUyMH0.TGZYRcjscN3ysRfTT5iHSl2pTOIhvMF6dCd-elm7L7g';
+const REC_LIVE_KEY = 'recommendations_live';
+
+/* ---------- Render Locals' Picks ---------- */
+const starStr = (n) => {
+  const r = Math.max(0, Math.min(5, parseInt(n,10) || 0));
+  if(!r) return '';
+  let s = '';
+  for(let i=1;i<=5;i++){ s += '<span class="'+(i<=r?'on':'off')+'">&#9733;</span>'; }
+  return '<div class="stars" aria-label="'+r+' out of 5 stars">'+s+'</div>';
+};
+const esc = (t) => String(t==null?'':t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function renderPicks(list){
+  const wrap = document.getElementById('picksList');
+  if(!Array.isArray(list) || list.length === 0){
+    wrap.innerHTML = '<div class="emptyPicks">No picks posted yet &mdash; be the first to recommend a spot below.</div>';
+    return;
+  }
+  wrap.innerHTML = list.map(p => {
+    const tag = p.example ? '<span class="tag">Example</span>' : '';
+    const area = p.area ? '<p class="area">'+esc(p.area)+'</p>' : '';
+    const by = p.by ? '<p class="by">Recommended by '+esc(p.by)+(p.date?' &middot; '+esc(p.date):'')+'</p>' : '';
+    return '<div class="pick">'
+      + '<div class="pick-top">'
+      +   '<div><h3>'+esc(p.name)+tag+'</h3>'+area+'</div>'
+      +   starStr(p.stars)
+      + '</div>'
+      + (p.blurb ? '<p class="blurb">&ldquo;'+esc(p.blurb)+'&rdquo;</p>' : '')
+      + by
+      + '</div>';
+  }).join('');
+}
+
+// Show the local fallback list immediately (fast, no blank flash), then
+// swap in the real published picks from Supabase once/if they load.
+renderPicks(PICKS);
+fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(REC_LIVE_KEY) + '&select=data', {
+  headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+}).then(r => r.ok ? r.json() : null)
+  .then(rows => {
+    const data = rows && rows[0] && Array.isArray(rows[0].data) ? rows[0].data : null;
+    if (data && data.length) renderPicks(data);
+  })
+  .catch(err => console.warn('[cloud] recommendations pull failed, showing fallback picks:', err));
+
+/* ---------- Star rating picker ---------- */
+(function ratingPicker(){
+  const wrap = document.getElementById('starPick');
+  const hidden = document.getElementById('rating');
+  const clear = document.getElementById('rateClear');
+  const stars = Array.from(wrap.querySelectorAll('button'));
+  const paint = (v) => stars.forEach(b => b.classList.toggle('lit', parseInt(b.dataset.v,10) <= v));
+  stars.forEach(b => {
+    b.addEventListener('click', () => {
+      const v = parseInt(b.dataset.v,10);
+      hidden.value = v;
+      paint(v);
+      clear.hidden = false;
+    });
+    b.addEventListener('mouseenter', () => paint(parseInt(b.dataset.v,10)));
+  });
+  wrap.addEventListener('mouseleave', () => paint(parseInt(hidden.value,10) || 0));
+  clear.addEventListener('click', () => { hidden.value=''; paint(0); clear.hidden = true; });
+})();
+
+/* ---------- Form submit -> Supabase review queue ---------- */
+(function formSubmit(){
+  const form = document.getElementById('recForm');
+  const btn = document.getElementById('submitBtn');
+  const err = document.getElementById('formErr');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    err.classList.remove('show');
+
+    // Honeypot: bots that fill this hidden field get a fake success, no submission sent.
+    if (form.querySelector('[name="bot-field"]').value) {
+      document.getElementById('formWrap').style.display = 'none';
+      document.getElementById('thanks').classList.add('show');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending\u2026';
+
+    const item = {
+      business: (form.business.value || '').trim(),
+      rating: form.rating.value || null,
+      reason: (form.reason.value || '').trim(),
+      area: (form.area.value || '').trim(),
+      firstname: (form.firstname.value || '').trim(),
+      type: form.type.value,
+      submittedAt: new Date().toISOString()
+    };
+
+    fetch(SUPABASE_URL + '/rest/v1/rpc/bth_submit_recommendation', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_item: item })
+    }).then((r) => {
+      if(!r.ok) throw new Error('bad status');
+      document.getElementById('formWrap').style.display = 'none';
+      document.getElementById('thanks').classList.add('show');
+      document.getElementById('share').scrollIntoView({ behavior:'smooth', block:'start' });
+    }).catch(() => {
+      err.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Send recommendation';
+    });
+  });
+})();
+</script>
+<script src="visitor-tracker.js" defer></script>
+</body>
+</html>

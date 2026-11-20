@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Sponsor Signup Card | Beyond the Highway</title>
+<style>
+  :root{--bg:#04140d;--green:#7CFF5C;--green-soft:#9bdc75;--soft:rgba(140,255,92,.28);--ink:#eafff0;--mut:#9fc4ad;--gold:#e6b85c}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:
+    radial-gradient(1200px 600px at 50% -10%,#0a2b1c 0%,var(--bg) 55%) fixed;color:var(--ink);
+    -webkit-font-smoothing:antialiased;line-height:1.45}
+  .wrap{max-width:480px;margin:0 auto;padding:0 16px 60px}
+  header{margin:22px 2px 6px;text-align:center}
+  .kick{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);
+    border:1px solid var(--soft);border-radius:999px;padding:4px 11px;margin-bottom:12px}
+  h1{margin:.1em 0 .3em;font-size:1.3rem;line-height:1.2}
+  .lede{color:var(--mut);font-size:.9rem;margin:0}
+
+  .cardOuter{margin-top:6px}
+  .physCard{background:#fff;color:#0b2016;border-radius:20px;padding:28px 24px 24px;max-width:360px;
+    margin:22px auto 0;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+  .pcKicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#2f9e5e;font-weight:800}
+  .pcOrg{font-size:1.35rem;font-weight:800;margin:10px 0 2px;color:#0b2016;line-height:1.25}
+  .pcTag{font-size:.8rem;color:#5c7568;margin-bottom:16px}
+  .pcQrBox{background:#fff;border:1px solid #e7ece9;border-radius:14px;padding:14px;display:inline-block;min-height:200px;min-width:200px}
+  .pcQrBox img{display:block;width:200px;height:200px}
+  .pcCta{margin-top:14px;font-weight:700;font-size:.92rem;color:#0b2016}
+  .pcLink{margin-top:4px;font-size:.72rem;color:#5c7568;word-break:break-all}
+  .pcSplit{margin-top:14px;font-size:.76rem;color:#5c7568;border-top:1px solid #e7ece9;padding-top:12px;text-align:left}
+  .pcSplit b{color:#0b2016}
+
+  .actions{display:none;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:22px}
+  .abtn{padding:11px 16px;border-radius:12px;border:1px solid var(--soft);background:rgba(4,17,11,.6);
+    color:var(--green-soft);font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit}
+  .abtn.primary{background:linear-gradient(135deg,#7CFF5C,#39c46a);color:#04140d;border:none}
+
+  .formMsg{display:none;font-size:.85rem;margin-top:14px;text-align:center}
+  .formMsg.ok{color:var(--green-soft)}
+  .formMsg.err{color:#ffb199}
+
+  footer{margin-top:30px;color:var(--mut);font-size:.8rem;text-align:center}
+
+  @media print{
+    .no-print{display:none !important}
+    body{background:#fff !important}
+    .wrap{max-width:none;padding:0}
+    .physCard{box-shadow:none;border:1.5px dashed #bbb;margin:0 auto;page-break-inside:avoid}
+    @page{margin:.4in}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="no-print">
+    <span class="kick">Beyond the Highway &middot; Sponsor Card</span>
+    <h1>Printable signup card</h1>
+    <p class="lede">Show this on your phone, print it onto a postcard or business card, or use Share to pass this whole page along — to a club member so they can hand it to businesses themselves, or straight to a business owner. Tapping or scanning the QR always goes right to the signup form.</p>
+  </header>
+
+  <div class="cardOuter" id="cardOuter" style="display:none">
+    <div class="physCard" id="physCard">
+      <div class="pcKicker">Beyond the Highway</div>
+      <div class="pcOrg" id="pcOrgName"></div>
+      <div class="pcTag">Coupon Partner Program</div>
+      <div class="pcQrBox" id="qr"></div>
+      <div class="pcCta">Scan to sign up your business</div>
+      <div class="pcLink" id="pcLink"></div>
+      <div class="pcSplit" id="pcSplit"></div>
+    </div>
+  </div>
+
+  <div class="actions no-print" id="actions">
+    <button class="abtn" id="btnCopy" type="button">Copy card link</button>
+    <button class="abtn" id="btnShare" type="button">Share this card</button>
+    <button class="abtn primary" id="btnPrint" type="button">Print this card</button>
+  </div>
+  <p class="formMsg no-print" id="cardMsg"></p>
+
+  <footer class="no-print">Beyond the Highway &middot; Fort McMurray Wood Buffalo</footer>
+</div>
+
+<script>
+var SUPABASE_URL = 'https://ceipylnjdidjqidamkpw.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlaXB5bG5qZGlkanFpZGFta3B3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyOTQ1MjAsImV4cCI6MjA5ODg3MDUyMH0.TGZYRcjscN3ysRfTT5iHSl2pTOIhvMF6dCd-elm7L7g';
+var SPONSOR_CLOUD_KEY = 'coupon_sponsor_orgs';
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+function qsParam(name){ return new URLSearchParams(window.location.search).get(name) || ''; }
+
+function cloudPullKey(key){
+  return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(key) + '&select=data', {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(rows){ return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : []; })
+    .catch(function(){ return []; });
+}
+
+function note(el, msg, ok){
+  el.textContent = msg;
+  el.className = 'formMsg ' + (ok ? 'ok' : 'err');
+  el.style.display = 'block';
+}
+
+var code = qsParam('ref');
+var signupUrl = window.location.origin + '/coupon-signup.html?ref=' + encodeURIComponent(code);
+var cardUrl = window.location.origin + '/sponsor-card.html?ref=' + encodeURIComponent(code);
+
+function showError(msg){
+  document.getElementById('cardOuter').style.display = 'none';
+  document.getElementById('actions').style.display = 'none';
+  note(document.getElementById('cardMsg'), msg, false);
+}
+
+function render(org){
+  var msgEl0 = document.getElementById('cardMsg');
+  msgEl0.style.display = 'none';
+  msgEl0.textContent = '';
+
+  document.getElementById('pcOrgName').textContent = org.name;
+  document.getElementById('pcLink').innerHTML = '<a href="' + esc(signupUrl) + '" target="_blank" rel="noopener" style="color:inherit">' + esc(signupUrl) + '</a>';
+  document.getElementById('pcSplit').innerHTML = 'Half of every subscription supports <b>' + esc(org.name) +
+    '</b> directly — the rest keeps Beyond the Highway running so the deal gets seen.';
+
+  var qrLink = document.createElement('a');
+  qrLink.href = signupUrl;
+  qrLink.target = '_blank';
+  qrLink.rel = 'noopener';
+  qrLink.setAttribute('aria-label', 'Go to the signup form');
+  var qrImg = document.createElement('img');
+  qrImg.alt = 'QR code to sign up as a Coupon Partner — tap to open the form directly';
+  qrImg.width = 200;
+  qrImg.height = 200;
+  qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&margin=8&data=' + encodeURIComponent(signupUrl);
+  qrLink.appendChild(qrImg);
+  var qrBox = document.getElementById('qr');
+  qrBox.innerHTML = '';
+  qrBox.appendChild(qrLink);
+
+  document.getElementById('cardOuter').style.display = 'block';
+  document.getElementById('actions').style.display = 'flex';
+
+  if (org.active === false){
+    note(document.getElementById('cardMsg'),
+      'Heads up: ' + org.name + ' is currently marked inactive in admin — signups from this card won’t lock in their credit until you reactivate it there.',
+      false);
+  }
+
+  // Copy/Share act on this card page's own link (not the bare signup form) —
+  // that way forwarding it to a club member or another volunteer hands them
+  // the same QR code, split explanation, and Copy/Share/Print buttons, so
+  // they can pass it along again or print it themselves. The QR and the link
+  // text above still go straight to the signup form for whoever's ready to
+  // sign up right now.
+  document.getElementById('btnCopy').onclick = function(){
+    var msgEl = document.getElementById('cardMsg');
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(cardUrl).then(function(){ note(msgEl, 'Card link copied — send it to a club member or a business.', true); })
+        .catch(function(){ note(msgEl, 'Couldn’t copy automatically — this page’s address bar has the link.', false); });
+    } else {
+      note(msgEl, 'Couldn’t copy automatically — this page’s address bar has the link.', false);
+    }
+  };
+
+  document.getElementById('btnShare').onclick = function(){
+    if (navigator.share){
+      navigator.share({
+        title: 'Beyond the Highway Coupon Partner — ' + org.name,
+        text: 'Sign up businesses as Beyond the Highway Coupon Partners, supporting ' + org.name,
+        url: cardUrl
+      }).catch(function(){});
+    } else {
+      document.getElementById('btnCopy').click();
+    }
+  };
+
+  document.getElementById('btnPrint').onclick = function(){ window.print(); };
+}
+
+if (!code){
+  showError('This page needs a sponsor link — open it from the “Get printable card” button next to a sponsor in admin, rather than typing this URL directly.');
+} else {
+  cloudPullKey(SPONSOR_CLOUD_KEY).then(function(list){
+    var match = list.find(function(o){ return o.code === code; });
+    if (!match){
+      showError('We couldn’t find that sponsor link. Double check the QR code, or confirm it in Beyond the Highway’s admin panel.');
+      return;
+    }
+    render(match);
+  });
+}
+</script>
+</body>
+</html>

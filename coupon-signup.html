@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Coupon Partner Signup | Beyond the Highway</title>
+<style>
+  :root{--bg:#04140d;--green:#7CFF5C;--green-soft:#9bdc75;--soft:rgba(140,255,92,.28);--ink:#eafff0;--mut:#9fc4ad;--gold:#e6b85c}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:
+    radial-gradient(1200px 600px at 50% -10%,#0a2b1c 0%,var(--bg) 55%) fixed;color:var(--ink);
+    -webkit-font-smoothing:antialiased;line-height:1.45}
+  .wrap{max-width:560px;margin:0 auto;padding:0 16px 60px}
+  .backBtn{display:inline-flex;align-items:center;gap:7px;margin:14px 0 0;padding:9px 14px;border:1px solid var(--soft);
+    border-radius:12px;background:rgba(4,17,11,.72);color:var(--green-soft);text-decoration:none;font-size:13px;font-weight:700}
+  header{margin:20px 2px 6px}
+  .kick{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);
+    border:1px solid var(--soft);border-radius:999px;padding:4px 11px;margin-bottom:12px}
+  h1{margin:.1em 0 .3em;font-size:1.5rem;line-height:1.2}
+  .lede{color:var(--mut);font-size:.92rem;margin:0}
+  .lede b{color:var(--ink)}
+
+  .sponsorBox{border:1.5px solid var(--gold);border-radius:12px;background:rgba(230,184,92,.1);padding:11px 13px;margin:16px 0;font-size:.88rem}
+  .sponsorBox b{color:var(--gold)}
+
+  .guide{border:1.5px dashed var(--soft);border-radius:14px;background:rgba(4,17,11,.5);padding:14px 15px;margin:16px 0;font-size:.86rem;color:var(--mut)}
+  .guide b{color:var(--green-soft)}
+
+  .card{border:1.5px solid #2f9e5e;border-radius:14px;background:rgba(4,17,11,.72);padding:16px;margin:16px 0}
+  .periodRow{display:flex;gap:8px;margin-top:0}
+  .periodBtn{flex:1;padding:10px;border-radius:10px;border:1px solid var(--soft);background:#04140d;color:var(--mut);
+    font-size:.87rem;font-weight:700;cursor:pointer;font-family:inherit}
+  .periodBtn.active{border-color:var(--green);color:var(--ink);background:rgba(140,255,92,.12)}
+  label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--green-soft);margin:14px 0 8px}
+  label:first-child{margin-top:0}
+  input,select,textarea{width:100%;background:#04140d;color:var(--ink);border:1px solid var(--soft);border-radius:10px;
+    padding:12px 13px;font-size:15px;font-family:inherit}
+  textarea{resize:vertical;min-height:70px}
+  .hint{font-size:.78rem;color:var(--mut);margin:6px 2px 0}
+
+  .cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:18px 0 4px;padding:15px;
+    border:none;border-radius:14px;background:linear-gradient(135deg,#7CFF5C,#39c46a);color:#04140d;font-weight:800;
+    font-size:1.02rem;cursor:pointer;box-shadow:0 6px 20px rgba(57,196,106,.25)}
+  .cta:disabled{opacity:.6;cursor:not-allowed}
+  .formMsg{font-size:.85rem;margin-top:10px;text-align:center}
+  .formMsg.ok{color:var(--green-soft)}
+  .formMsg.err{color:#ffb199}
+
+  .editLinkBox{display:none;border:1.5px solid var(--green);border-radius:12px;background:rgba(140,255,92,.08);
+    padding:14px 15px;margin:16px 0;font-size:.88rem}
+  .editLinkBox b{color:var(--green-soft)}
+  .editLinkRow{display:flex;gap:8px;margin-top:10px}
+  .editLinkRow input{flex:1;font-size:12.5px}
+  .editLinkRow button{padding:0 14px;border-radius:10px;border:1px solid var(--soft);background:#04140d;
+    color:var(--ink);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}
+
+  footer{margin-top:30px;color:var(--mut);font-size:.8rem;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="backBtn" href="advertise.html">&larr;&nbsp;Beyond the Highway</a>
+  <header>
+    <span class="kick">Coupon Partner &mdash; $20/mo</span>
+    <h1>Set up your coupon</h1>
+    <p class="lede">Your offer goes on our <b>Coupons page</b> and out to everyone who's opted in for local deal alerts. Fill this in, hit Activate, and you're on your way to checkout &mdash; cancel anytime.</p>
+  </header>
+
+  <div class="sponsorBox" id="sponsorBox" style="display:none"></div>
+
+  <div class="guide">
+    <b>What makes a good offer?</b> A discount on your slow days or hours, a happy-hour style deal, 10%+ off, or something free with a purchase &mdash; whatever's worth a customer pulling out their phone for.
+  </div>
+
+  <div class="card">
+    <label>Billing</label>
+    <div class="periodRow" id="csPeriodRow">
+      <button type="button" class="periodBtn" data-period="monthly">Monthly &mdash; $20/mo</button>
+      <button type="button" class="periodBtn" data-period="annual">Annual &mdash; $200/yr</button>
+    </div>
+
+    <label for="csBusiness">Business name</label>
+    <input id="csBusiness" autocomplete="off" placeholder="e.g. Riverside Coffee Co.">
+
+    <label for="csLocation">Location (optional)</label>
+    <input id="csLocation" autocomplete="off" placeholder="e.g. 123 Franklin Ave, Fort McMurray">
+    <p class="hint">So customers can get directions right from the coupon. Leave blank if you're a home-based or mobile business.</p>
+
+    <label for="csWebsite">Website (optional)</label>
+    <input id="csWebsite" autocomplete="off" placeholder="e.g. www.yourbusiness.com">
+    <p class="hint">For online or home-based businesses &mdash; the coupon links here instead of a map.</p>
+
+    <label for="csEmail">Email (optional)</label>
+    <input id="csEmail" type="email" autocomplete="off" placeholder="e.g. owner@business.com">
+    <p class="hint">Shows an Email button on your coupon for customers to reach you directly.</p>
+
+    <label for="csOffer">Your offer</label>
+    <textarea id="csOffer" maxlength="200" placeholder="e.g. 15% off your order, or Free coffee with any breakfast combo"></textarea>
+
+    <label for="csExpires">Offer expires (optional)</label>
+    <input id="csExpires" type="date">
+
+    <label for="csLimit">Limit how many can be claimed (optional)</label>
+    <input id="csLimit" type="number" min="0" step="10" inputmode="numeric" placeholder="e.g. 50 &mdash; leave blank for unlimited">
+
+    <label for="csSponsor" id="csSponsorLabel">Sponsoring organization (optional)</label>
+    <select id="csSponsor"><option value="">No sponsor</option></select>
+    <p class="hint" id="csSponsorHint">Pick a group and half your subscription goes directly to support them &mdash; the rest funds Beyond the Highway&rsquo;s upkeep &amp; marketing either way.</p>
+
+    <label for="csContact">Your phone or email</label>
+    <input id="csContact" autocomplete="off" placeholder="So we can confirm your payment with you">
+
+    <button class="cta" id="csActivate" type="button">Activate &amp; continue to payment</button>
+    <p class="formMsg" id="csMsg"></p>
+
+    <div class="editLinkBox" id="editLinkBox">
+      <b>Save this link</b> &mdash; it's the only way to edit your coupon yourself later (change the offer, update photos, turn it off, etc.), before or after it goes live. We don't email it to you automatically.
+      <div class="editLinkRow">
+        <input id="editLinkInput" readonly>
+        <button type="button" id="editLinkCopy">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>Beyond the Highway &middot; Fort McMurray Wood Buffalo</footer>
+</div>
+
+<script>
+var SUPABASE_URL = 'https://ceipylnjdidjqidamkpw.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlaXB5bG5qZGlkanFpZGFta3B3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyOTQ1MjAsImV4cCI6MjA5ODg3MDUyMH0.TGZYRcjscN3ysRfTT5iHSl2pTOIhvMF6dCd-elm7L7g';
+var SIGNUPS_KEY = 'coupon_signup_requests';
+var SIGNUPS_PIN = '2005'; // matches the site's public-submission PIN
+var SPONSOR_CLOUD_KEY = 'coupon_sponsor_orgs';
+
+// Same Payment Links as PAYMENT_LINKS.couponPartnerMonthly / couponPartnerAnnual
+// in advertise.html — keep both copies in sync if either ever changes.
+var COUPON_PAYMENT_LINKS = {
+  monthly: 'https://buy.stripe.com/00w3cu2EK4tA9WE3GscfK0H',
+  annual:  'https://buy.stripe.com/dRm8wO1AG0dk4Ck3GscfK0I'
+};
+
+var VALID_PERIODS = ['monthly', 'annual'];
+var selectedPeriod = VALID_PERIODS.indexOf(new URLSearchParams(window.location.search).get('period')) !== -1
+  ? new URLSearchParams(window.location.search).get('period')
+  : 'monthly';
+
+function renderPeriodButtons(){
+  document.querySelectorAll('#csPeriodRow .periodBtn').forEach(function(btn){
+    btn.classList.toggle('active', btn.getAttribute('data-period') === selectedPeriod);
+  });
+}
+document.querySelectorAll('#csPeriodRow .periodBtn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    selectedPeriod = btn.getAttribute('data-period');
+    renderPeriodButtons();
+  });
+});
+renderPeriodButtons();
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+function cloudPullKey(key){
+  return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(key) + '&select=data', {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(rows){ return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : []; })
+    .catch(function(){ return []; });
+}
+
+function signupsPush(list){
+  return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+    method: 'POST',
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_pin: SIGNUPS_PIN, p_key: SIGNUPS_KEY, p_data: list })
+  }).then(function(res){ return res.ok; }).catch(function(){ return false; });
+}
+
+var sponsorOrgs = [];
+var lockedSponsor = ''; // set when a valid ?ref= was found
+
+function refCode(){
+  return new URLSearchParams(window.location.search).get('ref') || '';
+}
+
+function setupSponsor(){
+  cloudPullKey(SPONSOR_CLOUD_KEY).then(function(list){
+    sponsorOrgs = list;
+    var code = refCode();
+    var match = code ? sponsorOrgs.find(function(o){ return o.code === code && o.active !== false; }) : null;
+    if (match){
+      lockedSponsor = match.name;
+      var box = document.getElementById('sponsorBox');
+      box.style.display = 'block';
+      box.innerHTML = 'Signing up as a Coupon Partner sponsored by <b>' + esc(match.name) + '</b> &mdash; half of your subscription goes directly to support them, the rest funds Beyond the Highway&rsquo;s upkeep &amp; marketing so your coupon gets seen.';
+      document.getElementById('csSponsorLabel').style.display = 'none';
+      document.getElementById('csSponsor').style.display = 'none';
+      document.getElementById('csSponsorHint').style.display = 'none';
+    } else {
+      var active = sponsorOrgs.filter(function(o){ return o.active !== false; });
+      document.getElementById('csSponsor').innerHTML = '<option value="">No sponsor</option>' +
+        active.map(function(o){ return '<option value="' + esc(o.name) + '">' + esc(o.name) + '</option>'; }).join('');
+    }
+  });
+}
+
+document.getElementById('csActivate').addEventListener('click', function(){
+  var businessName = document.getElementById('csBusiness').value.trim();
+  var location = document.getElementById('csLocation').value.trim();
+  var website = document.getElementById('csWebsite').value.trim();
+  if (website && !/^https?:\/\//i.test(website)) website = 'https://' + website;
+  var email = document.getElementById('csEmail').value.trim();
+  var discountText = document.getElementById('csOffer').value.trim();
+  var expiresAt = document.getElementById('csExpires').value || '';
+  var limitRaw = document.getElementById('csLimit').value.trim();
+  var limit = limitRaw ? parseInt(limitRaw, 10) : null;
+  var sponsorOrg = lockedSponsor || document.getElementById('csSponsor').value || '';
+  var contact = document.getElementById('csContact').value.trim();
+  var msg = document.getElementById('csMsg');
+  var btn = document.getElementById('csActivate');
+
+  if (!businessName || !discountText || !contact){
+    msg.textContent = 'Please fill in your business name, offer, and a way to reach you.';
+    msg.className = 'formMsg err';
+    return;
+  }
+  if (limitRaw && (isNaN(limit) || limit <= 0)){
+    msg.textContent = 'Claim limit should be a positive number, or left blank for unlimited.';
+    msg.className = 'formMsg err';
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = 'Saving...';
+  var entryId = 'cs-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+  var editToken = Math.random().toString(36).slice(2) + Date.now().toString(36);
+
+  cloudPullKey(SIGNUPS_KEY).then(function(current){
+    var entry = {
+      id: entryId,
+      editToken: editToken,
+      businessName: businessName,
+      location: location,
+      website: website,
+      email: email,
+      discountText: discountText,
+      expiresAt: expiresAt,
+      limit: limit,
+      sponsorOrg: sponsorOrg,
+      contact: contact,
+      billingPeriod: selectedPeriod,
+      submittedAt: new Date().toISOString(),
+      status: 'pending'
+    };
+    return signupsPush(current.concat([entry]));
+  }).then(function(ok){
+    if (!ok){
+      msg.textContent = 'Something went wrong — please try again in a moment.';
+      msg.className = 'formMsg err';
+      btn.disabled = false; btn.textContent = 'Activate & continue to payment';
+      return;
+    }
+
+    var editUrl = window.location.origin + '/coupon-edit.html?id=' + encodeURIComponent(entryId) + '&token=' + encodeURIComponent(editToken);
+    document.getElementById('editLinkInput').value = editUrl;
+    document.getElementById('editLinkBox').style.display = 'block';
+    document.getElementById('editLinkCopy').onclick = function(){
+      document.getElementById('editLinkInput').select();
+      navigator.clipboard && navigator.clipboard.writeText(editUrl).catch(function(){});
+      document.getElementById('editLinkCopy').textContent = 'Copied';
+      setTimeout(function(){ document.getElementById('editLinkCopy').textContent = 'Copy'; }, 1500);
+    };
+
+    var paymentLink = COUPON_PAYMENT_LINKS[selectedPeriod];
+    if (!paymentLink){
+      msg.textContent = 'Saved! Payment checkout isn’t set up yet — the site owner will reach out to get you paid and live.';
+      msg.className = 'formMsg ok';
+      btn.textContent = 'Saved';
+      return;
+    }
+    msg.textContent = 'Saved! Copy your edit link above, then continue to payment.';
+    msg.className = 'formMsg ok';
+    btn.textContent = 'Continue to payment';
+    btn.disabled = false;
+    btn.onclick = function(){ window.location.href = paymentLink; };
+  });
+});
+
+setupSponsor();
+</script>
+<script src="visitor-tracker.js" defer></script>
+</body>
+</html>

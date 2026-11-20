@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Get Featured Signup | Beyond the Highway</title>
+<style>
+  :root{--bg:#04140d;--green:#7CFF5C;--green-soft:#9bdc75;--soft:rgba(140,255,92,.28);--ink:#eafff0;--mut:#9fc4ad;--gold:#e6b85c}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:
+    radial-gradient(1200px 600px at 50% -10%,#0a2b1c 0%,var(--bg) 55%) fixed;color:var(--ink);
+    -webkit-font-smoothing:antialiased;line-height:1.45}
+  .wrap{max-width:560px;margin:0 auto;padding:0 16px 60px}
+  .backBtn{display:inline-flex;align-items:center;gap:7px;margin:14px 0 0;padding:9px 14px;border:1px solid var(--soft);
+    border-radius:12px;background:rgba(4,17,11,.72);color:var(--green-soft);text-decoration:none;font-size:13px;font-weight:700}
+  header{margin:20px 2px 6px}
+  .kick{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);
+    border:1px solid var(--soft);border-radius:999px;padding:4px 11px;margin-bottom:12px}
+  h1{margin:.1em 0 .3em;font-size:1.5rem;line-height:1.2}
+  .lede{color:var(--mut);font-size:.92rem;margin:0}
+
+  .modeRow{display:flex;gap:8px;margin:16px 0}
+  .modeBtn{flex:1;padding:12px;border-radius:12px;border:1.5px solid var(--soft);background:#04140d;color:var(--mut);
+    font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit}
+  .modeBtn.active{border-color:var(--green);color:var(--ink);background:rgba(140,255,92,.1)}
+
+  .card{border:1.5px solid #2f9e5e;border-radius:14px;background:rgba(4,17,11,.72);padding:16px;margin:16px 0}
+  label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--green-soft);margin:14px 0 8px}
+  label:first-child{margin-top:0}
+  input,select,textarea{width:100%;background:#04140d;color:var(--ink);border:1px solid var(--soft);border-radius:10px;
+    padding:12px 13px;font-size:15px;font-family:inherit}
+  textarea{resize:vertical;min-height:70px}
+  .hint{font-size:.78rem;color:var(--mut);margin:6px 2px 0}
+
+  .imgZone{border:1.5px dashed var(--soft);border-radius:12px;padding:14px;text-align:center;cursor:pointer;color:var(--mut);font-size:.85rem}
+  .imgZone img{max-width:100%;max-height:160px;border-radius:8px;display:block;margin:0 auto 8px}
+
+  .cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:18px 0 4px;padding:15px;
+    border:none;border-radius:14px;background:linear-gradient(135deg,#7CFF5C,#39c46a);color:#04140d;font-weight:800;
+    font-size:1.02rem;cursor:pointer;box-shadow:0 6px 20px rgba(57,196,106,.25)}
+  .cta:disabled{opacity:.6;cursor:not-allowed}
+  .formMsg{font-size:.85rem;margin-top:10px;text-align:center}
+  .formMsg.ok{color:var(--green-soft)}
+  .formMsg.err{color:#ffb199}
+
+  footer{margin-top:30px;color:var(--mut);font-size:.8rem;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="backBtn" href="advertise.html">&larr;&nbsp;Beyond the Highway</a>
+  <header>
+    <span class="kick" id="psKick">Get Featured</span>
+    <h1>Set up your placement</h1>
+    <p class="lede">Tell us who you are, hit Activate, and you're on your way to checkout &mdash; nothing goes live until we confirm your payment.</p>
+  </header>
+
+  <div class="modeRow">
+    <button type="button" class="modeBtn active" data-mode="existing" id="psModeExisting">I'm already listed</button>
+    <button type="button" class="modeBtn" data-mode="new" id="psModeNew">I'm not listed yet</button>
+  </div>
+
+  <div class="card">
+    <label for="psCategory">Category</label>
+    <select id="psCategory"></select>
+
+    <div id="psExistingFields">
+      <label for="psExistingBusiness">Your business</label>
+      <select id="psExistingBusiness"><option value="">Choose your listing&hellip;</option></select>
+      <p class="hint">We'll pre-fill anything already on file below &mdash; add or update your photo and description here.</p>
+    </div>
+
+    <div id="psNewFields" style="display:none">
+      <label for="psNewTitle">Business name</label>
+      <input id="psNewTitle" autocomplete="off" placeholder="e.g. Riverside Coffee Co.">
+    </div>
+
+    <label>Photo</label>
+    <div class="imgZone" id="psImgZone">Tap to upload a photo for your featured listing</div>
+    <input type="file" id="psImgInput" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+    <p class="hint" id="psImgHint">This photo is what shows in your Top Pick / Featured showcase.</p>
+
+    <label for="psDescription">Description</label>
+    <textarea id="psDescription" maxlength="500" placeholder="What makes this business worth featuring &mdash; this is your ad copy"></textarea>
+
+    <label for="psWebsite">Website (optional)</label>
+    <input id="psWebsite" autocomplete="off" placeholder="e.g. www.yourbusiness.com">
+
+
+    <label>Billing</label>
+    <div id="psPeriodRow" class="modeRow" style="margin-top:0"></div>
+
+    <label for="psContact">Your phone or email</label>
+    <input id="psContact" autocomplete="off" placeholder="So we can confirm your payment with you">
+
+    <button class="cta" id="psActivate" type="button">Activate &amp; continue to payment</button>
+    <p class="formMsg" id="psMsg"></p>
+  </div>
+
+  <footer>Beyond the Highway &middot; Fort McMurray Wood Buffalo</footer>
+</div>
+
+<script>
+var SUPABASE_URL = 'https://ceipylnjdidjqidamkpw.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlaXB5bG5qZGlkanFpZGFta3B3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyOTQ1MjAsImV4cCI6MjA5ODg3MDUyMH0.TGZYRcjscN3ysRfTT5iHSl2pTOIhvMF6dCd-elm7L7g';
+var PLACES_CLOUD_KEY = 'places_items';
+var LOCAL_CLOUD_KEY = 'local_business_items';
+var SIGNUPS_KEY = 'placement_signup_requests';
+var SIGNUPS_PIN = '2005'; // matches the site's public-submission PIN, same as coupon-signup.html
+var STORAGE_BUCKET = 'story-media'; // same public bucket used elsewhere on the site
+
+// Same Payment Links as advertise.html's PAYMENT_LINKS — keep both copies in
+// sync if either ever changes.
+var PAYMENT_LINKS = {
+  topPick:    { monthly: 'https://buy.stripe.com/fZu4gycfk4tAc4MccYcfK0D', annual: 'https://buy.stripe.com/4gM8wO5QWf8e9WE6SEcfK0C' },
+  featured:   { monthly: 'https://buy.stripe.com/aFa00i4MS2lsgl2gtecfK0F', annual: 'https://buy.stripe.com/3cI7sK2EK2lsb0I90McfK0E' },
+  ambassador: { oneTime: 'https://buy.stripe.com/7sYdR8ens1ho4Cka4QcfK0G' }
+};
+var TIER_NAMES = { topPick: 'Top Pick', featured: 'Featured', ambassador: 'Ambassador' };
+var CAT_ORDER=['Fine Dining','Restaurants','Cafés','Bars & Nightlife','Fast Food','Pizza & Donair','Hotels & Stays','Air Travel','Festivals','Museums','Theatres','Family Fun','Family','Trails','Lakes','Lakes & Outfitters','Winter','Outdoor Rinks','Skate Parks','Golf','Spray Parks','Provincial Parks','Campgrounds','Parks & Playgrounds','Taxis','Grocery Stores','Gas Stations','Convenience Stores','Pharmacies','Banks & ATMs','Realtors','Hospital & Health','Sporting Goods','Gift & Novelty','Florists','Trophies & Engraving','Art & Galleries'];
+var LOCAL_CAT_ORDER=['HVAC','Plumbing','Electrical','Construction & Renovation','Roofing','Landscaping','Painting','Auto Repair','Appliance Repair','Cleaning Services','Pest Control','Locksmiths','Moving Companies','Tree Service','Garage Doors','Welding & Junk & Snow Removal','Lawyers','Dentists','Accountants','Financial Advisors','Chiropractors','Optometrists','Doctors & Walk-in Clinics','Web & Tech Services'];
+
+function qs(name){ return new URLSearchParams(window.location.search).get(name); }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+var currentDir = qs('dir') === 'local' ? 'local' : 'places';
+function liveKeyFor(dir){ return dir === 'local' ? LOCAL_CLOUD_KEY : PLACES_CLOUD_KEY; }
+function catOrderFor(dir){ return dir === 'local' ? LOCAL_CAT_ORDER : CAT_ORDER; }
+
+var tier = ['topPick','featured','ambassador'].indexOf(qs('tier')) !== -1 ? qs('tier') : 'topPick';
+var VALID_PERIODS = tier === 'ambassador' ? ['oneTime'] : ['monthly','annual'];
+var selectedPeriod = VALID_PERIODS.indexOf(qs('period')) !== -1 ? qs('period') : VALID_PERIODS[0];
+var initialCategory = qs('category') || '';
+var mode = 'existing';
+var items = [];
+var newImageDataUrl = '';
+
+document.getElementById('psKick').textContent = 'Beyond the Highway \u2014 ' + TIER_NAMES[tier];
+
+function renderPeriodRow(){
+  var row = document.getElementById('psPeriodRow');
+  var labels = { monthly: 'Monthly', annual: 'Annual', oneTime: 'One-time' };
+  row.innerHTML = VALID_PERIODS.map(function(p){
+    return '<button type="button" class="modeBtn' + (p === selectedPeriod ? ' active' : '') + '" data-period="' + p + '">' + labels[p] + '</button>';
+  }).join('');
+  row.querySelectorAll('[data-period]').forEach(function(btn){
+    btn.addEventListener('click', function(){ selectedPeriod = btn.getAttribute('data-period'); renderPeriodRow(); });
+  });
+}
+renderPeriodRow();
+
+function setMode(m){
+  mode = m;
+  document.getElementById('psModeExisting').classList.toggle('active', m === 'existing');
+  document.getElementById('psModeNew').classList.toggle('active', m === 'new');
+  document.getElementById('psExistingFields').style.display = m === 'existing' ? '' : 'none';
+  document.getElementById('psNewFields').style.display = m === 'new' ? '' : 'none';
+}
+document.getElementById('psModeExisting').addEventListener('click', function(){ setMode('existing'); });
+document.getElementById('psModeNew').addEventListener('click', function(){ setMode('new'); });
+
+function cloudPullItems(key){
+  return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(key) + '&select=data', {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(rows){ return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : []; })
+    .catch(function(){ return []; });
+}
+
+function categoriesFromItems(list){
+  var order = catOrderFor(currentDir);
+  var present = Array.from(new Set(list.map(function(i){ return i.category || 'Other'; })));
+  var ordered = order.filter(function(c){ return present.indexOf(c) !== -1; });
+  var extra = present.filter(function(c){ return order.indexOf(c) === -1; }).sort();
+  return ordered.concat(extra);
+}
+
+function renderCategorySelect(){
+  var sel = document.getElementById('psCategory');
+  var opts = categoriesFromItems(items);
+  sel.innerHTML = opts.map(function(c){ return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
+  if (initialCategory && opts.indexOf(initialCategory) !== -1) sel.value = initialCategory;
+  renderBusinessSelect();
+}
+
+function renderBusinessSelect(){
+  var sel = document.getElementById('psExistingBusiness');
+  var cat = document.getElementById('psCategory').value;
+  var names = items.filter(function(i){ return (i.category || 'Other') === cat; })
+    .map(function(i){ return i.title; }).filter(Boolean).sort(function(a,b){ return a.localeCompare(b); });
+  sel.innerHTML = '<option value="">Choose your listing&hellip;</option>' + names.map(function(n){ return '<option value="' + esc(n) + '">' + esc(n) + '</option>'; }).join('');
+}
+document.getElementById('psCategory').addEventListener('change', renderBusinessSelect);
+
+// Pre-fill description/website from the matched listing when picked — still
+// fully editable, since most listings have no photo/description on file yet.
+document.getElementById('psExistingBusiness').addEventListener('change', function(){
+  var match = items.find(function(i){ return i.title === this.value; }, this);
+  document.getElementById('psDescription').value = (match && (match.details || match.summary)) || '';
+  document.getElementById('psWebsite').value = (match && match.website) || '';
+  if (match && match.map){
+    document.getElementById('psImgZone').innerHTML = '<img src="' + esc(match.map) + '"><div>Tap to change photo</div>';
+  } else {
+    document.getElementById('psImgZone').textContent = 'Tap to upload a photo for your featured listing';
+  }
+});
+
+// ---- Image upload (new-business path only) ----
+document.getElementById('psImgZone').addEventListener('click', function(){ document.getElementById('psImgInput').click(); });
+document.getElementById('psImgInput').addEventListener('change', function(e){
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    newImageDataUrl = reader.result;
+    document.getElementById('psImgZone').innerHTML = '<img src="' + newImageDataUrl + '"><div>Tap to change photo</div>';
+  };
+  reader.readAsDataURL(file);
+});
+
+function cloudUploadMedia(dataUrl, fileNameHint){
+  return fetch(dataUrl).then(function(res){ return res.blob(); }).then(function(blob){
+    var extGuess = (blob.type.split('/')[1] || 'bin').split(';')[0].split('+')[0];
+    var path = (fileNameHint || 'file').replace(/[^a-z0-9_-]/gi, '_') + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + extGuess;
+    return fetch(SUPABASE_URL + '/storage/v1/object/' + STORAGE_BUCKET + '/' + path, {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': blob.type || 'application/octet-stream' },
+      body: blob
+    }).then(function(uploadRes){
+      if (!uploadRes.ok) return uploadRes.text().then(function(t){ throw new Error('Storage upload failed: ' + uploadRes.status + ' ' + t); });
+      return SUPABASE_URL + '/storage/v1/object/public/' + STORAGE_BUCKET + '/' + path;
+    });
+  });
+}
+
+function signupsPull(){
+  return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(SIGNUPS_KEY) + '&select=data', {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(rows){ return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : []; })
+    .catch(function(){ return []; });
+}
+function signupsPush(list){
+  return fetch(SUPABASE_URL + '/rest/v1/rpc/bth_save_content', {
+    method: 'POST',
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_pin: SIGNUPS_PIN, p_key: SIGNUPS_KEY, p_data: list })
+  }).then(function(res){ return res.ok; }).catch(function(){ return false; });
+}
+
+document.getElementById('psActivate').addEventListener('click', function(){
+  var msg = document.getElementById('psMsg');
+  var btn = document.getElementById('psActivate');
+  var category = document.getElementById('psCategory').value;
+  var contact = document.getElementById('psContact').value.trim();
+  var description = document.getElementById('psDescription').value.trim();
+  var website = document.getElementById('psWebsite').value.trim();
+  if (website && !/^https?:\/\//i.test(website)) website = 'https://' + website;
+
+  if (!contact){
+    msg.textContent = 'Please leave a phone or email so we can confirm your payment.';
+    msg.className = 'formMsg err';
+    return;
+  }
+  if (!description){
+    msg.textContent = 'Please add a short description \u2014 this is what shows on your featured ad.';
+    msg.className = 'formMsg err';
+    return;
+  }
+
+  var entry = {
+    id: 'ps-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+    tier: tier,
+    category: category,
+    directory: currentDir,
+    mode: mode,
+    contact: contact,
+    billingPeriod: selectedPeriod,
+    submittedAt: new Date().toISOString(),
+    status: 'pending',
+    adContent: { description: description, website: website }
+  };
+
+  var title;
+  if (mode === 'existing'){
+    title = document.getElementById('psExistingBusiness').value;
+    if (!title){
+      msg.textContent = 'Please choose your business from the list.';
+      msg.className = 'formMsg err';
+      return;
+    }
+    entry.businessName = title;
+  } else {
+    title = document.getElementById('psNewTitle').value.trim();
+    if (!title){
+      msg.textContent = 'Please fill in your business name.';
+      msg.className = 'formMsg err';
+      return;
+    }
+    entry.newListing = { title: title };
+  }
+
+  btn.disabled = true; btn.textContent = 'Saving...';
+  var uploadPromise = newImageDataUrl ? cloudUploadMedia(newImageDataUrl, 'placement-' + title) : Promise.resolve('');
+  uploadPromise.then(function(imageUrl){
+    entry.adContent.image = imageUrl;
+    finishSubmit(entry);
+  }).catch(function(){
+    msg.textContent = 'That photo didn\u2019t upload \u2014 please try again.';
+    msg.className = 'formMsg err';
+    btn.disabled = false; btn.textContent = 'Activate & continue to payment';
+  });
+
+  function finishSubmit(entry){
+    signupsPull().then(function(current){
+      return signupsPush(current.concat([entry]));
+    }).then(function(ok){
+      if (!ok){
+        msg.textContent = 'Something went wrong \u2014 please try again in a moment.';
+        msg.className = 'formMsg err';
+        btn.disabled = false; btn.textContent = 'Activate & continue to payment';
+        return;
+      }
+      var links = PAYMENT_LINKS[tier] || {};
+      var paymentLink = links[selectedPeriod];
+      if (!paymentLink){
+        msg.textContent = 'Saved! Payment checkout isn\u2019t set up yet \u2014 the site owner will reach out to get you paid and live.';
+        msg.className = 'formMsg ok';
+        btn.textContent = 'Saved';
+        return;
+      }
+      msg.textContent = 'Saved \u2014 taking you to payment...';
+      msg.className = 'formMsg ok';
+      window.location.href = paymentLink;
+    });
+  }
+});
+
+(async function init(){
+  items = await cloudPullItems(liveKeyFor(currentDir));
+  renderCategorySelect();
+})();
+</script>
+<script src="visitor-tracker.js" defer></script>
+</body>
+</html>

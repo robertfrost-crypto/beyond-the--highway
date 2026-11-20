@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Edit Your Coupon | Beyond the Highway</title>
+<style>
+  :root{--bg:#04140d;--green:#7CFF5C;--green-soft:#9bdc75;--soft:rgba(140,255,92,.28);--ink:#eafff0;--mut:#9fc4ad;--gold:#e6b85c}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:
+    radial-gradient(1200px 600px at 50% -10%,#0a2b1c 0%,var(--bg) 55%) fixed;color:var(--ink);
+    -webkit-font-smoothing:antialiased;line-height:1.45}
+  .wrap{max-width:560px;margin:0 auto;padding:0 16px 60px}
+  .backBtn{display:inline-flex;align-items:center;gap:7px;margin:14px 0 0;padding:9px 14px;border:1px solid var(--soft);
+    border-radius:12px;background:rgba(4,17,11,.72);color:var(--green-soft);text-decoration:none;font-size:13px;font-weight:700}
+  header{margin:20px 2px 6px}
+  .kick{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);
+    border:1px solid var(--soft);border-radius:999px;padding:4px 11px;margin-bottom:12px}
+  h1{margin:.1em 0 .3em;font-size:1.5rem;line-height:1.2}
+  .lede{color:var(--mut);font-size:.92rem;margin:0}
+  .statusPill{display:inline-block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;
+    padding:4px 10px;margin-top:10px}
+  .statusPill.live{background:rgba(140,255,92,.15);color:var(--green-soft);border:1px solid var(--soft)}
+  .statusPill.pending{background:rgba(230,184,92,.12);color:var(--gold);border:1px solid var(--gold)}
+
+  .card{border:1.5px solid #2f9e5e;border-radius:14px;background:rgba(4,17,11,.72);padding:16px;margin:16px 0}
+  label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--green-soft);margin:14px 0 8px}
+  label:first-child{margin-top:0}
+  input,select,textarea{width:100%;background:#04140d;color:var(--ink);border:1px solid var(--soft);border-radius:10px;
+    padding:12px 13px;font-size:15px;font-family:inherit}
+  textarea{resize:vertical;min-height:70px}
+  .hint{font-size:.78rem;color:var(--mut);margin:6px 2px 0}
+  .checkbox-row{display:flex;align-items:center;gap:9px;margin-top:16px}
+  .checkbox-row input{width:auto}
+
+  .cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:18px 0 4px;padding:15px;
+    border:none;border-radius:14px;background:linear-gradient(135deg,#7CFF5C,#39c46a);color:#04140d;font-weight:800;
+    font-size:1.02rem;cursor:pointer;box-shadow:0 6px 20px rgba(57,196,106,.25)}
+  .cta:disabled{opacity:.6;cursor:not-allowed}
+  .formMsg{font-size:.85rem;margin-top:10px;text-align:center}
+  .formMsg.ok{color:var(--green-soft)}
+  .formMsg.err{color:#ffb199}
+
+  .centerMsg{text-align:center;color:var(--mut);padding:60px 20px;font-size:.95rem}
+  footer{margin-top:30px;color:var(--mut);font-size:.8rem;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="backBtn" href="advertise.html">&larr;&nbsp;Beyond the Highway</a>
+  <header id="header" style="display:none">
+    <span class="kick">Edit your coupon</span>
+    <h1 id="editTitle">Update your offer</h1>
+    <p class="lede">Changes save right away — no need to contact us.</p>
+    <span class="statusPill" id="statusPill"></span>
+  </header>
+
+  <div id="loadingMsg" class="centerMsg">Loading your coupon&hellip;</div>
+
+  <div class="card" id="editCard" style="display:none">
+    <label for="ceBusiness">Business name</label>
+    <input id="ceBusiness" autocomplete="off">
+
+    <label for="ceOffer">Your offer</label>
+    <textarea id="ceOffer" maxlength="200"></textarea>
+
+    <label for="ceLocation">Location (optional)</label>
+    <input id="ceLocation" autocomplete="off" placeholder="e.g. 123 Franklin Ave, Fort McMurray">
+    <p class="hint">So customers can get directions right from the coupon.</p>
+
+    <label for="ceWebsite">Website (optional)</label>
+    <input id="ceWebsite" autocomplete="off" placeholder="e.g. www.yourbusiness.com">
+
+    <label for="ceEmail">Email (optional)</label>
+    <input id="ceEmail" type="email" autocomplete="off" placeholder="e.g. owner@business.com">
+
+    <label for="ceExpires">Offer expires (optional)</label>
+    <input id="ceExpires" type="date">
+    <p class="hint">Leave blank for no expiration.</p>
+
+    <label for="ceLimit">Limit how many can be claimed (optional)</label>
+    <input id="ceLimit" type="number" min="0" step="10" inputmode="numeric" placeholder="Leave blank for unlimited">
+
+    <label class="checkbox-row" for="ceActive" id="ceActiveRow" style="display:none">
+      <input type="checkbox" id="ceActive">
+      <span>Live on the Coupons page</span>
+    </label>
+    <p class="hint" id="ceActiveHint" style="display:none">Turn this off any time to pause your offer without losing it.</p>
+
+    <button class="cta" id="ceSave" type="button">Save changes</button>
+    <p class="formMsg" id="ceMsg"></p>
+  </div>
+
+  <footer>Beyond the Highway &middot; Fort McMurray Wood Buffalo</footer>
+</div>
+
+<script>
+var SUPABASE_URL = 'https://ceipylnjdidjqidamkpw.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlaXB5bG5qZGlkanFpZGFta3B3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyOTQ1MjAsImV4cCI6MjA5ODg3MDUyMH0.TGZYRcjscN3ysRfTT5iHSl2pTOIhvMF6dCd-elm7L7g';
+
+// A coupon lives in one of these two places depending on whether you've
+// approved it yet — same id + editToken carries through either way (see
+// admin.html's approve handler, which preserves both when publishing).
+var CANDIDATE_KEYS = ['coupon_signup_requests', 'coupon_offers'];
+
+var params = new URLSearchParams(window.location.search);
+var entryId = params.get('id') || '';
+var entryToken = params.get('token') || '';
+
+var foundKey = null;
+var foundItem = null;
+
+function cloudPullKey(key){
+  return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(key) + '&select=data', {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(rows){ return (rows && rows[0] && Array.isArray(rows[0].data)) ? rows[0].data : []; })
+    .catch(function(){ return []; });
+}
+
+// Same local "remember this device" list coupon-signup.html writes to —
+// keeps it fresh here too, in case the business name changes later.
+var MY_COUPONS_KEY = 'bth_my_coupons';
+function rememberCoupon(entry){
+  try {
+    var list = JSON.parse(localStorage.getItem(MY_COUPONS_KEY) || '[]').filter(function(c){ return c.id !== entry.id; });
+    list.push(entry);
+    localStorage.setItem(MY_COUPONS_KEY, JSON.stringify(list));
+  } catch(e){}
+}
+
+function showError(msg){
+  document.getElementById('loadingMsg').textContent = msg;
+}
+
+if (!entryId || !entryToken){
+  showError('This edit link is missing some information. Please use the exact link you saved when you signed up.');
+} else {
+  Promise.all(CANDIDATE_KEYS.map(cloudPullKey)).then(function(results){
+    for (var k = 0; k < CANDIDATE_KEYS.length; k++){
+      var match = (results[k] || []).find(function(it){ return it.id === entryId && it.editToken === entryToken; });
+      if (match){ foundKey = CANDIDATE_KEYS[k]; foundItem = match; break; }
+    }
+    if (!foundItem){
+      showError('We couldn’t find a coupon matching this link. It may have been removed, or the link may be incomplete.');
+      return;
+    }
+    document.getElementById('loadingMsg').style.display = 'none';
+    document.getElementById('header').style.display = '';
+    document.getElementById('editCard').style.display = '';
+
+    rememberCoupon({ id: entryId, businessName: foundItem.businessName || '', editUrl: window.location.href });
+
+    var isLive = foundKey === 'coupon_offers';
+    document.getElementById('editTitle').textContent = foundItem.businessName || 'Update your offer';
+    var pill = document.getElementById('statusPill');
+    if (isLive){
+      pill.textContent = 'Live on the Coupons page';
+      pill.className = 'statusPill live';
+      document.getElementById('ceActiveRow').style.display = '';
+      document.getElementById('ceActiveHint').style.display = '';
+      document.getElementById('ceActive').checked = foundItem.active !== false;
+    } else {
+      pill.textContent = 'Pending review';
+      pill.className = 'statusPill pending';
+    }
+
+    document.getElementById('ceBusiness').value = foundItem.businessName || '';
+    document.getElementById('ceOffer').value = foundItem.discountText || '';
+    document.getElementById('ceLocation').value = foundItem.location || '';
+    document.getElementById('ceWebsite').value = foundItem.website || '';
+    document.getElementById('ceEmail').value = foundItem.email || '';
+    document.getElementById('ceExpires').value = foundItem.expiresAt || '';
+    document.getElementById('ceLimit').value = foundItem.limit ? String(foundItem.limit) : '';
+
+    document.getElementById('ceSave').addEventListener('click', function(){
+      var msg = document.getElementById('ceMsg');
+      var btn = document.getElementById('ceSave');
+      var businessName = document.getElementById('ceBusiness').value.trim();
+      var discountText = document.getElementById('ceOffer').value.trim();
+      var website = document.getElementById('ceWebsite').value.trim();
+      if (website && !/^https?:\/\//i.test(website)) website = 'https://' + website;
+      var limitRaw = document.getElementById('ceLimit').value.trim();
+      var limit = limitRaw ? parseInt(limitRaw, 10) : null;
+
+      if (!businessName || !discountText){
+        msg.textContent = 'Business name and offer can’t be empty.';
+        msg.className = 'formMsg err';
+        return;
+      }
+      if (limitRaw && (isNaN(limit) || limit <= 0)){
+        msg.textContent = 'Claim limit should be a positive number, or left blank for unlimited.';
+        msg.className = 'formMsg err';
+        return;
+      }
+
+      var updates = {
+        businessName: businessName,
+        discountText: discountText,
+        location: document.getElementById('ceLocation').value.trim(),
+        website: website,
+        email: document.getElementById('ceEmail').value.trim(),
+        expiresAt: document.getElementById('ceExpires').value || '',
+        limit: limit
+      };
+      if (isLive) updates.active = document.getElementById('ceActive').checked;
+
+      btn.disabled = true; btn.textContent = 'Saving...';
+      fetch(SUPABASE_URL + '/rest/v1/rpc/bth_update_entry_by_token', {
+        method: 'POST',
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ p_key: foundKey, p_id: entryId, p_token: entryToken, p_updates: updates })
+      }).then(function(res){ return res.ok ? res.json() : false; })
+        .then(function(ok){
+          btn.disabled = false; btn.textContent = 'Save changes';
+          if (ok === true){
+            msg.textContent = 'Saved!';
+            msg.className = 'formMsg ok';
+          } else {
+            msg.textContent = 'Something went wrong saving your changes — please try again.';
+            msg.className = 'formMsg err';
+          }
+        }).catch(function(){
+          btn.disabled = false; btn.textContent = 'Save changes';
+          msg.textContent = 'Something went wrong saving your changes — please try again.';
+          msg.className = 'formMsg err';
+        });
+    });
+  });
+}
+</script>
+<script src="visitor-tracker.js" defer></script>
+</body>
+</html>
