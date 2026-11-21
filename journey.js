@@ -210,15 +210,15 @@
   function bump(){ if (!busEl) return; busEl.classList.remove('bump'); void busEl.offsetWidth; busEl.classList.add('bump'); }
 
   // ---------- milestones ----------
-  var rewardFired = false;
+  var rewardFired = false, modalReward = false;
   function checkMilestones(){
-    rewardFired = false;
+    rewardFired = false; modalReward = false;
     var p = pct();
     if (p>=25 && !J.fired[25]){ J.fired[25]=true; saveJourney(); rewardFired=true;
       setTimeout(function(){ toast('Day Tripper!', 'Your first stamp is in the passport. Tip: ' + (SET.tip25||DEFAULT_TIP)); }, 650); }
-    if (p>=50 && !J.fired[50]){ J.fired[50]=true; saveJourney(); rewardFired=true;
+    if (p>=50 && !J.fired[50]){ J.fired[50]=true; saveJourney(); rewardFired=true; modalReward=true;
       setTimeout(function(){ certificateFlow(false); }, 850); }
-    if (p>=100 && !J.fired[100]){ J.fired[100]=true; saveJourney(); rewardFired=true;
+    if (p>=100 && !J.fired[100]){ J.fired[100]=true; saveJourney(); rewardFired=true; modalReward=true;
       setTimeout(function(){ certificateFlow(true); }, 850); }
   }
 
@@ -338,6 +338,7 @@
       saveJourney(); render(); bump(); checkMilestones();
     },
     rewardJustFired: function () { return rewardFired; },
+    modalJustFired: function () { return modalReward; },
     openPassport: openPassport,
     reset: function () {
       J = { pts:0, disc:{}, seen:{}, fired:{}, selfie:null, lastReturn:today() };
