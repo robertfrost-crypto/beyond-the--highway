@@ -255,7 +255,7 @@
       <span class="tile-text"><span class="tile-title">Events</span><span class="tile-sub">What’s on across Wood Buffalo — festivals, concerts, sports and community events (MAC Calendar).</span></span>
       <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
     </a>
-    <a class="tile wide" href="recommend.html"><span class="tile-img"><img src="assets/cards/recommend.webp" alt="" loading="lazy" decoding="async" width="900" height="380"></span>
+    <a class="tile" href="recommend.html"><span class="tile-img"><img src="assets/cards/recommend.webp" alt="" loading="lazy" decoding="async" width="900" height="380"></span>
       <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg></span>
       <span class="tile-text"><span class="tile-title">Recommendations</span><span class="tile-sub">Local favourites — straight from the people who live here.</span></span>
       <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
@@ -276,6 +276,28 @@
 </div>
 
 <script src="hub-links.js"></script>
+<script>
+  // Keep the card grid in tidy pairs: if the number of visible half-width cards is odd
+  // (tiles can be switched on/off from Admin), the last one stretches full width.
+  (function(){
+    var nav = document.querySelector('nav.menu');
+    if (!nav) return;
+    function balance(){
+      var tiles = Array.prototype.slice.call(nav.querySelectorAll('a.tile'));
+      tiles.forEach(function(t){ if (t.classList.contains('auto-wide')) t.classList.remove('wide','auto-wide'); });
+      var half = tiles.filter(function(t){ return !t.classList.contains('wide') && getComputedStyle(t).display !== 'none'; });
+      if (half.length % 2 === 1) half[half.length-1].classList.add('wide','auto-wide');
+    }
+    document.addEventListener('DOMContentLoaded', function(){
+      balance();
+      var mo = new MutationObserver(function(muts){
+        if (muts.some(function(m){ return m.attributeName === 'style'; })) balance();
+      });
+      nav.querySelectorAll('a.tile').forEach(function(t){ mo.observe(t, {attributes:true, attributeFilter:['style']}); });
+    });
+  })();
+</script>
+
 <script src="journey.js" defer></script>
 <script>
   // ---- Journey: count a section the first time its tile is tapped ----
