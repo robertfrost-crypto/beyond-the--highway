@@ -1804,15 +1804,19 @@ h1,h2,h3,.display,.brand-name,.story-card-body h3,.hero-tagline,.mystery-hero-ti
     <div class="pwa-overlay-title">Download to your home screen</div>
     <div class="pwa-overlay-step">
       <div class="pwa-overlay-step-num">1</div>
-      <div class="pwa-overlay-step-text">Tap the <strong>Share</strong> button at the bottom of Safari <span style="font-size:1.3em;">⬆</span></div>
+      <div class="pwa-overlay-step-text">Tap the <strong>menu button</strong> at the left end of Safari's address bar (the icon with small lines). On some phones it's <strong>&#8943;</strong> in the bottom corner instead.</div>
     </div>
     <div class="pwa-overlay-step">
       <div class="pwa-overlay-step-num">2</div>
-      <div class="pwa-overlay-step-text">Scroll down and tap <strong>"Add to Home Screen"</strong></div>
+      <div class="pwa-overlay-step-text">Tap <strong>Share</strong></div>
     </div>
     <div class="pwa-overlay-step">
       <div class="pwa-overlay-step-num">3</div>
-      <div class="pwa-overlay-step-text">Tap <strong>Add</strong> in the top-right</div>
+      <div class="pwa-overlay-step-text">Scroll down and tap <strong>"Add to Home Screen"</strong></div>
+    </div>
+    <div class="pwa-overlay-step">
+      <div class="pwa-overlay-step-num">4</div>
+      <div class="pwa-overlay-step-text">Leave <strong>Open as Web App</strong> on, then tap <strong>Add</strong></div>
     </div>
     <div class="pwa-overlay-note">
       The app will appear on your home screen. You can delete it anytime, just like any other app.
@@ -3389,7 +3393,7 @@ function topbar(extra = '') {
   const count = scrapbookCount();
   const showDownloadBtn = !isAdmin && !_pwa.installed;
   return `
-    <div class="topbar"><span class="ver">v61 &middot; Nov 21</span>
+    <div class="topbar"><span class="ver">v62 &middot; Nov 21</span>
       <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
         <button class="iconbtn bth-backbtn" onclick="location.href='/'" title="Back to Beyond the Highway">&larr;&nbsp;Beyond the Highway</button>
         <div class="brand" onclick="nav('home')" style="cursor:pointer;">
