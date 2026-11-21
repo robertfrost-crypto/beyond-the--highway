@@ -175,11 +175,21 @@ a.bthBackLink{display:inline-flex;align-items:center;gap:7px;margin:14px 2px 2px
 .foot{border-top:1px solid rgba(16,26,58,.18)!important;color:#4d587a!important}
 .clearBtn{min-height:40px;padding:10px 16px!important}
 a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#2a55e0;text-decoration:none;border:1px solid #111;border-radius:12px;padding:9px 14px;background:#fff;box-shadow:0 8px 14px -6px rgba(16,26,58,.4)}
+.catBanner{display:none;margin:0 0 14px;border:1px solid #111;border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 14px 26px -8px rgba(16,26,58,.42),0 4px 8px -2px rgba(16,26,58,.22)}
+.catBanner.show{display:block}
+.catBanner img{display:block;width:100%;height:118px;object-fit:cover;-webkit-mask-image:linear-gradient(to bottom,#000 60%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(to bottom,#000 60%,rgba(0,0,0,0) 100%)}
+.catBanner .cbText{padding:0 16px 12px;margin-top:-26px;position:relative}
+.catBanner .cbKick{display:inline-block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:#fff;background:#2a55e0;border-radius:999px;padding:4px 10px}
+.catBanner h2{margin:6px 0 0;font-family:var(--serifx);font-size:22px;line-height:1.1;color:#101a3a;font-weight:800}
+.catBanner h2::after{content:"";display:block;width:34px;height:3px;border-radius:3px;margin-top:7px;background:#f2b134}
+.catAdmin{margin-top:12px;padding-top:12px;border-top:1px solid rgba(16,26,58,.14)}
+.catAdmin .rowA{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.catAdmin select{flex:1;min-width:150px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="ver">v47 &middot; Nov 21</div>
+  <div class="ver">v48 &middot; Nov 21</div>
   <a href="index.html" class="bthBackLink">&larr;&nbsp;Beyond the Highway</a>
 
   <div class="topBrand">
@@ -230,7 +240,14 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
       <input id="fButton" placeholder="Source button label, e.g. Official / Source">
       <input id="fImageUrl" placeholder="Directions / Google Maps link">
       <input id="editingIndex" type="hidden" value="">
-      <div class="admin-tools full">
+      <div class="catAdmin full">
+      <h3 style="font-size:14px">Category banner images</h3>
+      <p class="note" style="margin:2px 0 0">Pick a category, choose a photo, tap Save banner. It is cropped wide and goes live for everyone.</p>
+      <div class="rowA"><select id="catImgSel"></select>
+        <label class="btn" style="cursor:pointer">Choose photo<input id="catImgFile" type="file" accept="image/*" hidden></label></div>
+      <div class="rowA"><button class="btn" id="catImgSave" type="button">Save banner</button><button class="btn" id="catImgReset" type="button">Reset to default</button><span id="catImgMsg" class="note" style="margin:0"></span></div>
+    </div>
+    <div class="admin-tools full">
         <button class="btn" id="saveItem" type="button">Save place</button>
         <button class="btn" id="newItem" type="button">New blank</button>
         <button class="btn" id="deleteItem" type="button">Delete selected</button>
@@ -268,6 +285,7 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
       <span style="font-size:13px;">★ Showing <strong>Top Picks &amp; Featured</strong> businesses only</span>
       <button class="btn" id="clearTopPicks" type="button" style="font-size:11.5px;padding:6px 10px;">Show all places</button>
     </div>
+    <div class="catBanner" id="catBanner"><img id="catBannerImg" alt="" width="900" height="300" decoding="async"><div class="cbText"><span class="cbKick">Category</span><h2 id="catBannerTitle"></h2></div></div>
     <p class="countText" id="countText">Loading places...</p>
     <div id="crossResults"></div>
     <div class="directory" id="cards"></div>
@@ -427,6 +445,47 @@ function renderCrossResults(q) {
   if (qp) { $('search').value = qp; }
 })();
 
+
+// ---------- Category banner images ----------
+const CAT_IMG_DEFAULT={"Fine Dining": "assets/cats/p32.webp", "Restaurants": "assets/cats/p32.webp", "Cafés": "assets/cats/p1.webp", "Fast Food": "assets/cats/p12.webp", "Pizza & Donair": "assets/cats/p38.webp", "Bars & Nightlife": "assets/cats/p21.webp", "Family Fun": "assets/cats/p20.webp", "Theatres": "assets/cats/p29.webp", "Museums": "assets/cats/p39.webp", "Festivals": "assets/cats/p11.webp", "Parks & Playgrounds": "assets/cats/p6.webp", "Spray Parks": "assets/cats/p16.webp", "Skate Parks": "assets/cats/p13.webp", "Outdoor Rinks": "assets/cats/p25.webp", "Lakes": "assets/cats/p15.webp", "Lakes & Outfitters": "assets/cats/p37.webp", "Trails": "assets/cats/p36.webp", "Winter": "assets/cats/p25.webp", "Golf": "assets/cats/p14.webp", "Provincial Parks": "assets/cats/p34.webp", "Campgrounds": "assets/cats/p3.webp", "Sporting Goods": "assets/cats/p17.webp", "Gift & Novelty": "assets/cats/p26.webp", "Florists": "assets/cats/p30.webp", "Trophies & Engraving": "assets/cats/p19.webp", "Art & Galleries": "assets/cats/p33.webp", "Handcrafted & Home Based Businesses": "assets/cats/p32.webp", "Grocery Stores": "assets/cats/p9.webp", "Gas Stations": "assets/cats/p12.webp", "Convenience Stores": "assets/cats/p9.webp", "Pharmacies": "assets/cats/p8.webp", "Banks & ATMs": "assets/cats/p33.webp", "Hospital & Health": "assets/cats/p5.webp", "Hotels & Stays": "assets/cats/p24.webp", "Air Travel": "assets/cats/p31.webp", "Taxis": "assets/cats/p12.webp"};
+const CAT_IMG_KEY='places_category_images';
+let catImgOverride={};
+async function catImgCloudPull(){
+  try{const r=await fetch(`${SUPABASE_URL}/rest/v1/bth_content?key=eq.${CAT_IMG_KEY}&select=data`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});
+    if(!r.ok) return; const rows=await r.json(); if(rows&&rows[0]&&rows[0].data&&typeof rows[0].data==='object'){catImgOverride=rows[0].data; renderCatBanner();}}catch(e){console.warn('[catimg] pull failed',e);}
+}
+async function catImgCloudPush(){
+  const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/bth_save_content`,{method:'POST',headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},body:JSON.stringify({p_pin:PLACES_ADMIN_PIN,p_key:CAT_IMG_KEY,p_data:catImgOverride})});
+  return r.ok;
+}
+function catImgFor(c){return catImgOverride[c]||CAT_IMG_DEFAULT[c]||null;}
+function renderCatBanner(){
+  const el=document.getElementById('catBanner'); if(!el) return;
+  const q=($('search').value||'').trim();
+  const src=(filter&&filter!=='All'&&!q&&!topOnly)?catImgFor(filter):null;
+  if(!src){el.classList.remove('show');return;}
+  const im=document.getElementById('catBannerImg'); if(im.getAttribute('src')!==src) im.src=src;
+  document.getElementById('catBannerTitle').textContent=filter; el.classList.add('show');
+}
+function catImgResize(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onerror=rej;fr.onload=()=>{const im=new Image();im.onerror=rej;im.onload=()=>{
+  const W=900,H=300,cv=document.createElement('canvas');cv.width=W;cv.height=H;const cx=cv.getContext('2d');
+  const s=Math.max(W/im.width,H/im.height),w=im.width*s,h=im.height*s;cx.drawImage(im,(W-w)/2,(H-h)*0.4,w,h);
+  res(cv.toDataURL('image/jpeg',0.72));};im.src=fr.result;};fr.readAsDataURL(file);});}
+(function catImgAdmin(){
+  const sel=document.getElementById('catImgSel'),file=document.getElementById('catImgFile'),msg=document.getElementById('catImgMsg');
+  if(!sel) return; let pending=null;
+  function fill(){sel.innerHTML=categories().filter(c=>c!=='All').map(c=>`<option>${esc(c)}</option>`).join('');}
+  function fillSafe(){try{fill();}catch(e){}}
+  setTimeout(fillSafe,1500); setTimeout(fillSafe,4000); sel.addEventListener('focus',fillSafe); sel.addEventListener('touchstart',fillSafe,{passive:true});
+  file.addEventListener('change',async()=>{const f=file.files&&file.files[0]; if(!f) return; try{pending=await catImgResize(f); msg.textContent='Photo ready. Tap Save banner.';}catch(e){msg.textContent='Could not read that photo.';}});
+  document.getElementById('catImgSave').addEventListener('click',async()=>{
+    if(!pending){msg.textContent='Choose a photo first.';return;}
+    catImgOverride[sel.value]=pending; msg.textContent='Saving...';
+    const ok=await catImgCloudPush(); msg.textContent=ok?'Saved. Live for everyone.':'Could not save. Try again.'; if(ok){pending=null;file.value='';} renderCatBanner();});
+  document.getElementById('catImgReset').addEventListener('click',async()=>{
+    delete catImgOverride[sel.value]; const ok=await catImgCloudPush(); msg.textContent=ok?'Back to the default photo.':'Could not save. Try again.'; renderCatBanner();});
+})();
+catImgCloudPull();
 function saveLocal(){localStorage.setItem(STORE_KEY, JSON.stringify(items)); placesCloudPush(items);}
 const CAT_ORDER=['Fine Dining','Restaurants','Caf\u00e9s','Bars & Nightlife','Fast Food','Pizza & Donair','Hotels & Stays','Air Travel','Festivals','Museums','Theatres','Family Fun','Family','Trails','Lakes','Lakes & Outfitters','Winter','Outdoor Rinks','Skate Parks','Golf','Spray Parks','Provincial Parks','Campgrounds','Parks & Playgrounds','Taxis','Grocery Stores','Gas Stations','Convenience Stores','Pharmacies','Banks & ATMs','Realtors','Hospital & Health','Sporting Goods','Gift & Novelty','Florists','Trophies & Engraving','Art & Galleries','Handcrafted & Home Based Businesses'];
 const CAT_GROUPS=[{label:'Food & Drink',cats:['Fine Dining','Restaurants','Caf\u00e9s','Fast Food','Pizza & Donair','Bars & Nightlife']},{label:'Family & Fun',cats:['Family Fun','Theatres','Museums','Festivals','Parks & Playgrounds','Spray Parks','Skate Parks','Outdoor Rinks']},{label:'Adventure & Outdoors',cats:['Lakes','Lakes & Outfitters','Trails','Winter','Golf','Provincial Parks','Campgrounds']},{label:'Shopping',cats:['Sporting Goods','Gift & Novelty','Florists','Trophies & Engraving','Art & Galleries','Handcrafted & Home Based Businesses']},{label:'Services',cats:['Grocery Stores','Gas Stations','Convenience Stores','Pharmacies','Banks & ATMs','Hospital & Health']},{label:'Travel & Stay',cats:['Hotels & Stays','Air Travel','Taxis']}];
@@ -480,6 +539,7 @@ function updateSchema(){
 
 function render(){
   renderChips();
+  renderCatBanner();
   updateSchema();
   const q=$('search').value.toLowerCase().trim();
   renderCrossResults(q);
