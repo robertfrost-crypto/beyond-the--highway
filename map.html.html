@@ -48,8 +48,15 @@
   }
   .chipRow::-webkit-scrollbar { display: none; }
   .chipRow.sections { top: 56px; }
-  .chipRow.subcats { top: 100px; display: none; }
+  .chipRow.subcats { display: none; top: 150px; left: 8px; right: auto; width: max-content; max-width: 172px; max-height: calc(100vh - 300px);
+    flex-direction: column; align-items: flex-start; gap: 6px; padding: 2px 4px 6px 0;
+    overflow-x: hidden; overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; }
   .chipRow.subcats.show { display: flex; }
+  .chipRow.subcats .chip { white-space: normal; text-align: left; justify-content: flex-start; line-height: 1.2; }
+  .subToggle { flex: 0 0 auto; align-self: flex-start; border: none; border-radius: 16px; padding: 5px 11px; font-size: 11px; font-weight: 700;
+    background: rgba(15,51,34,0.82); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.25); cursor: pointer; }
+  .chipRow.subcats.collapsed { width: auto; overflow: visible; }
+  .chipRow.subcats.collapsed .chip { display: none; }
 
   .chip {
     flex: 0 0 auto;
@@ -177,7 +184,7 @@
     transition: top 0.2s ease;
   }
   .note.narrow { top: 100px; }
-  .note.wide { top: 144px; }
+  .note.wide { top: 100px; }
 
   .toursBtn {
     background: #fff;
@@ -700,6 +707,13 @@ function renderSubcatChips(sec) {
   const row = document.getElementById('subcatChips');
   row.innerHTML = '';
   if (!sec) { row.classList.remove('show'); return; }
+
+  const tg = document.createElement('button');
+  tg.className = 'subToggle';
+  const paintTg = () => { tg.textContent = row.classList.contains('collapsed') ? '\u203A ' + sec.label : '\u2039 Hide'; };
+  tg.addEventListener('click', () => { row.classList.toggle('collapsed'); paintTg(); });
+  row.classList.remove('collapsed'); paintTg();
+  row.appendChild(tg);
 
   const allChip = document.createElement('button');
   allChip.className = 'chip active';
