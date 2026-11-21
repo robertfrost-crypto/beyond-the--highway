@@ -88,23 +88,24 @@
     '.bthj-caption{margin-top:14px;text-align:center;color:'+C.mist+';font-family:'+SERIF+';font-style:italic;font-size:14px}'+
     /* toast */
     '.bth-toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 18px);transform:translateX(-50%) translateY(20px);'+
-      'max-width:520px;width:calc(100% - 28px);background:linear-gradient(160deg,#1d3826,#102417);border:1px solid rgba(155,232,74,.45);'+
-      'border-radius:14px;padding:14px 16px;box-shadow:0 16px 40px -16px #000;opacity:0;pointer-events:none;transition:.4s;z-index:60;'+
-      'font-family:'+SANS+';color:'+C.paper+'}'+
+      'max-width:520px;width:calc(100% - 28px);background:#fff;border:1px solid #111;'+
+      'border-radius:16px;padding:14px 16px;box-shadow:0 14px 26px -8px rgba(16,26,58,.5);opacity:0;pointer-events:none;transition:.4s;z-index:60;'+
+      'font-family:'+SANS+';color:#101a3a}'+
     '.bth-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}'+
-    '.bth-toast b{color:'+C.gold+';display:block;font-family:'+SERIF+';font-size:16px;margin-bottom:2px}'+
-    '.bth-toast small{font-size:13px}'+
+    '.bth-toast b{color:#2a55e0;display:block;font-family:'+SERIF+';font-size:17px;margin-bottom:2px}'+
+    '.bth-toast small{font-size:13px;color:#4d587a}'+
     /* modal */
-    '.bth-modal{position:fixed;inset:0;z-index:70;background:rgba(2,8,5,.92);display:none;align-items:center;justify-content:center;'+
+    '.bth-modal{position:fixed;inset:0;z-index:70;background:rgba(16,26,58,.82);display:none;align-items:center;justify-content:center;'+
       'flex-direction:column;gap:16px;padding:calc(env(safe-area-inset-top) + 18px) 18px calc(env(safe-area-inset-bottom) + 18px)}'+
     '.bth-modal.show{display:flex}'+
+    '.bth-x{position:absolute;top:calc(env(safe-area-inset-top) + 12px);right:12px;width:44px;height:44px;border-radius:50%;border:1px solid #111;background:#fff;color:#101a3a;font-size:26px;line-height:1;cursor:pointer;box-shadow:0 8px 14px -6px rgba(0,0,0,.5)}'+
     '.bth-modal .bth-card{max-width:92vw;max-height:64vh;border-radius:14px;box-shadow:0 20px 50px -16px #000}'+
-    '.bth-modal h3{margin:0;font-family:'+SERIF+';color:'+C.g3+';font-size:22px;text-align:center}'+
-    '.bth-modal p{margin:0;color:'+C.mist+';text-align:center;font-size:14px;max-width:30ch;font-family:'+SANS+'}'+
+    '.bth-modal h3{margin:0;font-family:'+SERIF+';color:#fff;font-size:24px;text-align:center}'+
+    '.bth-modal p{margin:0;color:#dbe6fb;text-align:center;font-size:15px;max-width:30ch;font-family:'+SANS+'}'+
     '.bth-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}'+
-    '.bth-btn{padding:13px 20px;border-radius:12px;border:1px solid '+C.line+';cursor:pointer;font-family:'+SANS+';'+
-      'font-weight:700;font-size:15px;background:'+C.moss2+';color:'+C.paper+'}'+
-    '.bth-btn.primary{background:linear-gradient(160deg,#2a8f3a,#1d6e2c);border-color:rgba(155,232,74,.4);color:#eafff0}';
+    '.bth-btn{padding:13px 20px;border-radius:12px;border:1px solid #111;cursor:pointer;font-family:'+SANS+';'+
+      'font-weight:700;font-size:15px;background:#fff;color:#2a55e0}'+
+    '.bth-btn.primary{background:linear-gradient(160deg,#2a55e0,#1c46b0);color:#fff}';
     document.head.appendChild(s);
   }
 
@@ -116,6 +117,10 @@
     toastEl.innerHTML = '<b></b><small></small>'; document.body.appendChild(toastEl);
 
     modalEl = document.createElement('div'); modalEl.className='bth-modal';
+    var xb=document.createElement('button'); xb.className='bth-x'; xb.setAttribute('aria-label','Close'); xb.innerHTML='&times;';
+    xb.addEventListener('click', function(){ closeModal(); }); modalEl.appendChild(xb);
+    modalEl.addEventListener('click', function(e){ if (e.target===modalEl) closeModal(); });
+    document.addEventListener('keydown', function(e){ if (e.key==='Escape') closeModal(); });
     bodyEl = document.createElement('div'); modalEl.appendChild(bodyEl); document.body.appendChild(modalEl);
 
     canvas = document.createElement('canvas'); canvas.width=1080; canvas.height=1350; canvas.style.display='none';
@@ -147,7 +152,7 @@
       toastEl._tHide = setTimeout(function(){ toastEl.style.display = 'none'; }, 450);
     }, 4400);
   }
-  function closeModal(){ if (modalEl) modalEl.classList.remove('show'); }
+  function closeModal(){ if (modalEl){ modalEl.classList.remove('show'); modalEl.style.display=''; } }
 
   // ---------- strip ----------
   var stripEl, busEl, statEl, capEl;
