@@ -1,6 +1,6 @@
 // Beyond the Highway — service worker
 // Bump CACHE whenever you redeploy new content so installed users get the update prompt.
-const CACHE = 'bth-v24';
+const CACHE = 'bth-v25';
 
 // Cached for offline. Spoke pages are added here as they're built.
 const ASSETS = [
@@ -12,7 +12,7 @@ const ASSETS = [
   'places.html', 'sports.html', 'facilities.html',
   'local-hub.html', 'local-business.html', 'local-business-hero.jpg',
   'local-news.html',
-  'event.html', 'submit-event.html', 'llms.txt'
+  'event.html', 'submit-event.html', 'llms.txt', 'assets/cards/onnow.webp', 'assets/cards/map.webp', 'assets/cards/stories.webp', 'assets/cards/trails.webp', 'assets/cards/mystery.webp', 'assets/cards/aboriginal.webp', 'assets/cards/things.webp', 'assets/cards/localhub.webp', 'assets/cards/localnews.webp', 'assets/cards/coupons.webp', 'assets/cards/sports.webp', 'assets/cards/events.webp', 'assets/cards/recommend.webp'
 ];
 
 // Install: cache what exists, ignore anything not built yet (so install never fails).

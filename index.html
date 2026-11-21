@@ -21,10 +21,10 @@
 <title>Beyond the Highway — Fort McMurray</title>
 
 <!-- PWA / iOS meta. The manifest + service worker get wired in Step 5. -->
-<meta name="theme-color" content="#04100a">
+<meta name="theme-color" content="#f3f6fd">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Beyond the Highway">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -32,150 +32,122 @@
 
 <style>
   :root{
-    --ink:#04100a;
-    --ink-2:#081a11;
-    --moss:#0f1f17;
-    --moss-2:#162a1d;
-    --line:rgba(224,168,80,.22);
-    --gold:#e6b85c;
-    --gold-soft:#c98f3e;
-    --green-1:#9be84a;   /* aurora lime, from the art */
-    --green-2:#5bc94f;
-    --green-3:#cdfca0;
-    --paper:#f5f1e7;
-    --mist:rgba(245,241,231,.74);
+    --blue:#2a55e0; --navy:#1c46b0; --gold:#f2b134;
+    --ink:#101a3a; --ink-soft:#4d587a;
+    --paper:#f3f6fd; --card:#ffffff; --tint:#f1f5fe; --line:#d9e1f4;
     --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
     --sans:"Avenir Next",Avenir,"Segoe UI",system-ui,-apple-system,sans-serif;
   }
   *{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
-  body{
-    margin:0; min-height:100vh; min-height:100dvh;
-    background:radial-gradient(125% 70% at 50% -6%, #0e2818 0%, var(--ink) 60%) fixed, var(--ink);
-    color:var(--paper); font-family:var(--sans);
-    -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent;
-  }
+  body{margin:0; min-height:100vh; min-height:100dvh; background:var(--paper); color:var(--ink);
+    font-family:var(--sans); -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent}
   .wrap{max-width:600px; margin:0 auto;
     padding:calc(env(safe-area-inset-top) + 16px) clamp(14px,4.5vw,22px) calc(env(safe-area-inset-bottom) + 26px)}
 
   /* ---------- Top bar ---------- */
   .topbar{display:flex; align-items:center; gap:12px; margin-bottom:16px}
-  .brandmark{width:54px; height:54px; flex:0 0 auto; border-radius:50%;
-    display:grid; place-items:center;
-    background:radial-gradient(circle at 50% 35%, #143324, #07150e);
-    border:1.5px solid rgba(155,232,74,.35); box-shadow:0 0 22px rgba(155,232,74,.16)}
-  .brandmark svg{width:26px; height:26px; color:var(--green-3);
-    filter:drop-shadow(0 0 6px rgba(155,232,74,.5))}
+  .brandmark{width:52px; height:52px; flex:0 0 auto; border-radius:50%; display:grid; place-items:center;
+    background:var(--blue); color:#fff; box-shadow:0 8px 18px -10px rgba(42,85,224,.8)}
+  .brandmark svg{width:26px; height:26px}
   .brandtext{flex:1; line-height:1.05}
-  .brandtext .b1{font-family:var(--serif); font-weight:700; font-size:20px}
-  .brandtext .b2{font-family:var(--serif); font-style:italic; font-size:20px;
-    background:linear-gradient(90deg,var(--green-1),var(--green-2));
-    -webkit-background-clip:text; background-clip:text; color:transparent}
+  .brandtext .b1{font-family:var(--serif); font-weight:700; font-size:20px; color:var(--ink)}
+  .brandtext .b2{font-family:var(--serif); font-style:italic; font-size:20px; color:var(--blue)}
   .brandtext .b3{display:block; margin-top:3px; font-size:10.5px; letter-spacing:.22em;
-    color:var(--gold); text-transform:uppercase; font-weight:600}
-  .iconbtn{width:46px; height:46px; flex:0 0 auto; border-radius:13px;
-    display:grid; place-items:center; text-decoration:none; color:var(--gold);
-    background:var(--moss); border:1px solid var(--line);
+    color:var(--ink-soft); text-transform:uppercase; font-weight:700}
+  .iconbtn{width:46px; height:46px; flex:0 0 auto; border-radius:13px; display:grid; place-items:center;
+    text-decoration:none; color:var(--blue); background:var(--card); border:1px solid var(--line);
     transition:transform .12s ease, background .12s ease}
-  .iconbtn:active{transform:scale(.94); background:var(--moss-2)}
+  .iconbtn:active{transform:scale(.94); background:var(--tint)}
   .iconbtn svg{width:22px; height:22px}
 
-  /* ---------- Hero (real artwork) ---------- */
+  /* ---------- Hero ---------- */
   .hero{margin-bottom:20px}
-  .hero-art{display:block; width:100%; height:auto; border-radius:20px 20px 0 0;
-    box-shadow:0 22px 48px -26px rgba(0,0,0,.95), 0 0 30px -6px rgba(155,232,74,.12)}
-  .hero-title-wrap{background:var(--paper); border-radius:0 0 20px 20px;
-    padding:18px 16px 16px; text-align:center;
-    box-shadow:0 22px 48px -26px rgba(0,0,0,.95)}
+  .hero-art{display:block; width:100%; height:auto; border-radius:20px 20px 0 0}
+  .hero-title-wrap{background:var(--card); border:1px solid var(--line); border-top:0; border-radius:0 0 20px 20px;
+    padding:18px 16px 16px; text-align:center; box-shadow:0 18px 36px -26px rgba(16,26,58,.45)}
   .hero-title{margin:0; font-family:var(--serif); font-weight:800; color:var(--ink);
     font-size:clamp(28px,8.5vw,42px); line-height:1.04}
   .tagline{margin:10px 0 2px; text-align:center; font-family:var(--serif); font-style:italic;
-    font-size:clamp(15px,4.4vw,19px); color:var(--paper); opacity:.92;
-    text-shadow:0 1px 10px rgba(0,0,0,.4)}
+    font-size:clamp(15px,4.4vw,19px); color:var(--ink-soft)}
 
-  /* ---------- Tiles ---------- */
-  nav.menu{display:flex; flex-direction:column; gap:12px; margin-top:18px}
-  /* ---- Local Sports + Tournaments buttons (under On Now) ---- */
+  /* ---------- Menu: photo cards, image fading into white ---------- */
+  nav.menu{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:18px}
+  nav.menu > .linkrow, nav.menu > .hublinks, nav.menu > .tile.wide{grid-column:1 / -1}
   .hublinks{display:flex; flex-direction:column; gap:12px}
   .hub-eyebrow{font-family:var(--sans); font-weight:800; font-size:11px; letter-spacing:.16em;
-    text-transform:uppercase; color:var(--green-2); margin:4px 2px -2px}
+    text-transform:uppercase; color:var(--blue); margin:4px 2px -2px}
   .linkrow{display:flex; align-items:center; gap:13px; text-decoration:none; padding:13px 15px;
-    border-radius:14px; background:linear-gradient(160deg, rgba(19,39,26,.85), rgba(9,22,14,.92));
-    border:1px solid rgba(155,232,74,.22); color:var(--paper); transition:transform .12s, border-color .12s}
-  .linkrow:active{transform:scale(.985); border-color:rgba(155,232,74,.5)}
+    border-radius:16px; background:var(--card); border:1px solid var(--line); color:var(--ink);
+    box-shadow:0 10px 24px -20px rgba(16,26,58,.5); transition:transform .12s, border-color .12s}
+  .linkrow:active{transform:scale(.985); border-color:var(--blue)}
   .linkrow .lr-icon{width:38px; height:38px; flex:0 0 auto; border-radius:50%; display:grid; place-items:center;
-    background:radial-gradient(circle at 50% 35%, #143324, #07150e); border:1px solid rgba(155,232,74,.35); color:var(--green-3)}
+    background:var(--tint); border:1px solid var(--line); color:var(--blue)}
   .linkrow .lr-icon svg{width:20px; height:20px}
   .linkrow .lr-text{flex:1; min-width:0}
-  .linkrow .lr-title{display:block; font-family:var(--serif); font-weight:700; font-size:16px; color:#eafff0}
-  .linkrow .lr-sub{display:block; margin-top:1px; font-size:12.5px; color:var(--mist);
+  .linkrow .lr-title{display:block; font-family:var(--serif); font-weight:700; font-size:16px; color:var(--ink)}
+  .linkrow .lr-sub{display:block; margin-top:1px; font-size:12.5px; color:var(--ink-soft);
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-  .linkrow .lr-arrow{flex:0 0 auto; color:var(--green-2)}
+  .linkrow .lr-arrow{flex:0 0 auto; color:var(--blue)}
   .linkrow .lr-arrow svg{width:20px; height:20px}
-  .tile{display:flex; align-items:center; gap:15px; text-decoration:none; position:relative;
-    padding:15px 16px; border-radius:16px; color:var(--paper); overflow:hidden;
-    background:
-      linear-gradient(160deg, rgba(15,31,20,.68), rgba(6,15,10,.86)),
-      url('aurora-bg.jpg') center 32% / cover no-repeat;
-    border:1px solid var(--line); box-shadow:0 12px 28px -22px rgba(0,0,0,.95);
-    transition:transform .12s ease, border-color .12s ease, background-color .12s ease}
-  .tile:active{transform:scale(.985); border-color:rgba(155,232,74,.55)}
-  .tile::after{content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
-    background:radial-gradient(120% 90% at 85% 0%, rgba(155,232,74,.10), transparent 55%)}
-  .tile>*{position:relative; z-index:1}
-  .tile-icon{width:50px; height:50px; flex:0 0 auto; border-radius:50%;
-    display:grid; place-items:center; color:var(--gold);
-    background:radial-gradient(circle at 50% 36%, #173220, #0b1c13);
-    border:1.5px solid rgba(230,184,92,.42); box-shadow:0 0 16px rgba(230,184,92,.08)}
-  .tile-icon svg{width:25px; height:25px}
-  .tile-text{flex:1; min-width:0}
+
+  .tile{display:flex; flex-direction:column; text-decoration:none; position:relative; overflow:hidden;
+    border-radius:18px; background:var(--card); border:1px solid var(--line); color:var(--ink);
+    box-shadow:0 14px 28px -22px rgba(16,26,58,.55);
+    transition:transform .12s ease, border-color .12s ease}
+  .tile:active{transform:scale(.985); border-color:var(--blue)}
+  .tile-img{display:block; position:relative; height:112px; background:var(--tint)}
+  .tile.wide .tile-img{height:150px}
+  .tile-img img{display:block; width:100%; height:100%; object-fit:cover}
+  .tile-img::after{content:""; position:absolute; left:0; right:0; bottom:-1px; height:62%; pointer-events:none;
+    background:linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,.82) 70%, #fff 100%)}
+  .tile-icon,.tile-arrow{display:none}
+  .tile-text{display:block; padding:0 13px 14px; margin-top:-16px; position:relative; z-index:1}
+  .tile.wide .tile-text{padding:0 16px 16px; margin-top:-22px}
   .tile-title{display:block; font-family:var(--serif); font-weight:700;
-    font-size:clamp(21px,5.6vw,25px); color:var(--gold); line-height:1.1}
-  .tile-sub{display:block; margin-top:2px; font-size:clamp(13px,3.6vw,15px);
-    color:var(--mist); line-height:1.32}
-  .tile-arrow{flex:0 0 auto; color:var(--green-2)}
+    font-size:clamp(17px,4.8vw,20px); color:var(--ink); line-height:1.12}
+  .tile.wide .tile-title{font-size:clamp(21px,5.6vw,25px)}
+  .tile-sub{display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+    margin-top:4px; font-size:clamp(12.5px,3.4vw,14px); color:var(--ink-soft); line-height:1.34}
+  .tile-title::after{content:""; display:block; width:26px; height:3px; border-radius:3px; margin-top:7px; background:var(--gold)}
 .tile-soon{cursor:default;opacity:.62;pointer-events:none}
-.tile-soon .tile-icon,.tile-soon .tile-title,.tile-soon .tile-sub{filter:grayscale(.35)}
-.tile-soon-badge{flex:0 0 auto;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--green-2);border:1px solid var(--green-2);border-radius:999px;padding:4px 9px;white-space:nowrap;opacity:.9}
-  .tile-arrow svg{width:24px; height:24px}
+.tile-soon .tile-img img{filter:grayscale(.35)}
+.tile-soon-badge{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--blue);border:1px solid var(--blue);border-radius:999px;padding:4px 9px;white-space:nowrap}
 
   /* ---------- Footer ---------- */
   .foot{display:flex; align-items:center; gap:12px; justify-content:center;
     margin-top:26px; padding-top:22px; border-top:1px solid var(--line)}
-  .foot .leaf{color:var(--green-2); opacity:.85; flex:0 0 auto}
+  .foot .leaf{color:var(--blue); opacity:.8; flex:0 0 auto}
   .foot .leaf svg{width:22px; height:22px}
   .foot .leaf.r{transform:scaleX(-1)}
   .foot p{margin:0; text-align:center; font-family:var(--serif);
-    font-size:clamp(13px,3.5vw,15px); color:var(--mist); line-height:1.4; max-width:34ch}
+    font-size:clamp(13px,3.5vw,15px); color:var(--ink-soft); line-height:1.4; max-width:34ch}
 
-  a:focus-visible,.iconbtn:focus-visible{outline:2px solid var(--green-3); outline-offset:3px}
-
-  /* featured event tile (shows only when an event is live) */
-  .tile.event{position:relative; overflow:hidden;
-    background:linear-gradient(135deg,#1c4d2a,#123a22 55%,#0f2c1c);
-    border-color:rgba(155,232,74,.55); box-shadow:0 14px 30px -18px #000, 0 0 26px -8px rgba(155,232,74,.3)}
-  .tile.event::before{content:""; position:absolute; inset:0; z-index:0; opacity:.5;
-    background:radial-gradient(120% 90% at 80% -20%, rgba(155,232,74,.5), transparent 60%)}
-  .tile.event>*{position:relative; z-index:1}
-  .tile.event .eyebrow{display:block; font-family:var(--sans); font-weight:800; font-size:11px;
-    letter-spacing:.22em; color:var(--green-3); text-transform:uppercase; margin-bottom:2px}
-  .tile.event .tile-title{color:#eafff0}
-  .tile.event .tile-sub{color:rgba(245,241,231,.85)}
-  .tile.event .tile-icon{border-color:rgba(155,232,74,.55); color:var(--green-3)}
+  a:focus-visible,.iconbtn:focus-visible{outline:2px solid var(--blue); outline-offset:3px}
 
   /* update-available banner */
   #updateBar{position:fixed; left:0; right:0; z-index:60;
     bottom:calc(env(safe-area-inset-bottom) + 12px); margin:0 auto; max-width:560px;
     width:calc(100% - 28px); display:none; align-items:center; gap:12px;
-    padding:12px 14px; border-radius:14px; border:1px solid rgba(155,232,74,.45);
-    background:linear-gradient(160deg,#16331f,#0e2417); box-shadow:0 16px 40px -18px #000}
+    padding:12px 14px; border-radius:14px; border:1px solid var(--line);
+    background:var(--card); box-shadow:0 16px 40px -18px rgba(16,26,58,.6)}
   #updateBar.show{display:flex}
-  #updateBar span{flex:1; font-size:14px; color:var(--paper)}
+  #updateBar span{flex:1; font-size:14px; color:var(--ink)}
   #updateBar button{flex:0 0 auto; padding:9px 16px; border-radius:10px; border:0; cursor:pointer;
-    font-family:var(--sans); font-weight:700; font-size:14px;
-    background:linear-gradient(160deg,#2a8f3a,#1d6e2c); color:#eafff0}
+    font-family:var(--sans); font-weight:700; font-size:14px; background:var(--blue); color:#fff}
 
-  @media (prefers-reduced-motion: reduce){ .tile,.iconbtn{transition:none} }
+
+  /* Journey strip: blue to match the new palette (journey.js is shared, so override here only) */
+  #bth-journey .bthj-card{background:linear-gradient(160deg,#2a55e0,#1c46b0); border-color:#1c46b0; box-shadow:0 14px 28px -20px rgba(28,70,176,.85)}
+  #bth-journey .bthj-eyebrow{color:#fff}
+  #bth-journey .bthj-stat{color:#f2b134}
+  #bth-journey .bthj-caption{color:rgba(255,255,255,.88)}
+  #bth-journey .bthj-start{background:#f2b134; box-shadow:0 0 9px rgba(242,177,52,.8)}
+  #bth-journey .bthj-dot{background:#1c46b0; border-color:rgba(255,255,255,.5)}
+  #bth-journey .bthj-dot.on{background:#f2b134; border-color:#fff}
+  #bth-journey .bthj-glow{display:none}
+
+  @media (prefers-reduced-motion: reduce){ .tile,.iconbtn,.linkrow{transition:none} }
 </style>
 </head>
 <body>
@@ -214,13 +186,13 @@
       <span class="lr-text"><span class="lr-title">Top Picks</span><span class="lr-sub">Featured local businesses on Beyond the Highway</span></span>
       <span class="lr-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
     </a>
-<a class="tile" href="onnow.html">
+<a class="tile wide" href="onnow.html"><span class="tile-img"><img src="assets/cards/onnow.webp" alt="" loading="lazy" decoding="async" width="900" height="380"></span>
       <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
       <span class="tile-text"><span class="tile-title">On Now</span><span class="tile-sub">Live on stage this weekend — theatre, concerts and shows, courtesy of On Stage Productions (Mike Jones).</span></span>
       <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
     </a>
 
-    <a class="tile" href="map.html" id="tileMap" style="display:none">
+    <a class="tile wide" href="map.html" id="tileMap" style="display:none"><span class="tile-img"><img src="assets/cards/map.webp" alt="" loading="lazy" decoding="async" width="560" height="340"></span>
       <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15"/><path d="M9 3.236v15"/></svg></span>
       <span class="tile-text"><span class="tile-title">Maps</span><span class="tile-sub">Find your way around Wood Buffalo, one pin at a time.</span></span>
       <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
@@ -230,57 +202,57 @@
       <a class="linkrow" href="https://www.fortmcmurrayoilbarons.ca/stats/schedule" target="_blank" rel="noopener"><span class="lr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="lr-text"><span class="lr-title">Oil Barons</span><span class="lr-sub">Junior A hockey · game schedule</span></span><span class="lr-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a>
       <a class="linkrow" href="https://www.fortmcmurraygiants.ca/2026-home-schedule" target="_blank" rel="noopener"><span class="lr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="lr-text"><span class="lr-title">Giants</span><span class="lr-sub">WCBL baseball · game schedule</span></span><span class="lr-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></a>
     </div>
-    <a class="tile" href="stories.html">
+    <a class="tile" href="stories.html"><span class="tile-img"><img src="assets/cards/stories.webp" alt="" loading="lazy" decoding="async" width="560" height="340"></span>
       <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span>
       <span class="tile-text"><span class="tile-title">Stories</span><span class="tile-sub">Every place has a story to tell.</span></span>
       <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
     </a>
-    <a class="tile" href="trails.html">
+    <a class="tile" href="trails.html"><span class="tile-img"><img src="assets/cards/trails.webp" alt="" loading="lazy" decoding="async" width="560" height="340"></span>
       <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0Z"/><path d="M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0Z"/><path d="M16 17h4"/><path d="M4 13h4"/></svg></span>
       <span class="tile-text"><span class="tile-title">Trails</span><span class="tile-sub">Explore over 150 kilometres of trails and pathways.</span></span>
       <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
     </a>
-    <a class="tile" href="mystery-tours.html">
+    <a class="tile" href="mystery-tours.html"><span class="tile-img"><img src="assets/cards/mystery.webp" alt="" loading="lazy" decoding="async" width="560" height="340"></span>
       <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg></span>
       <span class="tile-text"><span class="tile-title">Mystery Tours</span><span class="tile-sub">Turn a day out into an adventure.</span></span>
       <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
     </a>
-    <a class="tile" href="aboriginal-experiences.html" id="tileAboriginal" style="display:none">
+    <a class="tile" href="aboriginal-experiences.html" id="tileAboriginal" style="display:none"><span class="tile-img"><img src="assets/cards/aboriginal.webp" alt="" loading="lazy" decoding="async" width="560" height="340"></span>
       <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg></span>
       <span class="tile-text"><span class="tile-title">Aboriginal Experiences</span><span class="tile-sub">Indigenous culture, history and experiences across Wood Buffalo.</span></span>
       <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
     </a>
-    <a class="tile" href="places.html">
+    <a class="tile" href="places.html"><span class="tile-img"><img src="assets/cards/things.webp" alt="" loading="lazy" decoding="async" width="560" height="340"></span>
       <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></span>
       <span class="tile-text"><span class="tile-title">Things to Do</span><span class="tile-sub">Dining, shopping and more.</span></span>
       <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
     </a>
-    <a class="tile" href="local-hub.html" id="tileLocalHub" style="display:none">
+    <a class="tile" href="local-hub.html" id="tileLocalHub" style="display:none"><span class="tile-img"><img src="assets/cards/localhub.webp" alt="" loading="lazy" decoding="async" width="560" height="340"></span>
       <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg></span>
       <span class="tile-text"><span class="tile-title">Local Hub</span><span class="tile-sub">Local businesses, classifieds and local news for Wood Buffalo residents.</span></span>
       <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
     </a>
-    <a class="tile" href="local-news.html" id="tileLocalNews" style="display:none">
+    <a class="tile" href="local-news.html" id="tileLocalNews" style="display:none"><span class="tile-img"><img src="assets/cards/localnews.webp" alt="" loading="lazy" decoding="async" width="560" height="340"></span>
       <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg></span>
       <span class="tile-text"><span class="tile-title">Local News</span><span class="tile-sub">This week's newsletter and community notices from Wood Buffalo.</span></span>
       <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
     </a>
-    <a class="tile" href="coupons.html" id="tileCoupons" style="display:none">
+    <a class="tile" href="coupons.html" id="tileCoupons" style="display:none"><span class="tile-img"><img src="assets/cards/coupons.webp" alt="" loading="lazy" decoding="async" width="560" height="340"></span>
       <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3.24H4a1 1 0 0 0-1 1v5.59a2 2 0 0 0 .59 1.41l9.58 9.58a2 2 0 0 0 2.83 0l4.59-4.59a2 2 0 0 0 0-2.83Z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg></span>
       <span class="tile-text"><span class="tile-title">Coupons</span><span class="tile-sub">Local deals from Beyond the Highway Coupon Partners.</span></span>
       <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
     </a>
-    <a class="tile" href="sports.html">
+    <a class="tile" href="sports.html"><span class="tile-img"><img src="assets/cards/sports.webp" alt="" loading="lazy" decoding="async" width="560" height="340"></span>
       <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></span>
       <span class="tile-text"><span class="tile-title">Sports</span><span class="tile-sub">Arenas, recreation, tournaments and activities.</span></span>
       <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
     </a>
-    <a class="tile" href="https://maccalendar.ca/" target="_blank" rel="noopener">
+    <a class="tile" href="https://maccalendar.ca/" target="_blank" rel="noopener"><span class="tile-img"><img src="assets/cards/events.webp" alt="" loading="lazy" decoding="async" width="560" height="340"></span>
       <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg></span>
       <span class="tile-text"><span class="tile-title">Events</span><span class="tile-sub">What’s on across Wood Buffalo — festivals, concerts, sports and community events (MAC Calendar).</span></span>
       <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
     </a>
-    <a class="tile" href="recommend.html">
+    <a class="tile wide" href="recommend.html"><span class="tile-img"><img src="assets/cards/recommend.webp" alt="" loading="lazy" decoding="async" width="900" height="380"></span>
       <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg></span>
       <span class="tile-text"><span class="tile-title">Recommendations</span><span class="tile-sub">Local favourites — straight from the people who live here.</span></span>
       <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
