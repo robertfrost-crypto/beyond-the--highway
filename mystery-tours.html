@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#1a1f24">
+<meta name="theme-color" content="#d9e6fd">
 <title>Adventures</title>
 <!-- =============================================================
      DEPLOYMENT RECIPE — Community portal HTML + sw.js
@@ -1680,6 +1680,63 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style id="bth-blue-v36">
+/* ===== Blue look (v36): remap the slate theme variables, then polish ===== */
+:root{
+  --night:#d9e6fd; --night-2:#f1f5fe; --night-3:#ffffff;
+  --aurora:#2a55e0; --aurora-dim:#1c46b0; --aurora-glow:rgba(42,85,224,.28);
+  --moss:#2a55e0; --moss-dim:#1c46b0; --rust:#c0392b;
+  --bone:#101a3a; --bone-soft:#4d587a;
+  --gold:#e8a21c; --gold-dim:#b9811a;
+  --ink:#101a3a; --ink-soft:#4d587a; --ink-muted:#7280a4;
+  --danger:#c0392b; --shadow:rgba(16,26,58,.38); --hairline:rgba(16,26,58,.16);
+  --serifx:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+}
+html,body{background:#d9e6fd!important;color:#101a3a}
+body{background-image:none!important}
+body::before{display:none!important}
+h1,h2,h3,.display,.brand-name,.story-card-body h3,.hero-tagline,.mystery-hero-title{font-family:var(--serifx)!important}
+.brand-name{color:#101a3a}
+.topbar{background:rgba(217,230,253,.92);border-bottom:1px solid rgba(16,26,58,.12);position:sticky}
+.ver{position:absolute;top:2px;right:10px;font:600 9px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:.08em;color:#a3bdec;pointer-events:none;user-select:none}
+.iconbtn{background:#fff;border:1px solid #111;color:#2a55e0;box-shadow:0 6px 12px -6px rgba(16,26,58,.45)}
+.iconbtn:active{background:#f1f5fe}
+.iconbtn.active{background:#e6eefd}
+.mystery-hero{border:1px solid #111!important;border-radius:18px!important;background-color:#fff!important;box-shadow:0 14px 26px -8px rgba(16,26,58,.42),0 4px 8px -2px rgba(16,26,58,.22)!important}
+.mystery-hero-overlay{padding:70px 18px 16px!important;background:linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.88) 58%,#fff 100%)!important}
+.mystery-hero-overlay .eyebrow{color:#2a55e0!important}
+.mystery-hero-title{color:#101a3a!important;font-style:normal!important;font-weight:800;font-size:1.9rem!important}
+.mystery-hero-title::after{content:"";display:block;width:34px;height:3px;border-radius:3px;margin-top:8px;background:#f2b134}
+.trail-card,.story-card{border:1px solid #111!important;background:#fff!important;box-shadow:0 14px 26px -8px rgba(16,26,58,.42),0 4px 8px -2px rgba(16,26,58,.22)!important}
+.trail-card:active,.story-card:active{border-color:#2a55e0!important}
+.trail-cover,.story-thumb{position:relative}
+.trail-cover::after,.story-thumb::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:30%;background:linear-gradient(to bottom,rgba(255,255,255,0),#fff);pointer-events:none}
+.tours-grid .trail-cover::after{display:block!important}
+.trail-cover.empty,.story-thumb.empty,.story-hero.empty{background:radial-gradient(circle at 30% 40%,rgba(42,85,224,.22),transparent 60%),linear-gradient(135deg,#e6eefd,#f7faff)!important;color:#2a55e0}
+.story-hero{border:1px solid #111!important;box-shadow:0 10px 18px -8px rgba(16,26,58,.4)}
+.eyebrow{color:#2a55e0}
+.btn{background:linear-gradient(160deg,#2a55e0,#1c46b0)!important;color:#fff!important;border:1px solid #111!important;box-shadow:0 10px 18px -8px rgba(28,70,176,.6)!important}
+.btn.secondary,.btn.ghost{background:#fff!important;color:#2a55e0!important;box-shadow:0 6px 12px -6px rgba(16,26,58,.4)!important}
+.btn.dark{background:#f2b134!important;color:#101a3a!important}
+.btn.danger{background:#c0392b!important;color:#fff!important}
+.pill{background:#f1f5fe;color:#101a3a;border:1px solid #d9e1f4}
+.pill.rust{background:#f2b134;color:#101a3a}.pill.moss{background:#2a55e0;color:#fff}
+.field input,.field textarea,.field select{background:#f1f5fe;border:1px solid #111;color:#101a3a}
+.clue-box,.audio-player{background:#fff;border:1px solid #111;box-shadow:0 8px 14px -6px rgba(16,26,58,.4)}
+.directions{background:#eef3fe;border-left:3px solid #2a55e0}
+.stop-row{background:#fff;border:1px solid #111}
+.welcome-audio{background:#fff;border:1px solid #111;box-shadow:0 8px 14px -6px rgba(16,26,58,.4)}
+.pwa-banner{background:#fff!important;border:1px solid #111!important;color:#101a3a!important;box-shadow:0 14px 26px -8px rgba(16,26,58,.5)!important}
+.pwa-banner-icon{background:#e6eefd!important;border:1px solid #2a55e0!important;color:#2a55e0!important}
+.pwa-banner-title{color:#101a3a!important;font-family:var(--serifx)}.pwa-banner-sub{color:#4d587a!important}
+.pwa-banner-btn-primary{background:linear-gradient(160deg,#2a55e0,#1c46b0)!important;color:#fff!important;border:1px solid #111!important}
+.pwa-banner-btn-ghost{background:transparent!important;color:#4d587a!important}
+.pwa-overlay{background:rgba(16,26,58,.82)!important}
+.pwa-overlay-card{background:#fff!important;border:1px solid #111!important;color:#101a3a!important}
+.pwa-overlay-title,.pwa-overlay-step-text strong{color:#101a3a!important}
+.pwa-overlay-step-num{background:#2a55e0!important;color:#fff!important}
+.pwa-download-btn{border:1px solid #111!important;background:#fff!important;color:#2a55e0!important}
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -3325,7 +3382,7 @@ function topbar(extra = '') {
   const count = scrapbookCount();
   const showDownloadBtn = !isAdmin && !_pwa.installed;
   return `
-    <div class="topbar">
+    <div class="topbar"><span class="ver">v36 &middot; Nov 21</span>
       <div style="display:flex; align-items:center; gap:10px;">
         <button class="iconbtn" onclick="location.href='/'" title="Back to Beyond the Highway">←</button>
         <div class="brand" onclick="nav('home')" style="cursor:pointer;">
