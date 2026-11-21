@@ -212,14 +212,11 @@
   // ---------- milestones ----------
   var rewardFired = false, modalReward = false;
   function checkMilestones(){
+    // Milestone pop-ups (25% toast, 50% and 100% selfie certificates) are switched off:
+    // they could freeze taps on some phones. Progress is still recorded and shown on the strip.
     rewardFired = false; modalReward = false;
     var p = pct();
-    if (p>=25 && !J.fired[25]){ J.fired[25]=true; saveJourney(); rewardFired=true;
-      setTimeout(function(){ toast('Day Tripper!', 'Your first stamp is in the passport. Tip: ' + (SET.tip25||DEFAULT_TIP)); }, 650); }
-    if (p>=50 && !J.fired[50]){ J.fired[50]=true; saveJourney(); rewardFired=true; modalReward=true;
-      setTimeout(function(){ certificateFlow(false); }, 850); }
-    if (p>=100 && !J.fired[100]){ J.fired[100]=true; saveJourney(); rewardFired=true; modalReward=true;
-      setTimeout(function(){ certificateFlow(true); }, 850); }
+    [25,50,100].forEach(function(m){ if (p>=m && !J.fired[m]){ J.fired[m]=true; saveJourney(); } });
   }
 
   // ---------- certificate ----------
