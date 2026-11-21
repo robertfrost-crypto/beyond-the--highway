@@ -1717,10 +1717,10 @@ h1,h2,h3,.display,.brand-name,.story-card-body h3,.hero-tagline,.mystery-hero-ti
 .eyebrow{color:#2a55e0}
 .btn{background:linear-gradient(160deg,#2a55e0,#1c46b0)!important;color:#fff!important;border:1px solid #111!important;box-shadow:0 10px 18px -8px rgba(28,70,176,.6)!important}
 .btn.secondary,.btn.ghost{background:#fff!important;color:#2a55e0!important;box-shadow:0 6px 12px -6px rgba(16,26,58,.4)!important}
-.btn.dark{background:#f2b134!important;color:#101a3a!important}
+.btn.dark{background:linear-gradient(160deg,#2a55e0,#1c46b0)!important;color:#fff!important;border:1px solid #111!important}
 .btn.danger{background:#c0392b!important;color:#fff!important}
 .pill{background:#f1f5fe;color:#101a3a;border:1px solid #d9e1f4}
-.pill.rust{background:#f2b134;color:#101a3a}.pill.moss{background:#2a55e0;color:#fff}
+.pill.rust{background:#1c46b0;color:#fff}.pill.moss{background:#2a55e0;color:#fff}
 .field input,.field textarea,.field select{background:#f1f5fe;border:1px solid #111;color:#101a3a}
 .clue-box,.audio-player{background:#fff;border:1px solid #111;box-shadow:0 8px 14px -6px rgba(16,26,58,.4)}
 .directions{background:#eef3fe;border-left:3px solid #2a55e0}
@@ -3382,7 +3382,7 @@ function topbar(extra = '') {
   const count = scrapbookCount();
   const showDownloadBtn = !isAdmin && !_pwa.installed;
   return `
-    <div class="topbar"><span class="ver">v36 &middot; Nov 21</span>
+    <div class="topbar"><span class="ver">v37 &middot; Nov 21</span>
       <div style="display:flex; align-items:center; gap:10px;">
         <button class="iconbtn" onclick="location.href='/'" title="Back to Beyond the Highway">←</button>
         <div class="brand" onclick="nav('home')" style="cursor:pointer;">
