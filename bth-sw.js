@@ -1,13 +1,13 @@
 // Beyond the Highway — service worker
 // Bump CACHE whenever you redeploy new content so installed users get the update prompt.
-const CACHE = 'bth-v60';
+const CACHE = 'bth-v61';
 
 // Cached for offline. Spoke pages are added here as they're built.
 const ASSETS = [
   './', 'index.html', 'onnow.html', 'manifest.json', 'admin.html',
   'journey.js', 'hub-links.js', 'assets/bus.webp', 'aurora-bg.jpg',
-  'icon-180.png', 'icon-192.png', 'icon-512.png',
-  'onnow-icon-180.png', 'onnow-icon-192.png',
+  'icon2-180.png', 'icon2-192.png', 'icon2-512.png',
+  'onnow-icon2-180.png', 'onnow-icon2-192.png',
   'stories.html', 'trails.html', 'mystery-tours.html',
   'places.html', 'sports.html', 'facilities.html',
   'local-hub.html', 'local-business.html', 'local-business-hero.jpg',
@@ -88,8 +88,8 @@ self.addEventListener('push', e => {
   const title = data.title || 'Beyond the Highway';
   const options = {
     body: data.body || '',
-    icon: 'icon-192.png',
-    badge: 'icon-192.png',
+    icon: 'icon2-192.png',
+    badge: 'icon2-192.png',
     data: { url: data.url || './' },
     tag: data.topic || 'bth-update',   // same topic replaces its own prior notification instead of stacking
     renotify: true   // without this, replacing a notification with the same tag is silent — no alert, no sound
