@@ -185,11 +185,14 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
 .catAdmin{margin-top:12px;padding-top:12px;border-top:1px solid rgba(16,26,58,.14)}
 .catAdmin .rowA{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
 .catAdmin select{flex:1;min-width:150px}
+.catSec{margin:22px 0 12px}
+.catSec:first-child{margin-top:4px}
+.catSec.noimg .cbText{margin-top:0;padding-top:12px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="ver">v48 &middot; Nov 21</div>
+  <div class="ver">v49 &middot; Nov 21</div>
   <a href="index.html" class="bthBackLink">&larr;&nbsp;Beyond the Highway</a>
 
   <div class="topBrand">
@@ -452,7 +455,7 @@ const CAT_IMG_KEY='places_category_images';
 let catImgOverride={};
 async function catImgCloudPull(){
   try{const r=await fetch(`${SUPABASE_URL}/rest/v1/bth_content?key=eq.${CAT_IMG_KEY}&select=data`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});
-    if(!r.ok) return; const rows=await r.json(); if(rows&&rows[0]&&rows[0].data&&typeof rows[0].data==='object'){catImgOverride=rows[0].data; renderCatBanner();}}catch(e){console.warn('[catimg] pull failed',e);}
+    if(!r.ok) return; const rows=await r.json(); if(rows&&rows[0]&&rows[0].data&&typeof rows[0].data==='object'){catImgOverride=rows[0].data; renderCatBanner(); if(typeof render==='function') render();}}catch(e){console.warn('[catimg] pull failed',e);}
 }
 async function catImgCloudPush(){
   const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/bth_save_content`,{method:'POST',headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},body:JSON.stringify({p_pin:PLACES_ADMIN_PIN,p_key:CAT_IMG_KEY,p_data:catImgOverride})});
@@ -549,7 +552,13 @@ function render(){
   const shown=items.map((it,idx)=>({...it,idx}))
     .filter(it=>(q ? true : (filter==='All'||it.category===filter)) && (!q || JSON.stringify(it).toLowerCase().includes(q)))
     .filter(it=> !topOnly || (it.tier==='Top Pick' || it.tier==='Featured'));
-  shown.sort((a,b)=>(TIER_RANK[a.tier||'Standard']-TIER_RANK[b.tier||'Standard']));
+  const grouped=!q&&!topOnly&&filter==='All';
+  const CORD={};{let n=0;CAT_GROUPS.forEach(g=>g.cats.forEach(c=>{CORD[c]=n++;}));}
+  const cRank=c=>(c in CORD)?CORD[c]:999;
+  shown.sort((a,b)=>(grouped?(cRank(a.category)-cRank(b.category)||String(a.category).localeCompare(String(b.category))):0)||(TIER_RANK[a.tier||'Standard']-TIER_RANK[b.tier||'Standard']));
+  const secHead=(it,pos)=>{ if(!grouped||(pos>0&&shown[pos-1].category===it.category)) return '';
+    const src=catImgFor(it.category);
+    return `<div class="catBanner show catSec${src?'':' noimg'}">${src?`<img src="${esc(src)}" alt="" width="900" height="300" loading="lazy" decoding="async">`:''}<div class="cbText"><h2>${esc(it.category)}</h2></div></div>`; };
   $('countText').textContent = topOnly
     ? `${shown.length} Top Pick${shown.length===1?'':'s'} & Featured business${shown.length===1?'':'es'}`
     : (q ? `${shown.length} match${shown.length===1?'':'es'} for "${$('search').value.trim()}"` : `${shown.length} place${shown.length===1?'':'s'}${filter==='All'?'':' in '+filter} · ${categories().length-1} categories total`);
@@ -567,7 +576,7 @@ function render(){
     const phoneBox = phone
       ? `<div class="detailBox"><div class="label">Phone</div><div class="value"><a class="btn" href="tel:${esc(phone.replace(/[^0-9+]/g,''))}">${esc(phone)}</a></div></div>` : '';
     const siteBtn = site ? `<a class="btn" data-track="website" target="_blank" rel="noopener" href="${esc(site)}">${esc(it.button||'Official / Source')} ↗</a>` : '';
-    return `<article class="facility-wrap" data-category="${esc(it.category)}" data-track-title="${esc(it.title)}" data-track-tier="${esc(tier)}">
+    return secHead(it,pos)+`<article class="facility-wrap" data-category="${esc(it.category)}" data-track-title="${esc(it.title)}" data-track-tier="${esc(tier)}">
       <div class="facility" role="button" tabindex="0" aria-expanded="false">
         <span class="icon">${ic}</span>
         <div class="facility-main">
