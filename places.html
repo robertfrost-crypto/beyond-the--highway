@@ -195,7 +195,7 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
 </head>
 <body>
 <div class="wrap">
-  <div class="ver">v55 &middot; Nov 21</div>
+  <div class="ver">v56 &middot; Nov 21</div>
   <a href="index.html" class="bthBackLink">&larr;&nbsp;Beyond the Highway</a>
 
   <div class="topBrand">
@@ -465,10 +465,11 @@ async function catImgCloudPush(){
   return r.ok;
 }
 function catImgFor(c){return catImgOverride[c]||CAT_IMG_DEFAULT[c]||null;}
+function catOpenImg(c){const g=CAT_GROUPS.find(x=>x.cats.includes(c));const gi=g?(catImgOverride[g.label]||CAT_IMG_DEFAULT[g.label]):null;return catImgOverride[c]||gi||CAT_IMG_DEFAULT[c]||null;}
 function renderCatBanner(){
   const el=document.getElementById('catBanner'); if(!el) return;
   const q=($('search').value||'').trim();
-  const src=(filter&&filter!=='All'&&!q&&!topOnly)?catImgFor(filter):null;
+  const src=(filter&&filter!=='All'&&!q&&!topOnly)?catOpenImg(filter):null;
   if(!src){el.classList.remove('show');return;}
   const im=document.getElementById('catBannerImg'); if(im.getAttribute('src')!==src) im.src=src;
   document.getElementById('catBannerTitle').textContent=filter; el.classList.add('show');
