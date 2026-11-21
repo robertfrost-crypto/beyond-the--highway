@@ -1736,6 +1736,11 @@ h1,h2,h3,.display,.brand-name,.story-card-body h3,.hero-tagline,.mystery-hero-ti
 .pwa-overlay-title,.pwa-overlay-step-text strong{color:#101a3a!important}
 .pwa-overlay-step-num{background:#2a55e0!important;color:#fff!important}
 .pwa-download-btn{border:1px solid #111!important;background:#fff!important;color:#2a55e0!important}
+.score-chip{background:#2a55e0!important;color:#fff!important;border:1px solid #111!important;box-shadow:0 6px 12px -6px rgba(28,70,176,.6)}
+.match-result.success,.btn.trivia-correct,.trivia-pill.correct{background:#2a55e0!important;color:#fff!important;border:1px solid #111!important}
+.match-result.fail,.btn.trivia-wrong,.trivia-pill.wrong{background:#e6eefd!important;color:#1c46b0!important;border:1px solid #1c46b0!important}
+.trivia-pill{background:#fff;color:#101a3a;border:1px solid #111!important;box-shadow:0 6px 12px -6px rgba(16,26,58,.4)}
+.trivia-pill.selected{border-color:#2a55e0!important;background:#e6eefd}
 </style>
 </head>
 <body>
@@ -3382,7 +3387,7 @@ function topbar(extra = '') {
   const count = scrapbookCount();
   const showDownloadBtn = !isAdmin && !_pwa.installed;
   return `
-    <div class="topbar"><span class="ver">v37 &middot; Nov 21</span>
+    <div class="topbar"><span class="ver">v38 &middot; Nov 21</span>
       <div style="display:flex; align-items:center; gap:10px;">
         <button class="iconbtn" onclick="location.href='/'" title="Back to Beyond the Highway">←</button>
         <div class="brand" onclick="nav('home')" style="cursor:pointer;">
