@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Local News — Beyond the Highway</title>
+<meta name="theme-color" content="#d9e6fd">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -338,9 +339,35 @@
     .intro { padding: 36px 18px 22px; }
     .feed { padding: 0 18px 60px; }
   }
+
+  /* ===== Blue look (v31): overrides on top of the page's own styles ===== */
+  :root{ --forest:#2a55e0; --forest-deep:#101a3a; --cream:#d9e6fd; --paper:#ffffff; --ink:#101a3a; --ink-soft:#4d587a; --gold:#f2b134; --rule:#d9e1f4;
+         --blue:#2a55e0; --navy:#1c46b0; --shadow:0 14px 26px -8px rgba(16,26,58,.42),0 4px 8px -2px rgba(16,26,58,.22); --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif; }
+  body{ -webkit-tap-highlight-color:transparent; }
+  .ver{ max-width:720px; margin:8px auto -8px; padding:0 18px; text-align:right; font:600 10px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; letter-spacing:.08em; color:#a3bdec; user-select:none; pointer-events:none; }
+  header{ background:transparent; color:var(--ink); padding:12px 18px 8px; max-width:720px; margin:0 auto; }
+  .back-link{ color:var(--blue); opacity:1; font-weight:700; padding:9px 14px; border:1px solid #111; border-radius:12px; background:#fff; box-shadow:0 8px 14px -6px rgba(16,26,58,.4); }
+  .header-title{ font-family:var(--serif); font-weight:700; color:var(--ink); font-size:20px; }
+  .intro.hcard{ max-width:688px; width:calc(100% - 32px); margin:8px auto 18px; padding:0; border:1px solid #111; border-radius:18px; overflow:hidden; background:#fff; box-shadow:var(--shadow); }
+  .intro .himg{ display:block; height:150px; }
+  .intro .himg img{ display:block; width:100%; height:100%; object-fit:cover; -webkit-mask-image:linear-gradient(to bottom,#000 62%,rgba(0,0,0,0) 100%); mask-image:linear-gradient(to bottom,#000 62%,rgba(0,0,0,0) 100%); }
+  .intro .hbody{ padding:0 18px 18px; margin-top:-10px; position:relative; }
+  .intro h1{ font-family:var(--serif); font-weight:800; font-size:clamp(25px,6.6vw,32px); line-height:1.12; margin:0 0 10px; color:var(--ink); }
+  .intro h1::after{ content:""; display:block; width:34px; height:3px; border-radius:3px; margin-top:9px; background:var(--gold); }
+  .intro p{ font-size:15px; line-height:1.55; color:var(--ink-soft); }
+  .feed{ padding:0 16px 60px; }
+  .entry{ border:1px solid #111; border-radius:18px; background:#fff; padding:18px 16px; margin:0 0 16px; box-shadow:var(--shadow); }
+  .entry:last-child{ border-bottom:1px solid #111; }
+  .entry h2{ font-family:var(--serif); font-weight:800; font-size:22px; }
+  .panel{ border:1px solid var(--rule); border-radius:12px; }
+  .pub-banner .pub-img{ border-radius:12px; }
+  #lnFullscreenClose{ background:var(--blue); }
+  footer{ color:var(--ink-soft); }
 </style>
 </head>
 <body>
+
+<div class="ver">v31 &middot; Nov 21</div>
 
 <header>
   <a class="back-link" href="index.html">
@@ -350,9 +377,12 @@
   <div class="header-title">Local News</div>
 </header>
 
-<div class="intro">
+<div class="intro hcard">
+  <span class="himg"><img src="assets/cards/hub-news.webp" alt="" width="900" height="380" decoding="async"></span>
+  <div class="hbody">
   <h1>What's happening around Wood Buffalo</h1>
   <p>News, notices and updates from the people who cover this region — shown here exactly as they published it.</p>
+  </div>
 </div>
 
 <div class="feed" id="feed">

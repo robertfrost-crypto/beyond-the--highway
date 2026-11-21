@@ -5,147 +5,54 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Local Hub | Fort McMurray Wood Buffalo</title>
 <meta name="description" content="Local Hub for Fort McMurray Wood Buffalo residents: a business directory, classifieds and local news, brought to you by Beyond the Highway.">
-
-<meta name="theme-color" content="#04100a">
+<meta name="theme-color" content="#d9e6fd">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Local Hub">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
-
-<style>
-  :root{
-    --ink:#04100a;
-    --ink-2:#081a11;
-    --moss:#0f1f17;
-    --moss-2:#162a1d;
-    --line:rgba(224,168,80,.22);
-    --gold:#e6b85c;
-    --gold-soft:#c98f3e;
-    --green-1:#9be84a;
-    --green-2:#5bc94f;
-    --green-3:#cdfca0;
-    --paper:#f5f1e7;
-    --mist:rgba(245,241,231,.74);
-    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
-    --sans:"Avenir Next",Avenir,"Segoe UI",system-ui,-apple-system,sans-serif;
-  }
-  *{box-sizing:border-box}
-  html{-webkit-text-size-adjust:100%}
-  body{
-    margin:0; min-height:100vh; min-height:100dvh;
-    background:
-      radial-gradient(125% 70% at 50% -6%, rgba(14,40,24,.45) 0%, rgba(4,16,10,.72) 60%) fixed,
-      url('aurora-bg.jpg') center 22% / cover no-repeat fixed,
-      var(--ink);
-    color:var(--paper); font-family:var(--sans);
-    -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent;
-  }
-  .wrap{max-width:600px; margin:0 auto;
-    padding:calc(env(safe-area-inset-top) + 16px) clamp(14px,4.5vw,22px) calc(env(safe-area-inset-bottom) + 26px)}
-
-  .topBrand{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin:0 0 20px;padding:12px 14px;border-radius:0 0 18px 18px;background:linear-gradient(180deg,#174a2c 0%,#0d351f 100%);box-shadow:0 0 18px rgba(109,240,68,.08);position:relative}
-  .brandLeft{display:grid;grid-template-columns:74px 1px minmax(0,1fr);gap:14px;align-items:center;min-width:0}
-  .miniLogo{width:74px;height:74px;border-radius:20px;object-fit:cover;box-shadow:0 0 12px rgba(109,240,68,.30);background:#04140d}
-  .brandDivider{width:1px;height:64px;background:rgba(255,255,255,.18)}
-  .brandTitle{min-width:0}
-  .brandTitle h1{margin:0;font-family:Georgia,'Times New Roman',serif;font-size:clamp(20px,3vw,28px);line-height:.96;color:#fff;font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,.28)}
-  .brandTitle .green{display:block;margin-top:0;color:#9cff62;font-size:clamp(11px,1.5vw,14px);letter-spacing:.11em;font-weight:850}
-  .brandTitle .place{display:block;margin-top:3px;color:var(--gold);font-size:clamp(9.5px,1.3vw,12px);letter-spacing:.13em;font-weight:850}
-  .topActions{display:flex;gap:7px;align-items:center}
-  .topBtn{width:36px;height:36px;border:1px solid rgba(180,255,105,.34);border-radius:50%;background:rgba(0,14,8,.30);color:#f7ffe9;text-decoration:none;font-size:17px;font-weight:900;cursor:pointer;display:grid;place-items:center;line-height:1}
-  .topBtn:hover{border-color:#9cff62;box-shadow:0 0 10px rgba(109,240,68,.18)}
-
-  .backlink{display:inline-flex;align-items:center;gap:7px;margin:0 2px 14px;padding:9px 14px;border:1px solid rgba(140,255,92,.32);border-radius:12px;background:rgba(6,29,20,.85);color:#9bdc75;text-decoration:none;font-size:14px;font-weight:600}
-
-  .intro{margin:4px 2px 20px;font-family:var(--serif);font-style:italic;font-size:clamp(15px,4.2vw,18px);color:var(--paper);opacity:.92;line-height:1.4;text-shadow:0 1px 10px rgba(0,0,0,.5)}
-
-  nav.menu{display:flex; flex-direction:column; gap:12px}
-  .tile{display:flex; align-items:center; gap:15px; text-decoration:none; position:relative;
-    padding:15px 16px; border-radius:16px; color:var(--paper); overflow:hidden;
-    background:
-      linear-gradient(160deg, rgba(15,31,20,.68), rgba(6,15,10,.86)),
-      url('aurora-bg.jpg') center 32% / cover no-repeat;
-    border:1px solid var(--line); box-shadow:0 12px 28px -22px rgba(0,0,0,.95);
-    transition:transform .12s ease, border-color .12s ease, background-color .12s ease}
-  .tile:active{transform:scale(.985); border-color:rgba(155,232,74,.55)}
-  .tile::after{content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
-    background:radial-gradient(120% 90% at 85% 0%, rgba(155,232,74,.10), transparent 55%)}
-  .tile>*{position:relative; z-index:1}
-  .tile-icon{width:50px; height:50px; flex:0 0 auto; border-radius:50%;
-    display:grid; place-items:center; color:var(--gold);
-    background:radial-gradient(circle at 50% 36%, #173220, #0b1c13);
-    border:1.5px solid rgba(230,184,92,.42); box-shadow:0 0 16px rgba(230,184,92,.08)}
-  .tile-icon svg{width:25px; height:25px}
-  .tile-text{flex:1; min-width:0}
-  .tile-title{display:block; font-family:var(--serif); font-weight:700;
-    font-size:clamp(21px,5.6vw,25px); color:var(--gold); line-height:1.1}
-  .tile-sub{display:block; margin-top:2px; font-size:clamp(13px,3.6vw,15px);
-    color:var(--mist); line-height:1.32}
-  .tile-arrow{flex:0 0 auto; color:var(--green-2)}
-  .tile-arrow svg{width:24px; height:24px}
-  .tile-soon{cursor:default;opacity:.62;pointer-events:none}
-  .tile-soon .tile-icon,.tile-soon .tile-title,.tile-soon .tile-sub{filter:grayscale(.35)}
-  .tile-soon-badge{flex:0 0 auto;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--green-2);border:1px solid var(--green-2);border-radius:999px;padding:4px 9px;white-space:nowrap;opacity:.9}
-
-  .foot{display:flex; align-items:center; gap:12px; justify-content:center;
-    margin-top:26px; padding-top:22px; border-top:1px solid var(--line)}
-  .foot p{margin:0; text-align:center; font-family:var(--serif);
-    font-size:clamp(13px,3.5vw,15px); color:var(--paper); opacity:.85; line-height:1.4; max-width:34ch; text-shadow:0 1px 8px rgba(0,0,0,.5)}
-
-  a:focus-visible,.topBtn:focus-visible{outline:2px solid var(--green-3); outline-offset:3px}
-  @media (prefers-reduced-motion: reduce){ .tile,.topBtn{transition:none} }
-</style>
+<link rel="stylesheet" href="bth-blue.css">
 </head>
-<body>
+<body class="bth">
 <div class="wrap">
+  <div class="ver">v31 &middot; Nov 21</div>
 
-  <a class="backlink" href="index.html">&larr;&nbsp;Beyond the Highway</a>
-
-  <div class="topBrand">
-    <div class="brandLeft">
-      <img class="miniLogo" src="icon-192.png" alt="Local Hub logo">
-      <div class="brandDivider" aria-hidden="true"></div>
-      <div class="brandTitle">
-        <span class="green">LOCAL HUB</span>
-        <span class="place">FORT McMURRAY WOOD BUFFALO</span>
-      </div>
-    </div>
-    <div class="topActions">
-      <a class="topBtn" href="index.html" aria-label="Home">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9v11a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9"/></svg>
-      </a>
-    </div>
+  <div class="navrow">
+    <a class="backbtn" href="index.html">&larr;&nbsp;Beyond the Highway</a>
   </div>
 
-  <p class="intro">Everything for the people who live here — local businesses, classifieds and community news, all in one place.</p>
+  <div class="topbar">
+    <img class="logo" src="icon-192.png" alt="Local Hub logo" width="52" height="52">
+    <div class="brandtext"><span class="b1">Local Hub</span><span class="b3">Fort McMurray Wood Buffalo</span></div>
+    <a class="iconbtn" href="index.html" aria-label="Home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9"/><path d="M10 21v-6h4v6"/></svg>
+    </a>
+  </div>
 
-  <nav class="menu" aria-label="Local Hub sections">
-    <a class="tile" href="local-business.html">
-      <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg></span>
-      <span class="tile-text"><span class="tile-title">Business Directory</span><span class="tile-sub">Local trades, home services and professional services.</span></span>
-      <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+  <p class="intro">Everything for the people who live here: local businesses, classifieds and community news, all in one place.</p>
+
+  <nav class="pgrid" aria-label="Local Hub sections">
+    <a class="pcard" href="local-business.html">
+      <span class="pcard-img"><img src="assets/cards/hub-business.webp" alt="" width="900" height="380" loading="lazy" decoding="async"></span>
+      <span class="pcard-text"><span class="pcard-title">Business Directory</span><span class="pcard-sub">Local trades, home services and professional services.</span></span>
     </a>
 
-    <div class="tile tile-soon" aria-disabled="true">
-      <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 4v16"/></svg></span>
-      <span class="tile-text"><span class="tile-title">Classifieds</span><span class="tile-sub">Buy, sell and find local side jobs.</span></span>
-      <span class="tile-soon-badge">Coming soon</span>
+    <div class="pcard soon" aria-disabled="true">
+      <span class="pcard-img"><img src="assets/cards/hub-classifieds.webp" alt="" width="900" height="380" loading="lazy" decoding="async"></span>
+      <span class="pcard-text"><span class="pcard-title">Classifieds</span><span class="pcard-sub">Buy, sell and find local side jobs.</span><span class="badge">Coming soon</span></span>
     </div>
 
-    <a class="tile" href="local-news.html">
-      <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg></span>
-      <span class="tile-text"><span class="tile-title">Local News</span><span class="tile-sub">Community updates for Wood Buffalo.</span></span>
-      <span class="tile-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+    <a class="pcard" href="local-news.html">
+      <span class="pcard-img"><img src="assets/cards/hub-news.webp" alt="" width="900" height="380" loading="lazy" decoding="async"></span>
+      <span class="pcard-text"><span class="pcard-title">Local News</span><span class="pcard-sub">Community updates for Wood Buffalo.</span></span>
     </a>
   </nav>
 
   <div class="foot">
-    <p>Brought to you by Beyond the Highway — Fort McMurray's tourism, entertainment &amp; resource centre.</p>
+    <p>Brought to you by Beyond the Highway, Fort McMurray's tourism, entertainment &amp; resource centre.</p>
   </div>
-
 </div>
 </body>
 </html>

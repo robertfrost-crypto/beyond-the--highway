@@ -3,85 +3,96 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#d9e6fd">
 <title>Coupons — Local Deals | Beyond the Highway</title>
 <link rel="stylesheet" href="push-signup.css">
 <style>
-  :root{--bg:#04140d;--panel:#061d14;--green:#7CFF5C;--green-soft:#9bdc75;--soft:rgba(140,255,92,.28);--ink:#eafff0;--mut:#9fc4ad;--gold:#e6b85c}
+  :root{--blue:#2a55e0;--navy:#1c46b0;--gold:#f2b134;--ink:#101a3a;--mut:#4d587a;--paper:#d9e6fd;--card:#fff;--tint:#f1f5fe;--line:#d9e1f4;
+    --shadow:0 14px 26px -8px rgba(16,26,58,.42),0 4px 8px -2px rgba(16,26,58,.22);--shadow-sm:0 8px 14px -6px rgba(16,26,58,.4);
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif}
   *{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:
-    radial-gradient(1200px 600px at 50% -10%,#0a2b1c 0%,var(--bg) 55%) fixed;color:var(--ink);
-    -webkit-font-smoothing:antialiased;line-height:1.45}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:var(--paper);color:var(--ink);
+    -webkit-font-smoothing:antialiased;line-height:1.45;-webkit-tap-highlight-color:transparent}
   .wrap{max-width:640px;margin:0 auto;padding:0 16px 40px}
+  .ver{margin:8px 2px -6px;text-align:right;font:600 10px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:.08em;color:#a3bdec;user-select:none;pointer-events:none}
   .topnav{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-  a.back{display:inline-flex;align-items:center;gap:7px;margin:14px 2px 2px;padding:9px 14px;border:1px solid var(--soft);
-    border-radius:12px;background:rgba(6,29,20,.85);color:var(--green-soft);text-decoration:none;font-size:14px;font-weight:600}
-  header{margin:13px 2px 4px}
-  .kick{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);
-    border:1px solid var(--soft);border-radius:999px;padding:4px 11px;margin-bottom:10px}
-  h1{margin:.1em 0 .1em;font-size:1.4rem;line-height:1.12}
-  .sub{color:var(--mut);font-size:.9rem;margin:0}
-  .myCouponsBtn{display:inline-flex;align-items:center;gap:6px;margin:10px 2px 0;padding:8px 13px;
-    border:1.5px solid var(--soft);border-radius:11px;background:rgba(140,255,92,.06);color:var(--green-soft);
-    text-decoration:none;font-size:.83rem;font-weight:700}
+  a.back{display:inline-flex;align-items:center;gap:7px;margin:14px 2px 2px;padding:9px 14px;border:1px solid #111;
+    border-radius:12px;background:var(--card);color:var(--blue);text-decoration:none;font-size:14px;font-weight:700;box-shadow:var(--shadow-sm)}
+  header{margin:14px 0 4px;border:1px solid #111;border-radius:18px;overflow:hidden;background:var(--card);box-shadow:var(--shadow)}
+  .himg{display:block;height:150px;position:relative}
+  .himg img{display:block;width:100%;height:100%;object-fit:cover;-webkit-mask-image:linear-gradient(to bottom,#000 62%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(to bottom,#000 62%,rgba(0,0,0,0) 100%)}
+  .hbody{padding:0 16px 16px;margin-top:-10px;position:relative}
+  .kick{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#fff;font-weight:700;
+    background:var(--blue);border-radius:999px;padding:5px 12px;margin-bottom:10px}
+  h1{margin:.1em 0 .1em;font-family:var(--serif);font-size:1.6rem;line-height:1.1;color:var(--ink)}
+  h1::after{content:"";display:block;width:34px;height:3px;border-radius:3px;margin-top:9px;background:var(--gold)}
+  .sub{color:var(--mut);font-size:.92rem;margin:8px 0 0}
+  .myCouponsBtn{display:inline-flex;align-items:center;gap:6px;margin:12px 0 0;padding:9px 14px;
+    border:1px solid #111;border-radius:11px;background:var(--card);color:var(--blue);
+    text-decoration:none;font-size:.85rem;font-weight:700;box-shadow:var(--shadow-sm)}
 
   /* ---- list ---- */
-  .ccard{display:flex;gap:12px;align-items:center;border:1.5px solid #2f9e5e;border-radius:14px;
-    background:rgba(4,17,11,.72);padding:12px;margin:12px 0;cursor:pointer;text-align:left;width:100%;
-    color:inherit;font:inherit}
-  .ccard:active{background:rgba(124,255,92,.06)}
-  .ccard .thumb{flex:0 0 auto;width:64px;height:64px;border-radius:10px;object-fit:cover;background:#0a2b1c}
-  .ccard .thumb-ph{flex:0 0 auto;width:64px;height:64px;border-radius:10px;background:#0a2b1c;display:flex;
+  .ccard{display:flex;gap:12px;align-items:center;border:1px solid #111;border-radius:16px;
+    background:var(--card);padding:12px;margin:14px 0;cursor:pointer;text-align:left;width:100%;
+    color:inherit;font:inherit;box-shadow:var(--shadow)}
+  .ccard:active{background:var(--tint)}
+  .ccard .thumb{flex:0 0 auto;width:64px;height:64px;border-radius:12px;object-fit:cover;background:var(--tint);border:1px solid var(--line)}
+  .ccard .thumb-ph{flex:0 0 auto;width:64px;height:64px;border-radius:12px;background:var(--tint);border:1px solid var(--line);display:flex;
     align-items:center;justify-content:center;font-size:26px}
   .ccard .cbody{flex:1;min-width:0}
-  .ccard .biz{font-weight:800;font-size:.98rem;margin:0 0 2px}
-  .ccard .deal{color:var(--green-soft);font-weight:700;font-size:.9rem;margin:0 0 3px}
+  .ccard .biz{font-family:var(--serif);font-weight:800;font-size:1.05rem;margin:0 0 2px;color:var(--ink)}
+  .ccard .deal{color:var(--blue);font-weight:800;font-size:.9rem;margin:0 0 3px}
   .ccard .exp{color:var(--mut);font-size:.78rem;margin:0}
-  .ccard .arrow{flex:0 0 auto;color:var(--mut);font-size:1.2rem}
+  .ccard .arrow{flex:0 0 auto;color:var(--blue);font-size:1.3rem;font-weight:700}
 
   /* ---- detail ---- */
   #detail{display:none}
   #detail.open{display:block}
   #list-view.hidden{display:none}
-  .dhero{width:100%;max-height:220px;object-fit:cover;border-radius:14px;border:1.5px solid #2f9e5e;margin:14px 0 2px}
-  .dbiz{font-family:inherit;font-size:1.3rem;font-weight:800;margin:14px 0 2px}
-  .ddeal{color:var(--green-soft);font-weight:800;font-size:1.05rem;margin:0 0 10px}
-  .dbox{border:1px solid var(--soft);border-radius:12px;background:rgba(6,29,20,.6);padding:12px 13px;margin:10px 0}
-  .dbox .label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin:0 0 4px}
+  .dhero{width:100%;max-height:220px;object-fit:cover;border-radius:16px;border:1px solid #111;margin:14px 0 2px;box-shadow:var(--shadow)}
+  .dbiz{font-family:var(--serif);font-size:1.45rem;font-weight:800;margin:14px 0 2px;color:var(--ink)}
+  .ddeal{color:var(--blue);font-weight:800;font-size:1.05rem;margin:0 0 10px}
+  .dbox{border:1px solid #111;border-radius:14px;background:var(--card);padding:12px 14px;margin:12px 0;box-shadow:var(--shadow-sm)}
+  .dbox .label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;font-weight:700}
   .dbox .value{font-size:.95rem}
   .dbtns{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
-  .dbtn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border:1.5px solid #2f9e5e;border-radius:10px;
-    background:#04140d;color:#eafff0;text-decoration:none;font-size:.85rem;font-weight:700}
+  .dbtn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border:1px solid #111;border-radius:10px;
+    background:var(--card);color:var(--blue);text-decoration:none;font-size:.85rem;font-weight:700;box-shadow:var(--shadow-sm)}
   .about{margin-top:14px}
-  .about h4{margin:0 0 6px;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;color:var(--green)}
+  .about h4{margin:0 0 6px;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;color:var(--navy)}
   .about p{margin:0;color:var(--ink);font-size:.95rem}
 
-  .redeem-wrap{margin-top:22px;padding-top:16px;border-top:1px solid var(--soft)}
+  .redeem-wrap{margin-top:22px;padding-top:16px;border-top:2px solid var(--blue)}
   .redeem-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:16px;
-    border:none;border-radius:14px;background:linear-gradient(135deg,#7CFF5C,#39c46a);color:#04140d;font-weight:800;
-    font-size:1.02rem;cursor:pointer;box-shadow:0 6px 20px rgba(57,196,106,.25)}
-  .redeem-btn:disabled{background:#264a35;color:var(--mut);box-shadow:none;cursor:default}
+    border:1px solid #111;border-radius:14px;background:linear-gradient(160deg,var(--blue),var(--navy));color:#fff;font-weight:800;
+    font-size:1.02rem;cursor:pointer;box-shadow:0 10px 18px -8px rgba(28,70,176,.6)}
+  .redeem-btn:disabled{background:#c9d4ec;color:#6d7899;box-shadow:none;cursor:default;border-color:#9aa8cc}
   .redeem-hint{color:var(--mut);font-size:.8rem;text-align:center;margin:8px 0 0}
-  .confirm-box{margin-top:12px;border:1.5px solid var(--gold);border-radius:12px;background:rgba(230,184,92,.08);
-    padding:14px}
-  .confirm-box p{margin:0 0 12px;font-size:.9rem;color:var(--ink)}
+  .confirm-box{margin-top:12px;border:1px solid #111;border-radius:14px;background:#fff7e0;
+    padding:14px;box-shadow:var(--shadow-sm)}
+  .confirm-box p{margin:0 0 12px;font-size:.92rem;color:var(--ink)}
   .confirm-row{display:flex;gap:8px}
-  .confirm-row button{flex:1;padding:11px;border-radius:10px;border:none;font-weight:700;font-size:.9rem;cursor:pointer}
-  .confirm-row .go{background:linear-gradient(135deg,#7CFF5C,#39c46a);color:#04140d}
-  .confirm-row .cancel{background:var(--panel);color:var(--ink);border:1px solid var(--soft)}
+  .confirm-row button{flex:1;padding:12px;border-radius:10px;border:1px solid #111;font-weight:700;font-size:.9rem;cursor:pointer}
+  .confirm-row .go{background:linear-gradient(160deg,var(--blue),var(--navy));color:#fff}
+  .confirm-row .cancel{background:var(--card);color:var(--ink)}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <div class="ver">v31 &middot; Nov 21</div>
   <div class="topnav">
     <a class="back" href="index.html">&larr;&nbsp;Beyond the Highway</a>
   </div>
 
   <div id="list-view">
     <header>
-      <span class="kick">Coupons</span>
-      <h1>Local Deals</h1>
-      <p class="sub" id="listSub">Offers from Beyond the Highway Coupon Partners.</p>
-      <div id="myCouponsWrap"></div>
+      <span class="himg"><img src="assets/cards/coupons.webp" alt="" width="560" height="340" decoding="async"></span>
+      <div class="hbody">
+        <span class="kick">Coupons</span>
+        <h1>Local Deals</h1>
+        <p class="sub" id="listSub">Offers from Beyond the Highway Coupon Partners.</p>
+        <div id="myCouponsWrap"></div>
+      </div>
     </header>
     <div id="listWrap"></div>
   </div>
