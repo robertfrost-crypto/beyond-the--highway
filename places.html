@@ -188,11 +188,14 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
 .catSec{margin:22px 0 12px}
 .catSec:first-child{margin-top:4px}
 .catSec.noimg .cbText{margin-top:0;padding-top:12px}
+.grpBan{flex:0 0 100%;width:100%;margin:14px 0 0;border-radius:14px;overflow:hidden}
+.grpBan img{display:block;width:100%;height:104px;object-fit:cover;-webkit-mask-image:linear-gradient(to bottom,#000 55%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(to bottom,#000 55%,rgba(0,0,0,0) 100%)}
+.grpLbl{border-top:0!important;padding-top:0!important;margin:-24px 4px 2px!important;position:relative;font-size:15px!important;color:#101a3a!important;font-family:var(--serifx);letter-spacing:.06em!important}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="ver">v49 &middot; Nov 21</div>
+  <div class="ver">v50 &middot; Nov 21</div>
   <a href="index.html" class="bthBackLink">&larr;&nbsp;Beyond the Highway</a>
 
   <div class="topBrand">
@@ -450,7 +453,7 @@ function renderCrossResults(q) {
 
 
 // ---------- Category banner images ----------
-const CAT_IMG_DEFAULT={"Fine Dining": "assets/cats/p32.webp", "Restaurants": "assets/cats/p32.webp", "Cafés": "assets/cats/p1.webp", "Fast Food": "assets/cats/p12.webp", "Pizza & Donair": "assets/cats/p38.webp", "Bars & Nightlife": "assets/cats/p21.webp", "Family Fun": "assets/cats/p20.webp", "Theatres": "assets/cats/p29.webp", "Museums": "assets/cats/p39.webp", "Festivals": "assets/cats/p11.webp", "Parks & Playgrounds": "assets/cats/p6.webp", "Spray Parks": "assets/cats/p16.webp", "Skate Parks": "assets/cats/p13.webp", "Outdoor Rinks": "assets/cats/p25.webp", "Lakes": "assets/cats/p15.webp", "Lakes & Outfitters": "assets/cats/p37.webp", "Trails": "assets/cats/p36.webp", "Winter": "assets/cats/p25.webp", "Golf": "assets/cats/p14.webp", "Provincial Parks": "assets/cats/p34.webp", "Campgrounds": "assets/cats/p3.webp", "Sporting Goods": "assets/cats/p17.webp", "Gift & Novelty": "assets/cats/p26.webp", "Florists": "assets/cats/p30.webp", "Trophies & Engraving": "assets/cats/p19.webp", "Art & Galleries": "assets/cats/p33.webp", "Handcrafted & Home Based Businesses": "assets/cats/p32.webp", "Grocery Stores": "assets/cats/p9.webp", "Gas Stations": "assets/cats/p12.webp", "Convenience Stores": "assets/cats/p9.webp", "Pharmacies": "assets/cats/p8.webp", "Banks & ATMs": "assets/cats/p33.webp", "Hospital & Health": "assets/cats/p5.webp", "Hotels & Stays": "assets/cats/p24.webp", "Air Travel": "assets/cats/p31.webp", "Taxis": "assets/cats/p12.webp"};
+const CAT_IMG_DEFAULT={"Food & Drink":"assets/cats/p32.webp","Family & Fun":"assets/cats/p20.webp","Adventure & Outdoors":"assets/cats/p34.webp","Shopping":"assets/cats/p30.webp","Services":"assets/cats/p33.webp","Travel & Stay":"assets/cats/p31.webp","Fine Dining": "assets/cats/p32.webp", "Restaurants": "assets/cats/p32.webp", "Cafés": "assets/cats/p1.webp", "Fast Food": "assets/cats/p12.webp", "Pizza & Donair": "assets/cats/p38.webp", "Bars & Nightlife": "assets/cats/p21.webp", "Family Fun": "assets/cats/p20.webp", "Theatres": "assets/cats/p29.webp", "Museums": "assets/cats/p39.webp", "Festivals": "assets/cats/p11.webp", "Parks & Playgrounds": "assets/cats/p6.webp", "Spray Parks": "assets/cats/p16.webp", "Skate Parks": "assets/cats/p13.webp", "Outdoor Rinks": "assets/cats/p25.webp", "Lakes": "assets/cats/p15.webp", "Lakes & Outfitters": "assets/cats/p37.webp", "Trails": "assets/cats/p36.webp", "Winter": "assets/cats/p25.webp", "Golf": "assets/cats/p14.webp", "Provincial Parks": "assets/cats/p34.webp", "Campgrounds": "assets/cats/p3.webp", "Sporting Goods": "assets/cats/p17.webp", "Gift & Novelty": "assets/cats/p26.webp", "Florists": "assets/cats/p30.webp", "Trophies & Engraving": "assets/cats/p19.webp", "Art & Galleries": "assets/cats/p33.webp", "Handcrafted & Home Based Businesses": "assets/cats/p32.webp", "Grocery Stores": "assets/cats/p9.webp", "Gas Stations": "assets/cats/p12.webp", "Convenience Stores": "assets/cats/p9.webp", "Pharmacies": "assets/cats/p8.webp", "Banks & ATMs": "assets/cats/p33.webp", "Hospital & Health": "assets/cats/p5.webp", "Hotels & Stays": "assets/cats/p24.webp", "Air Travel": "assets/cats/p31.webp", "Taxis": "assets/cats/p12.webp"};
 const CAT_IMG_KEY='places_category_images';
 let catImgOverride={};
 async function catImgCloudPull(){
@@ -477,7 +480,7 @@ function catImgResize(file){return new Promise((res,rej)=>{const fr=new FileRead
 (function catImgAdmin(){
   const sel=document.getElementById('catImgSel'),file=document.getElementById('catImgFile'),msg=document.getElementById('catImgMsg');
   if(!sel) return; let pending=null;
-  function fill(){sel.innerHTML=categories().filter(c=>c!=='All').map(c=>`<option>${esc(c)}</option>`).join('');}
+  function fill(){sel.innerHTML=[...CAT_GROUPS.map(g=>g.label),...categories().filter(c=>c!=='All')].map(c=>`<option>${esc(c)}</option>`).join('');}
   function fillSafe(){try{fill();}catch(e){}}
   setTimeout(fillSafe,1500); setTimeout(fillSafe,4000); sel.addEventListener('focus',fillSafe); sel.addEventListener('touchstart',fillSafe,{passive:true});
   file.addEventListener('change',async()=>{const f=file.files&&file.files[0]; if(!f) return; try{pending=await catImgResize(f); msg.textContent='Photo ready. Tap Save banner.';}catch(e){msg.textContent='Could not read that photo.';}});
@@ -505,7 +508,8 @@ function renderChips(){
   let out=`<button class="chip ${'All'===filter?'active':''}" data-filter="All">All</button>`;
   const used=new Set(['All']);
   CAT_GROUPS.forEach(g=>{const cs=g.cats.filter(c=>present.has(c));if(!cs.length)return;
-    out+=`<div class="chipgroup-label">${esc(g.label)}</div>`;
+    {const gs=catImgFor(g.label);if(gs)out+=`<div class="grpBan"><img src="${esc(gs)}" alt="" width="900" height="300" loading="lazy" decoding="async"></div>`;}
+    out+=`<div class="chipgroup-label grpLbl">${esc(g.label)}</div>`;
     cs.forEach(c=>{used.add(c);out+=`<button class="chip ${c===filter?'active':''}" data-filter="${esc(c)}">${esc(c)}</button>`;});});
   const extras=[...present].filter(c=>!used.has(c)).sort();
   if(extras.length){out+=`<div class="chipgroup-label">More</div>`;
