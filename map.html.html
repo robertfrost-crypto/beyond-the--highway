@@ -132,6 +132,17 @@
     font-weight: 700;
     cursor: pointer;
   }
+  /* Card layout: icon + title on top, text across the full width, button at the bottom */
+  .card.show { display: grid; grid-template-columns: 44px 1fr; column-gap: 12px; row-gap: 0; align-items: start;
+    max-height: 62vh; overflow-y: auto; }
+  .card .info { display: contents; }
+  .card .icon { grid-column: 1; grid-row: 1 / span 2; }
+  .card .info .cat { grid-column: 2; grid-row: 1; align-self: end; padding-right: 40px; margin-top: 0; }
+  .card .info .name { grid-column: 2; grid-row: 2; padding-right: 40px; }
+  .card #cardImage { grid-column: 1 / -1; }
+  .card .info .desc { grid-column: 1 / -1; margin-top: 10px; }
+  .card #cardAudio { grid-column: 1 / -1; }
+  .card .go { grid-column: 1 / -1; width: 100%; margin-top: 12px; padding: 12px 14px; font-size: 14px; }
 
   .proxBanner {
     position: absolute;
