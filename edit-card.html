@@ -81,6 +81,8 @@ small{color:var(--soft)}
     <label class="f" for="menuText">Menu text (edit anything)</label>
     <textarea id="menuText" class="menuText" placeholder="# Starters&#10;Calamari | 14 | Crispy squid, lemon aioli&#10;Soup of the day | 9&#10;&#10;# Mains&#10;Ribeye 12oz | 46 | Seasonal vegetables"></textarea>
     <small>A line starting with # is a section heading. Each dish is: Name | price | description (price and description are optional).</small>
+    <label class="chk"><input id="mPrices" type="checkbox" checked> Show prices on my menu</label>
+    <small>Turn this off and visitors see only dish names and descriptions. Your prices stay saved, so you can turn them back on any time.</small>
   </div>
 
   <div class="save"><button class="btn primary" id="save" type="button">Save changes</button><div class="msg" id="saveMsg" style="text-align:center"></div></div>
@@ -128,7 +130,7 @@ function init(){
       $('bookUrl').value=card.bookUrl||'';if(card.bookLabel)$('bookLabel').value=card.bookLabel;
       var b=card.buttons||{};$('bBook').checked=b.book!==false;$('bMenu').checked=b.menu!==false;$('bCall').checked=b.call!==false;$('bDir').checked=b.directions!==false;$('bWeb').checked=b.website!==false;
       setPhoto(card.photo);
-      menuPhotos=(card.menu&&card.menu.photos)||[];$('menuText').value=menuToText(card.menu);thumbs();
+      menuPhotos=(card.menu&&card.menu.photos)||[];$('menuText').value=menuToText(card.menu);$('mPrices').checked=!(card.menu&&card.menu.hidePrices);thumbs();
       $('app').hidden=false;
     });
   }).catch(function(){$('bad').hidden=false;});
@@ -159,7 +161,7 @@ $('save').onclick=function(){var btn=this;btn.disabled=true;$('saveMsg').classNa
   var secs=textToMenu($('menuText').value);
   var upd={photo:card.photo||'',tagline:$('tagline').value.trim(),hours:$('hours').value.trim(),phone:$('phone').value.trim(),bookUrl:$('bookUrl').value.trim(),bookLabel:$('bookLabel').value,
     buttons:{book:$('bBook').checked,menu:$('bMenu').checked,call:$('bCall').checked,directions:$('bDir').checked,website:$('bWeb').checked},
-    menu:{sections:secs,photos:menuPhotos,updatedAt:new Date().toISOString()}};
+    menu:{sections:secs,photos:menuPhotos,hidePrices:!$('mPrices').checked,updatedAt:new Date().toISOString()}};
   rpc('bth_card_update',{p_id:ID,p_token:TOK,p_updates:upd}).then(function(r){return r.json()}).then(function(ok){btn.disabled=false;
     $('saveMsg').className='msg '+(ok===true?'ok':'err');$('saveMsg').textContent=ok===true?'Saved. Your card is updated.':'Could not save. Check your link and try again.';})
   .catch(function(){btn.disabled=false;$('saveMsg').className='msg err';$('saveMsg').textContent='Could not save. Check your signal and try again.';});};

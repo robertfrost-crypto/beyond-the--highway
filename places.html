@@ -229,7 +229,7 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
 </head>
 <body>
 <div class="wrap">
-  <div class="ver">v67 &middot; Nov 22</div>
+  <div class="ver">v68 &middot; Nov 22</div>
   <a href="index.html" class="bthBackLink">&larr;&nbsp;Beyond the Highway</a>
 
   <div class="topBrand">
@@ -547,8 +547,8 @@ async function cardsPull(){
 function bookHref(u){u=(u||'').trim(); if(!u) return ''; if(/^(https?:|tel:|mailto:)/i.test(u)) return u; if(/^\+?[\d\s().-]{7,}$/.test(u)) return 'tel:'+u.replace(/[^0-9+]/g,''); return 'https://'+u;}
 function hasMenu(c){return !!(c&&c.menu&&((c.menu.sections&&c.menu.sections.length)||(c.menu.photos&&c.menu.photos.length)));}
 function openMenu(title,c){
-  const m=c.menu||{}; let h=`<h3>${esc(title)} menu</h3>`;
-  (m.sections||[]).forEach(s=>{h+=`<div class="mSec"><h4>${esc(s.name)}</h4>`+(s.items||[]).map(i=>`<div class="mItem"><div><b>${esc(i.name)}</b>${i.desc?`<div class="md">${esc(i.desc)}</div>`:''}</div>${i.price?`<div class="mp">$${esc(i.price)}</div>`:''}</div>`).join('')+'</div>';});
+  const m=c.menu||{}; const hp=!!m.hidePrices; let h=`<h3>${esc(title)} menu</h3>`;
+  (m.sections||[]).forEach(s=>{h+=`<div class="mSec"><h4>${esc(s.name)}</h4>`+(s.items||[]).map(i=>`<div class="mItem"><div><b>${esc(i.name)}</b>${i.desc?`<div class="md">${esc(i.desc)}</div>`:''}</div>${i.price&&!hp?`<div class="mp">$${esc(i.price)}</div>`:''}</div>`).join('')+'</div>';});
   if(!(m.sections||[]).length && (m.photos||[]).length) h+='<div class="menuPhotos">'+m.photos.map(p=>`<img src="${esc(p)}" alt="Menu" loading="lazy">`).join('')+'</div>';
   document.getElementById('menuBody').innerHTML=h; document.getElementById('menuSheet').classList.add('show');
 }
