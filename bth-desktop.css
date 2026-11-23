@@ -10,13 +10,16 @@
   .hero-title{font-size:clamp(40px,4.2vw,58px)}
   .tagline{font-size:clamp(18px,1.6vw,22px)}
   nav.menu{grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
-  nav.menu > .tile.wide{grid-column:1 / -1}
+  nav.menu{grid-auto-flow:dense}
+  nav.menu > .tile.wide{grid-column:span 2}
+  /* On Now alone (Maps hidden) goes full width */
+  nav.menu:has(#tileMap[style*="none"]) > a.tile.wide[href="onnow.html"]{grid-column:1 / -1}
   nav.menu > .linkrow, nav.menu > .hublinks{grid-column:1 / -1}
   .hublinks{flex-direction:row; flex-wrap:wrap}
   .hublinks > .linkrow{flex:1 1 320px}
   .hub-eyebrow{flex:0 0 100%}
   .tile-img{height:150px}
-  .tile.wide .tile-img{height:190px}
+  .tile.wide .tile-img{height:210px}
   .tile-title{font-size:21px}
   .tile.wide .tile-title{font-size:26px}
   .tile-sub{font-size:14.5px}

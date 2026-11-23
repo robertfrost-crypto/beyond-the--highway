@@ -1,6 +1,6 @@
 // Beyond the Highway — service worker
 // Bump CACHE whenever you redeploy new content so installed users get the update prompt.
-const CACHE = 'bth-v64';
+const CACHE = 'bth-v65';
 
 // Cached for offline. Spoke pages are added here as they're built.
 const ASSETS = [
