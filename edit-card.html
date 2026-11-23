@@ -143,12 +143,12 @@ $('menuFiles').onchange=function(){var fs=[].slice.call(this.files).slice(0,5);i
   Promise.all(fs.map(function(f){return resize(f,1800,0.8)})).then(function(arr){newMenuImages=arr;thumbs();$('menuAi').disabled=false;$('menuMsg').textContent=arr.length+' photo'+(arr.length>1?'s':'')+' ready. Tap Make readable menu.';})
   .catch(function(){$('menuMsg').className='msg err';$('menuMsg').textContent='Could not read those photos.';});};
 
-$('menuAi').onclick=function(){if(!newMenuImages.length)return;var btn=this;btn.disabled=true;$('menuMsg').className='msg';$('menuMsg').textContent='Reading your menu. This takes about 20 seconds...';
+$('menuAi').onclick=function(){if(!newMenuImages.length)return;var btn=this;btn.disabled=true;$('menuMsg').className='msg';$('menuMsg').textContent='Reading your menu. A big menu can take up to a minute. Please keep this page open...';
   fetch(SB+'/functions/v1/menu-ai',{method:'POST',headers:H,body:JSON.stringify({id:ID,token:TOK,images:newMenuImages})}).then(function(r){return r.json()}).then(function(j){
     if(j&&j.ok){$('menuText').value=menuToText({sections:j.sections});
       // keep the original photos too, so a visitor can always see the real menu
       return Promise.all(newMenuImages.map(function(d){return upload(d,'menus')})).then(function(urls){menuPhotos=menuPhotos.concat(urls);newMenuImages=[];thumbs();
-        $('menuMsg').className='msg ok';$('menuMsg').textContent='Done. Check the text below, fix anything, then tap Save changes.';});}
+        $('menuMsg').className='msg ok';$('menuMsg').textContent=(j.pagesTotal&&j.pagesRead<j.pagesTotal?'We read '+j.pagesRead+' of your '+j.pagesTotal+' photos. Add the missing page by typing it below, or try again. ':'Done. ')+'Check the text below, fix anything, then tap Save changes.';});}
     var e=(j&&j.error)||'';
     // AI not available or could not read it: keep the photos as the menu instead
     return Promise.all(newMenuImages.map(function(d){return upload(d,'menus')})).then(function(urls){menuPhotos=menuPhotos.concat(urls);newMenuImages=[];thumbs();btn.disabled=true;
