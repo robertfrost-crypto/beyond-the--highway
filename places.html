@@ -195,6 +195,7 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
 
 /* ---- Rich Top Pick / Featured card ---- */
 .facility-wrap.paid .details{padding:0!important;overflow:hidden}
+.facility-wrap.paid.open>.facility{display:none}
 .richHero{position:relative;height:190px;background:#fff}
 .richHero img{display:block;width:100%;height:100%;object-fit:cover;-webkit-mask-image:linear-gradient(to bottom,#000 62%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(to bottom,#000 62%,rgba(0,0,0,0) 100%)}
 .richHero.noimg{height:96px;display:flex;align-items:center;justify-content:center;font-size:42px;background:linear-gradient(180deg,#e6eefc,#fff)}
@@ -228,7 +229,7 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
 </head>
 <body>
 <div class="wrap">
-  <div class="ver">v66 &middot; Nov 22</div>
+  <div class="ver">v67 &middot; Nov 22</div>
   <a href="index.html" class="bthBackLink">&larr;&nbsp;Beyond the Highway</a>
 
   <div class="topBrand">
@@ -730,7 +731,7 @@ function render(){
     // so badged vs unbadged performance can be compared. Never blocks the UI.
     const trackInfo=type=>({title:w.dataset.trackTitle,category:w.dataset.category,tier:w.dataset.trackTier,type:type});
     const track=type=>{ try{ if(window.BTHTrack) window.BTHTrack.click(trackInfo(type)); }catch(e){} };
-    const toggle=()=>{const open=w.classList.toggle('open'); row.setAttribute('aria-expanded',open); if(open) track('card_open');};
+    const toggle=()=>{const open=w.classList.toggle('open'); row.setAttribute('aria-expanded',open); if(open) track('card_open'); if(open&&w.classList.contains('paid')) setTimeout(()=>w.scrollIntoView({behavior:'smooth',block:'start'}),40);};
     row.onclick=toggle;
     row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}};
     const x=w.querySelector('.closeBtn'); if(x) x.onclick=ev=>{ev.stopPropagation();w.classList.remove('open');row.setAttribute('aria-expanded','false');};
