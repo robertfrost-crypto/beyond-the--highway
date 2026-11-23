@@ -229,7 +229,7 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
 </head>
 <body>
 <div class="wrap">
-  <div class="ver">v68 &middot; Nov 22</div>
+  <div class="ver">v69 &middot; Nov 22</div>
   <a href="index.html" class="bthBackLink">&larr;&nbsp;Beyond the Highway</a>
 
   <div class="topBrand">
@@ -278,7 +278,7 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
       <textarea id="fSummary" class="full" placeholder="Short summary shown on the row"></textarea>
       <textarea id="fDetails" class="full" placeholder="About this place (shown when expanded)"></textarea>
       <input id="fButton" placeholder="Source button label, e.g. Official / Source">
-      <input id="fImageUrl" placeholder="Directions / Google Maps link">
+      <input id="fImageUrl" placeholder="Maps link (optional, blank = search Google Maps)">
       <input id="editingIndex" type="hidden" value="">
       <div class="cardLinkBox full">
       <h3 style="font-size:14px">Business card page (Top Pick / Featured)</h3>
@@ -587,7 +587,14 @@ function categories(){const present=Array.from(new Set(items.map(i=>i.category||
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 function normalizeUrl(u){u=(u||'').trim(); if(!u) return ''; if(/^https?:\/\//i.test(u)) return u; if(/^\/\//.test(u)) return 'https:'+u; return 'https://'+u;}
 function iconFor(c){return ICONS[c]||ICONS.Other;}
-function mapsLink(it){return it.map || ('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((it.title||'')+' Fort McMurray AB'));}
+function mapsLink(it){
+  const m=(it.map||'').trim(); if(m) return m;
+  // No saved link: open Google Maps searching for the business by name and address
+  let loc=String(it.location||'').trim();
+  if(!loc||/^fort mcmurray wood buffalo$/i.test(loc)) loc='Fort McMurray AB';
+  else if(!/mcmurray|wood buffalo|\bAB\b|alberta/i.test(loc)) loc+=' Fort McMurray AB';
+  return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((it.title||'')+' '+loc);
+}
 function hostLabel(url){try{return new URL(url).hostname.replace(/^www\./,'');}catch(e){return 'Official site';}}
 function firstLine(s){return String(s||'').split('\n')[0];}
 
