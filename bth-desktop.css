@@ -1,0 +1,63 @@
+/* Beyond the Highway: computer (wide screen) layout.
+   Applies only at 1000px and up, so phones and portrait tablets are untouched. */
+@media (min-width:1000px){
+
+  /* Wider page container everywhere */
+  .wrap, .bth .wrap{max-width:1200px!important;padding-left:28px!important;padding-right:28px!important}
+
+  /* ---------- Front page ---------- */
+  .hero-art{height:430px;object-fit:cover;object-position:center 42%}
+  .hero-title{font-size:clamp(40px,4.2vw,58px)}
+  .tagline{font-size:clamp(18px,1.6vw,22px)}
+  nav.menu{grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+  nav.menu > .tile.wide{grid-column:1 / -1}
+  nav.menu > .linkrow, nav.menu > .hublinks{grid-column:1 / -1}
+  .hublinks{flex-direction:row; flex-wrap:wrap}
+  .hublinks > .linkrow{flex:1 1 320px}
+  .hub-eyebrow{flex:0 0 100%}
+  .tile-img{height:150px}
+  .tile.wide .tile-img{height:190px}
+  .tile-title{font-size:21px}
+  .tile.wide .tile-title{font-size:26px}
+  .tile-sub{font-size:14.5px}
+  .foot p{max-width:60ch}
+
+  /* ---------- Things to Do, Local Business ---------- */
+  .heroBanner{aspect-ratio:auto!important;height:400px!important;object-fit:cover!important;object-position:center 40%!important}
+  #cards.directory{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+  #cards.directory > .catBanner,
+  #cards.directory > .facility-wrap.open{grid-column:1 / -1}
+  .chips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 14px;align-items:start}
+  .chips > .chip[data-filter="All"]{grid-column:1 / -1;justify-self:start}
+  .chips > .chipgroup-label{grid-column:1 / -1}
+  .chipGrp{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start}
+  .chipGrp .grpBan{margin:0}
+  .catBanner img{height:150px}
+  .grpBan img{height:130px}
+
+  /* ---------- Trails, Sports: heroes were already full width, so cap their height ---------- */
+  .hero img{max-height:430px;object-fit:cover;object-position:center 45%}
+
+  /* ---------- On Now ---------- */
+  .onstage-banner img{height:340px;object-fit:cover;object-position:center 30%}
+  #list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+  #promos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+
+  /* ---------- Local Recommendations ---------- */
+  .heroImg img{height:340px;object-fit:cover;object-position:center 30%}
+  .picks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+
+  /* ---------- Coupons ---------- */
+  #list-view > header{max-width:none}
+  #list-view > header .himg img{height:230px;object-fit:cover}
+  #listWrap{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+  #detail{max-width:680px;margin-left:auto;margin-right:auto}
+
+  /* ---------- Local Hub, Aboriginal Experiences ---------- */
+  .bth .pgrid, .pgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+  .bth .pcard-img{height:190px}
+
+  /* ---------- Local News ---------- */
+  body > header, .intro.hcard, .feed{max-width:1000px;margin-left:auto;margin-right:auto}
+  .intro.hcard{width:calc(100% - 56px)}
+}

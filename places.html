@@ -188,6 +188,7 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
 .catSec{margin:22px 0 12px}
 .catSec:first-child{margin-top:4px}
 .catSec.noimg .cbText{margin-top:0;padding-top:12px}
+.chipGrp{display:contents}
 .grpBan{flex:0 0 100%;width:100%;margin:14px 0 0;border-radius:14px;overflow:hidden}
 .grpBan img{display:block;width:100%;height:104px;object-fit:cover;-webkit-mask-image:linear-gradient(to bottom,#000 55%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(to bottom,#000 55%,rgba(0,0,0,0) 100%)}
 .grpLbl{border-top:0!important;padding-top:0!important;margin:-24px 4px 2px!important;position:relative;font-size:15px!important;color:#101a3a!important;font-family:var(--serifx);letter-spacing:.06em!important}
@@ -223,10 +224,11 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
 .cardLinkBox{margin-top:12px;padding-top:12px;border-top:1px solid rgba(16,26,58,.14)}
 .cardLinkBox input{width:100%;margin-top:8px}
 </style>
+<link rel="stylesheet" href="bth-desktop.css" media="(min-width:1000px)">
 </head>
 <body>
 <div class="wrap">
-  <div class="ver">v63 &middot; Nov 21</div>
+  <div class="ver">v64 &middot; Nov 22</div>
   <a href="index.html" class="bthBackLink">&larr;&nbsp;Beyond the Highway</a>
 
   <div class="topBrand">
@@ -593,9 +595,11 @@ function renderChips(){
   let out=`<button class="chip ${'All'===filter?'active':''}" data-filter="All">All</button>`;
   const used=new Set(['All']);
   CAT_GROUPS.forEach(g=>{const cs=g.cats.filter(c=>present.has(c));if(!cs.length)return;
+    out+='<div class="chipGrp">';
     {const gs=catImgFor(g.label);if(gs)out+=`<div class="grpBan"><img src="${esc(gs)}" alt="" width="900" height="300" loading="lazy" decoding="async"></div>`;}
     out+=`<div class="chipgroup-label grpLbl">${esc(g.label)}</div>`;
-    cs.forEach(c=>{used.add(c);out+=`<button class="chip ${c===filter?'active':''}" data-filter="${esc(c)}">${esc(c)}</button>`;});});
+    cs.forEach(c=>{used.add(c);out+=`<button class="chip ${c===filter?'active':''}" data-filter="${esc(c)}">${esc(c)}</button>`;});
+    out+='</div>';});
   const extras=[...present].filter(c=>!used.has(c)).sort();
   if(extras.length){out+=`<div class="chipgroup-label">More</div>`;
     extras.forEach(c=>{out+=`<button class="chip ${c===filter?'active':''}" data-filter="${esc(c)}">${esc(c)}</button>`;});}
