@@ -176,6 +176,7 @@ a.bthBackLink{display:inline-flex;align-items:center;gap:7px;margin:14px 2px 2px
 .clearBtn{min-height:40px;padding:10px 16px!important}
 .quickTop{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:13px;font-weight:800;letter-spacing:.04em;color:#2a55e0;background:#fff;border:1px solid #111;border-radius:999px;padding:9px 16px;cursor:pointer;box-shadow:0 6px 12px -6px rgba(16,26,58,.4)}
 .quickTop.on{background:#2a55e0;color:#fff}
+.topGroupHead{margin:14px 4px 6px;font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#4d587a}
 a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#2a55e0;text-decoration:none;border:1px solid #111;border-radius:12px;padding:9px 14px;background:#fff;box-shadow:0 8px 14px -6px rgba(16,26,58,.4)}
 .catBanner{display:none;margin:0 0 14px;border:1px solid #111;border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 14px 26px -8px rgba(16,26,58,.42),0 4px 8px -2px rgba(16,26,58,.22)}
 .catBanner.show{display:block}
@@ -688,8 +689,8 @@ function render(){
   const grouped=!q&&!topOnly&&filter==='All';
   const CORD={};{let n=0;CAT_GROUPS.forEach(g=>g.cats.forEach(c=>{CORD[c]=n++;}));}
   const cRank=c=>(c in CORD)?CORD[c]:999;
-  shown.sort((a,b)=>(grouped?(cRank(a.category)-cRank(b.category)||String(a.category).localeCompare(String(b.category))):0)||(TIER_RANK[a.tier||'Standard']-TIER_RANK[b.tier||'Standard']));
-  const secHead=(it,pos)=>{ if(!grouped||(pos>0&&shown[pos-1].category===it.category)) return '';
+  shown.sort((a,b)=>((grouped||topOnly)?(cRank(a.category)-cRank(b.category)||String(a.category).localeCompare(String(b.category))):0)||(TIER_RANK[a.tier||'Standard']-TIER_RANK[b.tier||'Standard']));
+  const secHead=(it,pos)=>{ if(topOnly){ return (pos>0&&shown[pos-1].category===it.category)?'':`<div class="topGroupHead">${esc(it.category)}</div>`; } if(!grouped||(pos>0&&shown[pos-1].category===it.category)) return '';
     const src=catImgFor(it.category);
     return `<div class="catBanner show catSec${src?'':' noimg'}">${src?`<img src="${esc(src)}" alt="" width="900" height="300" loading="lazy" decoding="async">`:''}<div class="cbText"><h2>${esc(it.category)}</h2></div></div>`; };
   $('countText').textContent = topOnly

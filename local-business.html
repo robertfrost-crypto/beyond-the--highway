@@ -176,6 +176,7 @@ a.bthBackLink{display:inline-flex;align-items:center;gap:7px;margin:14px 2px 2px
 .clearBtn{min-height:40px;padding:10px 16px!important}
 .quickTop{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:13px;font-weight:800;letter-spacing:.04em;color:#2a55e0;background:#fff;border:1px solid #111;border-radius:999px;padding:9px 16px;cursor:pointer;box-shadow:0 6px 12px -6px rgba(16,26,58,.4)}
 .quickTop.on{background:#2a55e0;color:#fff}
+.topGroupHead{margin:14px 4px 6px;font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#4d587a}
 a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#2a55e0;text-decoration:none;border:1px solid #111;border-radius:12px;padding:9px 14px;background:#fff;box-shadow:0 8px 14px -6px rgba(16,26,58,.4)}
 a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#2a55e0;text-decoration:none;border:1px solid #111;border-radius:12px;padding:9px 14px;background:#fff;box-shadow:0 8px 14px -6px rgba(16,26,58,.4)}
 #topPicksBanner{background:#fff!important;border:1px solid #111!important;color:#101a3a;box-shadow:0 8px 14px -6px rgba(16,26,58,.4)}
@@ -495,7 +496,11 @@ function render(){
   const shown=items.map((it,idx)=>({...it,idx}))
     .filter(it=>(q ? true : (filter==='All'||cats(it).includes(filter))) && (!q || JSON.stringify(it).toLowerCase().includes(q)))
     .filter(it=> !topOnly || (it.tier==='Spotlight' || it.tier==='Featured'));
-  shown.sort((a,b)=>(TIER_RANK[a.tier||'Standard']-TIER_RANK[b.tier||'Standard']));
+  const CORD={};{let n=0;CAT_GROUPS.forEach(g=>g.cats.forEach(c=>{CORD[c]=n++;}));}
+  const cRank=c=>(c in CORD)?CORD[c]:999;
+  const pc=it=>cats(it)[0]||'Other';
+  shown.sort((a,b)=>(topOnly?(cRank(pc(a))-cRank(pc(b))||String(pc(a)).localeCompare(String(pc(b)))):0)||(TIER_RANK[a.tier||'Standard']-TIER_RANK[b.tier||'Standard']));
+  const topHead=(it,pos)=>(topOnly&&!(pos>0&&pc(shown[pos-1])===pc(it)))?`<div class="topGroupHead">${esc(pc(it))}</div>`:'';
   $('countText').textContent = topOnly
     ? `${shown.length} Spotlight${shown.length===1?'':'s'} & Featured business${shown.length===1?'':'es'}`
     : (q ? `${shown.length} match${shown.length===1?'':'es'} for "${$('search').value.trim()}"` : `${shown.length} business${shown.length===1?'':'es'}${filter==='All'?'':' in '+filter} · ${categories().length-1} categories total`);
@@ -513,7 +518,7 @@ function render(){
     const phoneBox = phone
       ? `<div class="detailBox"><div class="label">Phone</div><div class="value"><a class="btn" href="tel:${esc(phone.replace(/[^0-9+]/g,''))}">${esc(phone)}</a></div></div>` : '';
     const siteBtn = site ? `<a class="btn" data-track="website" target="_blank" rel="noopener" href="${esc(site)}">${esc(it.button||'Official / Source')} ↗</a>` : '';
-    return `<article class="facility-wrap" data-category="${esc(cats(it).join(', '))}" data-track-title="${esc(it.title)}" data-track-tier="${esc(tier)}">
+    return topHead(it,pos)+`<article class="facility-wrap" data-category="${esc(cats(it).join(', '))}" data-track-title="${esc(it.title)}" data-track-tier="${esc(tier)}">
       <div class="facility" role="button" tabindex="0" aria-expanded="false">
         <span class="icon">${ic}</span>
         <div class="facility-main">
