@@ -176,6 +176,7 @@ a.bthBackLink{display:inline-flex;align-items:center;gap:7px;margin:14px 2px 2px
 .clearBtn{min-height:40px;padding:10px 16px!important}
 .quickTop{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:13px;font-weight:800;letter-spacing:.04em;color:#2a55e0;background:#fff;border:1px solid #111;border-radius:999px;padding:9px 16px;cursor:pointer;box-shadow:0 6px 12px -6px rgba(16,26,58,.4)}
 .quickTop.on{background:#2a55e0;color:#fff}
+.topGroupHead{margin:14px 4px 6px;font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#4d587a}
 a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#2a55e0;text-decoration:none;border:1px solid #111;border-radius:12px;padding:9px 14px;background:#fff;box-shadow:0 8px 14px -6px rgba(16,26,58,.4)}
 .catBanner{display:none;margin:0 0 14px;border:1px solid #111;border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 14px 26px -8px rgba(16,26,58,.42),0 4px 8px -2px rgba(16,26,58,.22)}
 .catBanner.show{display:block}
@@ -321,6 +322,7 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
   <section id="directory">
     <div class="sectionTitle">Places Directory</div>
     <div style="text-align:center;margin:0 0 12px;"><button class="quickTop" id="quickTop" type="button" aria-pressed="false">★ Top Picks</button></div>
+    <div id="topSlot"></div>
     <div class="toolbar">
       <div class="search-row">
         <input id="search" type="search" placeholder="Search a place by name — e.g. Famoso, The Keg, Pomeroy">
@@ -331,6 +333,8 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
     <div style="margin:2px 0 12px;">
       <a href="local-business.html" class="hubStrip">🏘️&nbsp;Looking for a local service instead? Browse the Local Hub →</a>
     </div>
+    <div id="listHome"></div>
+    <div id="listWrap">
     <div id="topPicksBanner" class="hidden" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 10px;padding:9px 12px;border-radius:12px;background:linear-gradient(160deg,rgba(255,211,106,.14),rgba(255,211,106,.05));border:1px solid rgba(255,211,106,.4);">
       <span style="font-size:13px;">★ Showing <strong>Top Picks &amp; Featured</strong> businesses only</span>
       <button class="btn" id="clearTopPicks" type="button" style="font-size:11.5px;padding:6px 10px;">Show all places</button>
@@ -339,6 +343,7 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
     <p class="countText" id="countText">Loading places...</p>
     <div id="crossResults"></div>
     <div class="directory" id="cards"></div>
+    </div>
   </section>
 
   <div class="foot">Powered by Ask Mac and LogicLinksAI, the AI division of TravTriv Inc.</div>
@@ -676,7 +681,7 @@ function render(){
   const q=$('search').value.toLowerCase().trim();
   renderCrossResults(q);
   $('chips').classList.toggle('hidden', q.length>0 || topOnly);
-  const banner = $('topPicksBanner'); if (banner) banner.classList.toggle('hidden', !topOnly); const qt=$('quickTop'); if(qt){qt.classList.toggle('on',topOnly); qt.setAttribute('aria-pressed',topOnly?'true':'false');}
+  const banner = $('topPicksBanner'); if (banner) banner.classList.toggle('hidden', !topOnly); {const lw=$('listWrap'),ts=$('topSlot'),lh=$('listHome'); if(lw&&ts&&lh){ if(topOnly){ if(lw.parentNode!==ts) ts.appendChild(lw); } else if(lw.parentNode===ts){ lh.after(lw); } }} const qt=$('quickTop'); if(qt){qt.classList.toggle('on',topOnly); qt.setAttribute('aria-pressed',topOnly?'true':'false');}
   const TIER_RANK={'Top Pick':0,'Featured':1,'Ambassador':2,'Standard':3};
   const shown=items.map((it,idx)=>({...it,idx}))
     .filter(it=>(q ? true : (filter==='All'||it.category===filter)) && (!q || JSON.stringify(it).toLowerCase().includes(q)))
@@ -684,8 +689,8 @@ function render(){
   const grouped=!q&&!topOnly&&filter==='All';
   const CORD={};{let n=0;CAT_GROUPS.forEach(g=>g.cats.forEach(c=>{CORD[c]=n++;}));}
   const cRank=c=>(c in CORD)?CORD[c]:999;
-  shown.sort((a,b)=>(grouped?(cRank(a.category)-cRank(b.category)||String(a.category).localeCompare(String(b.category))):0)||(TIER_RANK[a.tier||'Standard']-TIER_RANK[b.tier||'Standard']));
-  const secHead=(it,pos)=>{ if(!grouped||(pos>0&&shown[pos-1].category===it.category)) return '';
+  shown.sort((a,b)=>((grouped||topOnly)?(cRank(a.category)-cRank(b.category)||String(a.category).localeCompare(String(b.category))):0)||(TIER_RANK[a.tier||'Standard']-TIER_RANK[b.tier||'Standard']));
+  const secHead=(it,pos)=>{ if(topOnly){ return (pos>0&&shown[pos-1].category===it.category)?'':`<div class="topGroupHead">${esc(it.category)}</div>`; } if(!grouped||(pos>0&&shown[pos-1].category===it.category)) return '';
     const src=catImgFor(it.category);
     return `<div class="catBanner show catSec${src?'':' noimg'}">${src?`<img src="${esc(src)}" alt="" width="900" height="300" loading="lazy" decoding="async">`:''}<div class="cbText"><h2>${esc(it.category)}</h2></div></div>`; };
   $('countText').textContent = topOnly
