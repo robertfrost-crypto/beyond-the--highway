@@ -276,6 +276,10 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
         🎤 This is an On Now venue (bars/theatres with a current live lineup show here on the map)
       </label>
       <label class="full" style="display:flex; align-items:center; gap:8px; font-weight:normal;">
+        <input id="fPatio" type="checkbox" style="width:18px; height:18px;">
+        ☀️ Has an outdoor patio (shows under Patios in Food &amp; Drink during patio season)
+      </label>
+      <label class="full" style="display:flex; align-items:center; gap:8px; font-weight:normal;">
         <input id="fNotify" type="checkbox" style="width:18px; height:18px;">
         🔔 Show a "nearby" banner on the map when visitors are within ~200m
       </label>
@@ -359,6 +363,17 @@ const ICONS = {"Campgrounds":"🏕️","Fast Food":"🍔","Pizza & Donair":"🍕
 const STORE_KEY = 'askMacPlacesItems_v35';
 let items = JSON.parse(localStorage.getItem(STORE_KEY) || JSON.stringify(seedItems));
 let filter = 'All';
+// ---------- Patios (tag, not a category) ----------
+// Items carry patio:true. The "Patios" filter chip only shows during patio
+// season (Apr 15 - Oct 15, Edmonton time), or any time with ?patios=1 to preview.
+const PATIO_FILTER='__patio';
+function patioSeason(){
+  if(new URLSearchParams(location.search).get('patios')==='1') return true;
+  let d; try{ d=new Date().toLocaleDateString('en-CA',{timeZone:'America/Edmonton'}); }catch(e){ d=new Date().toISOString().slice(0,10); }
+  const md=d.slice(5); return md>='04-15' && md<='10-15';
+}
+const filterLabel=f=>f===PATIO_FILTER?'\u2600\uFE0F Patios':f;
+const matchFilter=it=>filter==='All'||(filter===PATIO_FILTER?!!it.patio:it.category===filter);
 let editMode = false;
 const $ = id => document.getElementById(id);
 
@@ -542,7 +557,7 @@ function renderCatBanner(){
   const src=(filter&&filter!=='All'&&!q&&!topOnly)?catOpenImg(filter):null;
   if(!src){el.classList.remove('show');return;}
   const im=document.getElementById('catBannerImg'); if(im.getAttribute('src')!==src) im.src=src;
-  document.getElementById('catBannerTitle').textContent=filter; el.classList.add('show');
+  document.getElementById('catBannerTitle').textContent=filterLabel(filter); el.classList.add('show');
 }
 function catImgResize(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onerror=rej;fr.onload=()=>{const im=new Image();im.onerror=rej;im.onload=()=>{
   const W=900,H=300,cv=document.createElement('canvas');cv.width=W;cv.height=H;const cx=cv.getContext('2d');
@@ -635,6 +650,7 @@ function renderChips(){
     {const gs=catImgFor(g.label);if(gs)out+=`<div class="grpBan"><img src="${esc(gs)}" alt="" width="900" height="300" loading="lazy" decoding="async"></div>`;}
     out+=`<div class="chipgroup-label grpLbl">${esc(g.label)}</div>`;
     cs.forEach(c=>{used.add(c);out+=`<button class="chip ${c===filter?'active':''}" data-filter="${esc(c)}">${esc(c)}</button>`;});
+    if(g.label==='Food & Drink' && patioSeason() && items.some(i=>i.patio)) out+=`<button class="chip ${filter===PATIO_FILTER?'active':''}" data-filter="${PATIO_FILTER}">${filterLabel(PATIO_FILTER)}</button>`;
     out+='</div>';});
   const extras=[...present].filter(c=>!used.has(c)).sort();
   if(extras.length){out+=`<div class="chipgroup-label">More</div>`;
@@ -704,8 +720,9 @@ function render(){
   const banner = $('topPicksBanner'); if (banner) banner.classList.toggle('hidden', !topOnly); {const lw=$('listWrap'),ts=$('topSlot'),lh=$('listHome'); if(lw&&ts&&lh){ if(topOnly){ if(lw.parentNode!==ts) ts.appendChild(lw); } else if(lw.parentNode===ts){ lh.after(lw); } }} const qt=$('quickTop'); if(qt){qt.classList.toggle('on',topOnly); qt.setAttribute('aria-pressed',topOnly?'true':'false');}
   const TIER_RANK={'Top Pick':0,'Featured':1,'Ambassador':2,'Standard':3};
   const shown=items.map((it,idx)=>({...it,idx}))
-    .filter(it=>(q ? true : (filter==='All'||it.category===filter)) && (!q || JSON.stringify(it).toLowerCase().includes(q)))
-    .filter(it=> !topOnly || (it.tier==='Top Pick' || it.tier==='Featured'));
+    .filter(it=>(q ? true : matchFilter(it)) && (!q || JSON.stringify(it).toLowerCase().includes(q)))
+    .filter(it=> !topOnly || (it.tier==='Top Pick' || it.tier==='Featured'))
+    .filter((it,i,a)=> !(filter===PATIO_FILTER && !q && !topOnly) || a.findIndex(x=>x.title===it.title)===i);
   const grouped=!q&&!topOnly&&filter==='All';
   const CORD={};{let n=0;CAT_GROUPS.forEach(g=>g.cats.forEach(c=>{CORD[c]=n++;}));}
   const cRank=c=>(c in CORD)?CORD[c]:999;
@@ -715,7 +732,7 @@ function render(){
     return `<div class="catBanner show catSec${src?'':' noimg'}">${src?`<img src="${esc(src)}" alt="" width="900" height="300" loading="lazy" decoding="async">`:''}<div class="cbText"><h2>${esc(it.category)}</h2></div></div>`; };
   $('countText').textContent = topOnly
     ? `${shown.length} Top Pick${shown.length===1?'':'s'} & Featured business${shown.length===1?'':'es'}`
-    : (q ? `${shown.length} match${shown.length===1?'':'es'} for "${$('search').value.trim()}"` : `${shown.length} place${shown.length===1?'':'s'}${filter==='All'?'':' in '+filter} · ${categories().length-1} categories total`);
+    : (q ? `${shown.length} match${shown.length===1?'':'es'} for "${$('search').value.trim()}"` : `${shown.length} place${shown.length===1?'':'s'}${filter==='All'?'':' in '+filterLabel(filter)} · ${categories().length-1} categories total`);
   $('cards').innerHTML = shown.map((it,pos)=>{
     const prevIdx = pos>0 ? shown[pos-1].idx : -1;
     const nextIdx = pos<shown.length-1 ? shown[pos+1].idx : -1;
@@ -780,8 +797,8 @@ function render(){
   applyDeepLink();
 }
 
-function loadForm(idx){const it=items[idx]; $('editingIndex').value=idx; $('fTitle').value=it.title||''; $('fTier').value=it.tier||'Standard'; $('fOnNow').checked=!!it.onNow; $('fNotify').checked=!!it.notify; $('fNotifyLabel').value=it.notifyLabel||''; $('fLink').value=it.website||''; $('fSummary').value=it.summary||''; $('fDetails').value=it.details||''; $('fButton').value=it.button||'Official / Source'; $('fImageUrl').value=it.map||''; openAdmin(); editMode=true; render(); $('fCategory').value=it.category||'Other'; window.scrollTo({top:$('adminPanel').offsetTop-20,behavior:'smooth'});}
-function clearForm(){['fTitle','fLink','fSummary','fDetails','fImageUrl','editingIndex','fNewCategory','fNotifyLabel'].forEach(id=>$(id).value=''); $('fButton').value='Official / Source'; $('fTier').value='Standard'; $('fOnNow').checked=false; $('fNotify').checked=false; $('fNewCategory').classList.add('hidden');}
+function loadForm(idx){const it=items[idx]; $('editingIndex').value=idx; $('fTitle').value=it.title||''; $('fTier').value=it.tier||'Standard'; $('fOnNow').checked=!!it.onNow; $('fPatio').checked=!!it.patio; $('fNotify').checked=!!it.notify; $('fNotifyLabel').value=it.notifyLabel||''; $('fLink').value=it.website||''; $('fSummary').value=it.summary||''; $('fDetails').value=it.details||''; $('fButton').value=it.button||'Official / Source'; $('fImageUrl').value=it.map||''; openAdmin(); editMode=true; render(); $('fCategory').value=it.category||'Other'; window.scrollTo({top:$('adminPanel').offsetTop-20,behavior:'smooth'});}
+function clearForm(){['fTitle','fLink','fSummary','fDetails','fImageUrl','editingIndex','fNewCategory','fNotifyLabel'].forEach(id=>$(id).value=''); $('fButton').value='Official / Source'; $('fTier').value='Standard'; $('fOnNow').checked=false; $('fPatio').checked=false; $('fNotify').checked=false; $('fNewCategory').classList.add('hidden');}
 function moveItem(idx,swapWith){if(swapWith<0||swapWith===idx) return; const tmp=items[idx]; items[idx]=items[swapWith]; items[swapWith]=tmp; saveLocal(); render();}
 function openAdmin(){$('adminPanel').classList.add('open'); editMode=true;}
 const ADMIN_GATE_KEY = 'bthAdminUnlocked';
@@ -805,7 +822,7 @@ if (topOnly) { const b=$('topPicksBanner'); if (b) b.classList.remove('hidden');
 $('adminToggle').onclick=toggleAdmin;
 $('adminClose').onclick=()=>{$('adminPanel').classList.remove('open'); editMode=false; render();};
 $('newItem').onclick=clearForm;
-$('saveItem').onclick=async()=>{const idx=$('editingIndex').value; let cat=$('fCategory').value||'Other'; if(cat==='__new__'){cat=$('fNewCategory').value.trim()||'Other';} const it={title:$('fTitle').value.trim()||'Untitled place',category:cat,tier:$('fTier').value||'Standard',onNow:$('fOnNow').checked,notify:$('fNotify').checked,notifyLabel:$('fNotifyLabel').value.trim(),website:normalizeUrl($('fLink').value.trim()),summary:$('fSummary').value.trim(),details:$('fDetails').value.trim(),button:$('fButton').value.trim()||'Official / Source',map:$('fImageUrl').value.trim(),location:'Fort McMurray Wood Buffalo'};
+$('saveItem').onclick=async()=>{const idx=$('editingIndex').value; let cat=$('fCategory').value||'Other'; if(cat==='__new__'){cat=$('fNewCategory').value.trim()||'Other';} const it={title:$('fTitle').value.trim()||'Untitled place',category:cat,tier:$('fTier').value||'Standard',onNow:$('fOnNow').checked,patio:$('fPatio').checked,notify:$('fNotify').checked,notifyLabel:$('fNotifyLabel').value.trim(),website:normalizeUrl($('fLink').value.trim()),summary:$('fSummary').value.trim(),details:$('fDetails').value.trim(),button:$('fButton').value.trim()||'Official / Source',map:$('fImageUrl').value.trim(),location:'Fort McMurray Wood Buffalo'};
   // Geocode the new/edited listing so it can be plotted on the map, without blocking the save if it fails.
   try {
     const geoRes = await fetch('/.netlify/functions/geocode-place-single', {
