@@ -1,11 +1,11 @@
 // Beyond the Highway — service worker
 // Bump CACHE whenever you redeploy new content so installed users get the update prompt.
-const CACHE = 'bth-v69';
+const CACHE = 'bth-v70';
 
 // Cached for offline. Spoke pages are added here as they're built.
 const ASSETS = [
   './', 'index.html', 'bth-desktop.css', 'onnow.html', 'manifest.json', 'admin.html',
-  'journey.js', 'hub-links.js', 'assets/bus.webp', 'aurora-bg.jpg',
+  'journey.js', 'install-guide.js', 'hub-links.js', 'assets/bus.webp', 'aurora-bg.jpg',
   'icon2-180.png', 'icon2-192.png', 'icon2-512.png',
   'onnow-icon2-180.png', 'onnow-icon2-192.png',
   'stories.html', 'trails.html', 'mystery-tours.html',

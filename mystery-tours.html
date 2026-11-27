@@ -3393,7 +3393,7 @@ function topbar(extra = '') {
   const count = scrapbookCount();
   const showDownloadBtn = !isAdmin && !_pwa.installed;
   return `
-    <div class="topbar"><span class="ver">v69 &middot; Nov 22</span>
+    <div class="topbar"><span class="ver">v70 &middot; Nov 27</span>
       <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
         <button class="iconbtn bth-backbtn" onclick="location.href='/'" title="Back to Beyond the Highway">&larr;&nbsp;Beyond the Highway</button>
         <div class="brand" onclick="nav('home')" style="cursor:pointer;">
@@ -7852,5 +7852,6 @@ initStorage()
 
 </script>
 <script src="visitor-tracker.js" defer></script>
+<script src="install-guide.js" defer></script>
 </body>
 </html>
