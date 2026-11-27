@@ -27,6 +27,7 @@ textarea{min-height:90px;resize:vertical}
 .chk{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:15px}
 .chk input{width:22px;height:22px;accent-color:var(--blue)}
 .prev[hidden]{display:none}.prev{display:block;width:100%;height:170px;object-fit:cover;border:1px solid #111;border-radius:14px;margin-top:8px;background:#e6eefc}
+.prev{touch-action:none;cursor:grab}.prev.full{object-fit:contain;touch-action:auto;cursor:default}
 .thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.thumbs img{width:72px;height:72px;object-fit:cover;border:1px solid #111;border-radius:10px}
 .msg{font-size:13px;color:var(--soft);margin-top:8px}.msg.err{color:#b3261e;font-weight:700}.msg.ok{color:#1a7f37;font-weight:700}
 .bad{text-align:center;padding:40px 10px}
@@ -44,6 +45,8 @@ small{color:var(--soft)}
     <h2>Photo</h2><p class="h">One good wide photo of your place, food or storefront.</p>
     <img id="photoPrev" class="prev" alt="" hidden>
     <div class="row"><label class="btn">Choose photo<input id="photoFile" type="file" accept="image/*" hidden></label><button class="btn" id="photoClear" type="button">Remove</button></div>
+    <p class="h" id="photoHint" hidden>Drag the photo to choose which part shows. Visitors see a wide strip. If your photo is tall, tick the box below to shrink it so the whole thing fits.</p>
+    <label class="chk" id="photoFullWrap" hidden><input type="checkbox" id="photoFull"> Fit the whole photo in the strip (smaller, with space on the sides)</label>
     <div class="msg" id="photoMsg"></div>
   </div>
 
@@ -114,7 +117,21 @@ function textToMenu(t){var secs=[],cur=null;String(t||'').split('\n').forEach(fu
   var p=l.split('|').map(function(x){return x.trim()});cur.items.push({name:p[0]||'',price:(p[1]||'').replace(/^$/,''),desc:p.slice(2).join(' | ')});});
   return secs.filter(function(s){return s.items.length});}
 
-function setPhoto(u){card.photo=u||'';var im=$('photoPrev');if(u){im.src=u;im.hidden=false}else{im.hidden=true}}
+var pos={x:50,y:50};
+function clamp(n){return Math.max(0,Math.min(100,Math.round(n)));}
+function applyPos(){var im=$('photoPrev');im.style.objectPosition=$('photoFull').checked?'50% 50%':pos.x+'% '+pos.y+'%';im.classList.toggle('full',$('photoFull').checked);}
+function setPhoto(u){card.photo=u||'';var im=$('photoPrev');if(u){im.src=u;im.hidden=false}else{im.hidden=true}
+  $('photoHint').hidden=!u;$('photoFullWrap').hidden=!u;applyPos();}
+$('photoFull').onchange=applyPos;
+(function(){var im=$('photoPrev'),drag=null;
+  im.addEventListener('pointerdown',function(e){if($('photoFull').checked)return;drag={x:e.clientX,y:e.clientY,px:pos.x,py:pos.y};try{im.setPointerCapture(e.pointerId)}catch(_){}e.preventDefault();});
+  im.addEventListener('pointermove',function(e){if(!drag)return;
+    var bw=im.clientWidth,bh=im.clientHeight,nw=im.naturalWidth||1,nh=im.naturalHeight||1,s=Math.max(bw/nw,bh/nh),ox=nw*s-bw,oy=nh*s-bh;
+    if(ox>1)pos.x=clamp(drag.px-(e.clientX-drag.x)/ox*100);
+    if(oy>1)pos.y=clamp(drag.py-(e.clientY-drag.y)/oy*100);
+    applyPos();});
+  ['pointerup','pointercancel'].forEach(function(ev){im.addEventListener(ev,function(){drag=null;});});
+})();
 function thumbs(){$('menuThumbs').innerHTML=menuPhotos.map(function(u){return '<img src="'+u+'" alt="">'}).join('')+newMenuImages.map(function(u){return '<img src="'+u+'" alt="">'}).join('');}
 
 function init(){
@@ -129,6 +146,7 @@ function init(){
       $('tagline').value=card.tagline||'';$('hours').value=card.hours||'';$('phone').value=card.phone||place.phone||'';
       $('bookUrl').value=card.bookUrl||'';if(card.bookLabel)$('bookLabel').value=card.bookLabel;
       var b=card.buttons||{};$('bBook').checked=b.book!==false;$('bMenu').checked=b.menu!==false;$('bCall').checked=b.call!==false;$('bDir').checked=b.directions!==false;$('bWeb').checked=b.website!==false;
+      var pp=card.photoPos||{};pos={x:isFinite(+pp.x)?clamp(+pp.x):50,y:isFinite(+pp.y)?clamp(+pp.y):50};$('photoFull').checked=!!card.photoFull;
       setPhoto(card.photo);
       menuPhotos=(card.menu&&card.menu.photos)||[];$('menuText').value=menuToText(card.menu);$('mPrices').checked=!(card.menu&&card.menu.hidePrices);thumbs();
       $('app').hidden=false;
@@ -137,7 +155,7 @@ function init(){
 }
 
 $('photoFile').onchange=function(){var f=this.files[0];if(!f)return;$('photoMsg').className='msg';$('photoMsg').textContent='Uploading...';
-  resize(f,1400,0.82).then(function(d){return upload(d,'cards')}).then(function(u){setPhoto(u);$('photoMsg').className='msg ok';$('photoMsg').textContent='Photo ready. Tap Save changes at the bottom.';})
+  resize(f,1400,0.82).then(function(d){return upload(d,'cards')}).then(function(u){pos={x:50,y:50};$('photoFull').checked=false;setPhoto(u);$('photoMsg').className='msg ok';$('photoMsg').textContent='Photo ready. Tap Save changes at the bottom.';})
   .catch(function(){$('photoMsg').className='msg err';$('photoMsg').textContent='Could not upload that photo. Try another.';});};
 $('photoClear').onclick=function(){setPhoto('');};
 
@@ -159,7 +177,7 @@ $('menuAi').onclick=function(){if(!newMenuImages.length)return;var btn=this;btn.
 
 $('save').onclick=function(){var btn=this;btn.disabled=true;$('saveMsg').className='msg';$('saveMsg').textContent='Saving...';
   var secs=textToMenu($('menuText').value);
-  var upd={photo:card.photo||'',tagline:$('tagline').value.trim(),hours:$('hours').value.trim(),phone:$('phone').value.trim(),bookUrl:$('bookUrl').value.trim(),bookLabel:$('bookLabel').value,
+  var upd={photo:card.photo||'',photoPos:{x:pos.x,y:pos.y},photoFull:$('photoFull').checked,tagline:$('tagline').value.trim(),hours:$('hours').value.trim(),phone:$('phone').value.trim(),bookUrl:$('bookUrl').value.trim(),bookLabel:$('bookLabel').value,
     buttons:{book:$('bBook').checked,menu:$('bMenu').checked,call:$('bCall').checked,directions:$('bDir').checked,website:$('bWeb').checked},
     menu:{sections:secs,photos:menuPhotos,hidePrices:!$('mPrices').checked,updatedAt:new Date().toISOString()}};
   rpc('bth_card_update',{p_id:ID,p_token:TOK,p_updates:upd}).then(function(r){return r.json()}).then(function(ok){btn.disabled=false;
