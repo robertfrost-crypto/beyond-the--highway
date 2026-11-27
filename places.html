@@ -289,7 +289,7 @@ a.hubStrip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-we
       <div class="cardLinkBox full">
       <h3 style="font-size:14px">Business card page (Top Pick / Featured)</h3>
       <p class="note" style="margin:2px 0 0">Open a Top Pick or Featured place with Edit, then get its private link. Send the link to the business so they can add their own photo, hours, Book Now button and menu.</p>
-      <div class="rowA" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn" id="cardLinkGet" type="button">Get edit link</button><button class="btn" id="cardLinkNew" type="button">Make a new link (old one stops working)</button></div>
+      <div class="rowA" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn gold" id="cardLinkOpen" type="button">Open card editor ↗</button><button class="btn" id="cardLinkGet" type="button">Get edit link</button><button class="btn" id="cardLinkNew" type="button">Make a new link (old one stops working)</button></div>
       <input id="cardLinkOut" readonly placeholder="The link shows here" onclick="this.select()">
       <span id="cardLinkMsg" class="note"></span>
     </div>
@@ -608,6 +608,32 @@ cardsPull();
   document.getElementById('cardLinkGet').onclick=()=>go(false);
   document.getElementById('cardLinkNew').onclick=()=>go(true);
 })();
+// ---------- Admin: open a card's editor directly (no copy/paste) ----------
+// Makes sure the card + private token exist, then opens edit-card.html in a new tab.
+async function openCardEditor(idx,btn){
+  const it=items[idx];
+  const say=t=>{ const m=document.getElementById('cardLinkMsg'); if(m) m.textContent=t; if(btn){ btn.dataset.l=btn.dataset.l||btn.textContent; } };
+  if(!it){ say('Open a place with its Edit button first.'); alert('Open a place with its Edit button first.'); return; }
+  if(!(it.tier==='Top Pick'||it.tier==='Featured')){ alert('Set the tier to Top Pick or Featured, tap Save place, then try again.'); return; }
+  // Open the tab right away (inside the tap) so iOS Safari does not block it, then point it at the editor.
+  let win=null; try{ win=window.open('', '_blank'); }catch(e){}
+  if(win){ try{ win.document.write('<p style="font:16px -apple-system,sans-serif;padding:24px">Opening card editor...</p>'); }catch(e){} }
+  const orig=btn?btn.textContent:''; if(btn){ btn.disabled=true; btn.textContent='Opening...'; }
+  const rpc=(fn,body)=>fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`,{method:'POST',headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  try{
+    if(!it.cardId){ const slug=String(it.title||'place').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40); it.cardId=slug+'-'+Math.random().toString(36).slice(2,6); saveLocal(); }
+    const r=await rpc('bth_card_issue',{p_pin:PLACES_ADMIN_PIN,p_id:it.cardId,p_rotate:false});
+    if(!r.ok) throw new Error('issue failed');
+    const token=await r.json();
+    await rpc('bth_card_update',{p_id:it.cardId,p_token:token,p_updates:{placeTitle:it.title}});
+    const url=location.origin+'/edit-card.html?id='+encodeURIComponent(it.cardId)+'&t='+encodeURIComponent(token);
+    if(win && !win.closed){ win.location.href=url; } else { location.href=url; }
+  }catch(e){
+    if(win) try{ win.close(); }catch(_){}
+    alert('Could not open the card editor. Check your connection and try again.');
+  }finally{ if(btn){ btn.disabled=false; btn.textContent=orig; } }
+}
+(function(){ const b=document.getElementById('cardLinkOpen'); if(b) b.onclick=()=>{ const idx=document.getElementById('editingIndex').value; if(idx===''){ alert('Open a place with its Edit button first.'); return; } openCardEditor(Number(idx),b); }; })();
 function saveLocal(){localStorage.setItem(STORE_KEY, JSON.stringify(items)); placesCloudPush(items);}
 const CAT_ORDER=['Fine Dining','Restaurants','Caf\u00e9s','Bars & Nightlife','Fast Food','Pizza & Donair','Hotels & Stays','Air Travel','Festivals','Museums','Theatres','Family Fun','Family','Trails','Lakes','Lakes & Outfitters','Winter','Outdoor Rinks','Skate Parks','Golf','Spray Parks','Provincial Parks','Campgrounds','Parks & Playgrounds','Taxis','Grocery Stores','Gas Stations','Convenience Stores','Pharmacies','Banks & ATMs','Realtors','Hospital & Health','Sporting Goods','Gift & Novelty','Florists','Trophies & Engraving','Art & Galleries','Handcrafted & Home Based Businesses'];
 const CAT_GROUPS=[{label:'Food & Drink',cats:['Fine Dining','Restaurants','Caf\u00e9s','Fast Food','Pizza & Donair','Bars & Nightlife']},{label:'Family & Fun',cats:['Family Fun','Theatres','Museums','Festivals','Parks & Playgrounds','Spray Parks','Skate Parks','Outdoor Rinks']},{label:'Adventure & Outdoors',cats:['Lakes','Lakes & Outfitters','Trails','Winter','Golf','Provincial Parks','Campgrounds']},{label:'Shopping',cats:['Sporting Goods','Gift & Novelty','Florists','Trophies & Engraving','Art & Galleries','Handcrafted & Home Based Businesses']},{label:'Services',cats:['Grocery Stores','Gas Stations','Convenience Stores','Pharmacies','Banks & ATMs','Hospital & Health']},{label:'Travel & Stay',cats:['Hotels & Stays','Air Travel','Taxis']},{label:'Real Estate',cats:['Realtors']}];
@@ -680,7 +706,7 @@ function richDetails(it,card,ic,loc,maps,site,phone,tierBadge,editMode,prevIdx,n
   if(ph&&b.call!==false) btns.push(`<a class="btn" data-track="call" href="tel:${esc(ph.replace(/[^0-9+]/g,''))}">Call</a>`);
   if(b.directions!==false) btns.push(`<a class="btn" data-track="directions" target="_blank" rel="noopener" href="${esc(maps)}">Directions ↗</a>`);
   if(site&&b.website!==false) btns.push(`<a class="btn" data-track="website" target="_blank" rel="noopener" href="${esc(site)}">Website ↗</a>`);
-  const admin=editMode?`<div class="richBtns"><button class="btn edit-card" type="button" data-idx="${it.idx}">Edit</button><button class="btn move-up" type="button" data-idx="${it.idx}" data-swap="${prevIdx}" ${prevIdx<0?'disabled':''}>↑ Move up</button><button class="btn move-down" type="button" data-idx="${it.idx}" data-swap="${nextIdx}" ${nextIdx<0?'disabled':''}>↓ Move down</button></div>`:'';
+  const admin=editMode?`<div class="richBtns"><button class="btn edit-card" type="button" data-idx="${it.idx}">Edit</button><button class="btn gold open-editor" type="button" data-idx="${it.idx}">Edit card ↗</button><button class="btn move-up" type="button" data-idx="${it.idx}" data-swap="${prevIdx}" ${prevIdx<0?'disabled':''}>↑ Move up</button><button class="btn move-down" type="button" data-idx="${it.idx}" data-swap="${nextIdx}" ${nextIdx<0?'disabled':''}>↓ Move down</button></div>`:'';
   return `<div class="details">
     <div class="richHero${photo?'':' noimg'}">${photo?`<img src="${esc(photo)}" alt="" loading="lazy" decoding="async">`:ic}<button class="closeBtn" type="button" aria-label="Close">×</button></div>
     <div class="richBody">
@@ -770,11 +796,12 @@ function render(){
     row.onclick=toggle;
     row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}};
     const x=w.querySelector('.closeBtn'); if(x) x.onclick=ev=>{ev.stopPropagation();w.classList.remove('open');row.setAttribute('aria-expanded','false');};
-    w.querySelectorAll('.details a,.details .edit-card,.details .menu-open').forEach(el=>el.addEventListener('click',ev=>ev.stopPropagation()));
+    w.querySelectorAll('.details a,.details .edit-card,.details .open-editor,.details .menu-open').forEach(el=>el.addEventListener('click',ev=>ev.stopPropagation()));
     w.querySelectorAll('[data-track]').forEach(el=>el.addEventListener('click',()=>track(el.dataset.track)));
   });
   document.querySelectorAll('.facility-wrap .menu-open').forEach(btn=>btn.addEventListener('click',ev=>{ev.stopPropagation(); const w=btn.closest('.facility-wrap'); const it=items.find(x=>x.title===w.dataset.trackTitle); const c=(it&&it.cardId&&CARDS[it.cardId])||{}; openMenu(w.dataset.trackTitle,c);}));
   document.querySelectorAll('.edit-card').forEach(btn=>btn.onclick=()=>loadForm(Number(btn.dataset.idx)));
+  document.querySelectorAll('.open-editor').forEach(btn=>btn.onclick=ev=>{ev.stopPropagation(); openCardEditor(Number(btn.dataset.idx),btn);});
   document.querySelectorAll('.move-up').forEach(btn=>btn.onclick=()=>moveItem(Number(btn.dataset.idx),Number(btn.dataset.swap)));
   document.querySelectorAll('.move-down').forEach(btn=>btn.onclick=()=>moveItem(Number(btn.dataset.idx),Number(btn.dataset.swap)));
   applyDeepLink();
