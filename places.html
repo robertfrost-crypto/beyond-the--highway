@@ -365,12 +365,12 @@ let items = JSON.parse(localStorage.getItem(STORE_KEY) || JSON.stringify(seedIte
 let filter = 'All';
 // ---------- Patios (tag, not a category) ----------
 // Items carry patio:true. The "Patios" filter chip only shows during patio
-// season (Apr 15 - Oct 15, Edmonton time), or any time with ?patios=1 to preview.
+// season (May 1 - Oct 15, Edmonton time), or any time with ?patios=1 to preview.
 const PATIO_FILTER='__patio';
 function patioSeason(){
   if(new URLSearchParams(location.search).get('patios')==='1') return true;
   let d; try{ d=new Date().toLocaleDateString('en-CA',{timeZone:'America/Edmonton'}); }catch(e){ d=new Date().toISOString().slice(0,10); }
-  const md=d.slice(5); return md>='04-15' && md<='10-15';
+  const md=d.slice(5); return md>='05-01' && md<='10-15';
 }
 const filterLabel=f=>f===PATIO_FILTER?'\u2600\uFE0F Patios':f;
 const matchFilter=it=>filter==='All'||(filter===PATIO_FILTER?!!it.patio:it.category===filter);
