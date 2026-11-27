@@ -71,6 +71,10 @@
   .vbtns{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
   .vbtn{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border:1px solid #111;border-radius:10px;
     background:var(--card);color:var(--blue);text-decoration:none;font-size:.84rem;font-weight:700;box-shadow:0 6px 10px -6px rgba(16,26,58,.4)}
+  .vcard.top{border:2px solid var(--gold);background:linear-gradient(180deg,#fff8e6,#fff 70%)}
+  .tpBadge{display:inline-block;margin-left:8px;font-family:system-ui,-apple-system,sans-serif;font-size:.66rem;letter-spacing:.07em;text-transform:uppercase;font-weight:800;color:#7a5200;background:#ffe6a3;border:1px solid var(--gold);border-radius:999px;padding:2px 8px;vertical-align:middle;white-space:nowrap}
+  .vcard.feat .tpBadge{color:var(--navy);background:var(--tint);border-color:var(--blue)}
+  .vbtn.menu{background:var(--blue);color:#fff}
   .uphead{margin:26px 2px 4px;font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;color:var(--navy);font-weight:800;
     border-top:2px solid var(--blue);padding-top:14px}
   .up{display:flex;gap:12px;align-items:baseline;padding:8px 2px}
@@ -186,7 +190,35 @@ function venueMapUrl(v){
   return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((v.venue||'') + ' Fort McMurray');
 }
 
+// ---- Top Pick / Featured matching (same Supabase data the Places page uses) ----
+var PLACES_KEY = 'places_items', CARDS_KEY = 'places_cards';
+var PAID = [], CARDS = {}, LAST_ONNOW = null;
+function sbPull(key){
+  return fetch(SUPABASE_URL + '/rest/v1/bth_content?key=eq.' + encodeURIComponent(key) + '&select=data', {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(rows){ return (rows && rows[0] && rows[0].data) ? rows[0].data : null; })
+    .catch(function(){ return null; });
+}
+function normName(s){
+  return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/\([^)]*\)/g,' ').replace(/&/g,' and ').replace(/['\u2019]/g,'')
+    .replace(/\bthe\b/g,' ').replace(/[^a-z0-9]+/g,' ').trim();
+}
+function findPaid(v){
+  var n = normName(v.venue), best = null;
+  if(!n) return null;
+  PAID.forEach(function(p){
+    if(!p.n) return;
+    var hit = (p.n === n) || ((' '+n+' ').indexOf(' '+p.n+' ') > -1) || ((' '+p.n+' ').indexOf(' '+n+' ') > -1);
+    if(hit && (!best || p.n.length > best.n.length)) best = p;
+  });
+  return best;
+}
+function cardHasMenu(c){ return !!(c && c.menu && ((c.menu.sections && c.menu.sections.length) || (c.menu.photos && c.menu.photos.length))); }
+
 function renderOnNow(ONNOW){
+  LAST_ONNOW = ONNOW;
   document.getElementById('range').textContent = ONNOW.range;
   ['srcBottom','ctaTop'].forEach(function(id){ document.getElementById(id).href = ONNOW.source || ONNOW_FALLBACK.source; });
   var list = document.getElementById('list');
@@ -195,15 +227,25 @@ function renderOnNow(ONNOW){
   if(!venues.some(function(v){return (v.events||[]).length;})){
     list.innerHTML = '<p class="empty">This weekend\u2019s full lineup is on the poster \u2014 tap the button above.</p>';
   } else {
+    var rank = function(v){ var p = findPaid(v); return p ? (p.tier === 'Top Pick' ? 0 : 1) : 2; };
+    venues = venues.map(function(v,i){ return {v:v,i:i,r:rank(v)}; })
+      .sort(function(a,b){ return (a.r - b.r) || (a.i - b.i); })
+      .map(function(x){ return x.v; });
     venues.forEach(function(v){
       if(!(v.events||[]).length) return;
-      var card=document.createElement('div'); card.className='vcard';
-      var h='<div class="venue">'+v.venue+'</div>';
+      var paid = findPaid(v), pcard = (paid && paid.it.cardId && CARDS[paid.it.cardId]) || {}, pb = pcard.buttons || {};
+      var card=document.createElement('div'); card.className='vcard' + (paid ? (paid.tier === 'Top Pick' ? ' top' : ' feat') : '');
+      var h='<div class="venue">'+v.venue+(paid ? '<span class="tpBadge">'+(paid.tier === 'Top Pick' ? '\u2605 Top Pick' : 'Featured')+'</span>' : '')+'</div>';
       v.events.forEach(function(e){
         h+='<div class="ev"><div class="n">'+(e.n||'')+'</div>'+(e.d?'<div class="tag">'+e.d+'</div>':'')+'</div>';
       });
       h+='<div class="vbtns"><a class="vbtn" href="'+venueMapUrl(v)+'" target="_blank" rel="noopener">\uD83D\uDCCD Directions</a>';
-      if(v.web){ h+='<a class="vbtn" href="'+v.web+'" target="_blank" rel="noopener">\uD83C\uDF10 Website</a>'; }
+      var web = v.web || (paid && pb.website !== false ? paid.it.website : '');
+      web = promoSafeUrl(web);
+      if(web){ h+='<a class="vbtn" href="'+promoEsc(web)+'" target="_blank" rel="noopener">\uD83C\uDF10 Website</a>'; }
+      if(paid && cardHasMenu(pcard) && pb.menu !== false){
+        h+='<a class="vbtn menu" href="places.html?from=onnow&place='+encodeURIComponent(paid.it.title)+'&menu=1">\uD83C\uDF7D\uFE0F Menu</a>';
+      }
       h+='</div>';
       card.innerHTML=h; list.appendChild(card);
     });
@@ -283,6 +325,16 @@ function renderPromos(data){
     try {
       if (window.BTHTrack) BTHTrack.click({ title: a.getAttribute('data-title'), category: 'On Now Promo', tier: 'Featured', type: 'promo_click' });
     } catch(err) {}
+  });
+})();
+
+(function(){
+  Promise.all([sbPull(PLACES_KEY), sbPull(CARDS_KEY)]).then(function(r){
+    var items = Array.isArray(r[0]) ? r[0] : [];
+    PAID = items.filter(function(it){ return it && (it.tier === 'Top Pick' || it.tier === 'Featured'); })
+      .map(function(it){ return { n: normName(it.title), tier: it.tier, it: it }; });
+    CARDS = {}; (Array.isArray(r[1]) ? r[1] : []).forEach(function(c){ if(c && c.id) CARDS[c.id] = c; });
+    if(PAID.length && LAST_ONNOW) renderOnNow(LAST_ONNOW);
   });
 })();
 
