@@ -27,7 +27,7 @@ textarea{min-height:90px;resize:vertical}
 .chk{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:15px}
 .chk input{width:22px;height:22px;accent-color:var(--blue)}
 .prev[hidden]{display:none}.prev{display:block;width:100%;height:170px;object-fit:cover;border:1px solid #111;border-radius:14px;margin-top:8px;background:#e6eefc}
-.prev{touch-action:none;cursor:grab}.prev.full{height:auto;max-height:420px;object-fit:contain;touch-action:auto;cursor:default}
+.prev{touch-action:none;cursor:grab}.prev.full{object-fit:contain;touch-action:auto;cursor:default}
 .thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.thumbs img{width:72px;height:72px;object-fit:cover;border:1px solid #111;border-radius:10px}
 .msg{font-size:13px;color:var(--soft);margin-top:8px}.msg.err{color:#b3261e;font-weight:700}.msg.ok{color:#1a7f37;font-weight:700}
 .bad{text-align:center;padding:40px 10px}
@@ -45,8 +45,8 @@ small{color:var(--soft)}
     <h2>Photo</h2><p class="h">One good wide photo of your place, food or storefront.</p>
     <img id="photoPrev" class="prev" alt="" hidden>
     <div class="row"><label class="btn">Choose photo<input id="photoFile" type="file" accept="image/*" hidden></label><button class="btn" id="photoClear" type="button">Remove</button></div>
-    <p class="h" id="photoHint" hidden>Drag the photo to choose which part shows. Visitors see it as a wide strip, so keep what matters (a sign, the food) inside.</p>
-    <label class="chk" id="photoFullWrap" hidden><input type="checkbox" id="photoFull"> Show the whole photo (no cropping)</label>
+    <p class="h" id="photoHint" hidden>Drag the photo to choose which part shows. Visitors see a wide strip. If your photo is tall, tick the box below to shrink it so the whole thing fits.</p>
+    <label class="chk" id="photoFullWrap" hidden><input type="checkbox" id="photoFull"> Fit the whole photo in the strip (smaller, with space on the sides)</label>
     <div class="msg" id="photoMsg"></div>
   </div>
 
@@ -119,7 +119,7 @@ function textToMenu(t){var secs=[],cur=null;String(t||'').split('\n').forEach(fu
 
 var pos={x:50,y:50};
 function clamp(n){return Math.max(0,Math.min(100,Math.round(n)));}
-function applyPos(){var im=$('photoPrev');im.style.objectPosition=pos.x+'% '+pos.y+'%';im.classList.toggle('full',$('photoFull').checked);}
+function applyPos(){var im=$('photoPrev');im.style.objectPosition=$('photoFull').checked?'50% 50%':pos.x+'% '+pos.y+'%';im.classList.toggle('full',$('photoFull').checked);}
 function setPhoto(u){card.photo=u||'';var im=$('photoPrev');if(u){im.src=u;im.hidden=false}else{im.hidden=true}
   $('photoHint').hidden=!u;$('photoFullWrap').hidden=!u;applyPos();}
 $('photoFull').onchange=applyPos;
