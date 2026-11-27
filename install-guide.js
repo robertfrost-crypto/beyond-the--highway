@@ -213,7 +213,12 @@
     });
   }
 
-  function start() { setTimeout(showBanner, forced ? 300 : 3500); }
+  function start() {
+    // Pages with the push signup script already show their own Home Screen nudge
+    // at the bottom of the screen, so skip ours there to avoid two cards stacking.
+    if (!forced && document.querySelector('script[src*="push-signup"]')) return;
+    setTimeout(showBanner, forced ? 300 : 3500);
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 })();
