@@ -71,6 +71,7 @@
   .vbtns{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
   .vbtn{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border:1px solid #111;border-radius:10px;
     background:var(--card);color:var(--blue);text-decoration:none;font-size:.84rem;font-weight:700;box-shadow:0 6px 10px -6px rgba(16,26,58,.4)}
+  .vphoto{display:block;width:calc(100% + 28px);margin:-11px -14px 10px;height:150px;object-fit:cover;border-radius:14px 14px 0 0;border-bottom:2px solid var(--gold)}
   .vcard.top{border:2px solid var(--gold);background:linear-gradient(180deg,#fff8e6,#fff 70%)}
   .tpBadge{display:inline-block;margin-left:8px;font-family:system-ui,-apple-system,sans-serif;font-size:.66rem;letter-spacing:.07em;text-transform:uppercase;font-weight:800;color:#7a5200;background:#ffe6a3;border:1px solid var(--gold);border-radius:999px;padding:2px 8px;vertical-align:middle;white-space:nowrap}
   .vcard.feat .tpBadge{color:var(--navy);background:var(--tint);border-color:var(--blue)}
@@ -235,7 +236,8 @@ function renderOnNow(ONNOW){
       if(!(v.events||[]).length) return;
       var paid = findPaid(v), pcard = (paid && paid.it.cardId && CARDS[paid.it.cardId]) || {}, pb = pcard.buttons || {};
       var card=document.createElement('div'); card.className='vcard' + (paid ? (paid.tier === 'Top Pick' ? ' top' : ' feat') : '');
-      var h='<div class="venue">'+v.venue+(paid ? '<span class="tpBadge">'+(paid.tier === 'Top Pick' ? '\u2605 Top Pick' : 'Featured')+'</span>' : '')+'</div>';
+      var pimg = (paid && paid.tier === 'Top Pick') ? promoSafeUrl(pcard.photo) : '';
+      var h=(pimg ? '<img class="vphoto" src="'+promoEsc(pimg)+'" alt="" loading="lazy" decoding="async">' : '')+'<div class="venue">'+v.venue+(paid ? '<span class="tpBadge">'+(paid.tier === 'Top Pick' ? '\u2605 Top Pick' : 'Featured')+'</span>' : '')+'</div>';
       v.events.forEach(function(e){
         h+='<div class="ev"><div class="n">'+(e.n||'')+'</div>'+(e.d?'<div class="tag">'+e.d+'</div>':'')+'</div>';
       });
