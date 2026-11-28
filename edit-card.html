@@ -31,13 +31,16 @@ textarea{min-height:90px;resize:vertical}
 .thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.thumbs img{width:72px;height:72px;object-fit:cover;border:1px solid #111;border-radius:10px}
 .msg{font-size:13px;color:var(--soft);margin-top:8px}.msg.err{color:#b3261e;font-weight:700}.msg.ok{color:#1a7f37;font-weight:700}
 .bad{text-align:center;padding:40px 10px}
-.save{position:sticky;bottom:10px;z-index:5}
+.save{position:sticky;bottom:0;z-index:5;background:#d9e6fd;padding:10px 0 8px;margin-top:-4px;box-shadow:0 -10px 14px -6px #d9e6fd}
+.back{display:inline-block;margin:0 0 4px;padding:9px 14px;border:1px solid #111;border-radius:999px;background:#fff;color:var(--blue);font-weight:800;font-size:14px;text-decoration:none;box-shadow:0 6px 12px -6px rgba(16,26,58,.4)}
+.done{text-decoration:none;display:block;width:100%;margin-top:10px;text-align:center}
 .save .btn{width:100%;font-size:17px;padding:15px}
 small{color:var(--soft)}
 </style>
 </head>
 <body>
 <div class="wrap" id="app" hidden>
+  <a class="back" href="places.html" id="backTop">&larr; Back to Places</a>
   <h1 id="ttl">Your card</h1>
   <p class="sub">This is the private page for your Beyond the Highway listing. Changes go live as soon as you tap Save. Keep this link to yourself.</p>
 
@@ -88,7 +91,7 @@ small{color:var(--soft)}
     <small>Turn this off and visitors see only dish names and descriptions. Your prices stay saved, so you can turn them back on any time.</small>
   </div>
 
-  <div class="save"><button class="btn primary" id="save" type="button">Save changes</button><div class="msg" id="saveMsg" style="text-align:center"></div></div>
+  <div class="save"><button class="btn primary" id="save" type="button">Save changes</button><div class="msg" id="saveMsg" style="text-align:center"></div><a class="btn done" href="places.html" id="backBottom">Done, back to Places</a></div>
 </div>
 <div class="wrap bad card" id="bad" hidden><h2>This link is not working</h2><p class="sub">Please ask Beyond the Highway for a new edit link.</p></div>
 
