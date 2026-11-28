@@ -97,6 +97,7 @@
       '#bthig-overlay .bthig-step{font-size:15px;line-height:1.4}' +
       '#bthig-overlay .bthig-step strong{font-weight:700}' +
       '#bthig-overlay .bthig-ico{display:inline-block;width:22px;height:22px;vertical-align:-6px;margin:0 2px;color:#2a55e0}' +
+      '#bthig-overlay .bthig-opt{display:block;margin-top:8px;padding:8px 10px;background:#fff;border:1px solid #d9e1f4;border-radius:10px;font-size:14px}' +
       '#bthig-overlay .bthig-hint{margin:12px 2px 0;font-size:13px;line-height:1.4;color:#4d587a}' +
       '#bthig-overlay .bthig-done{display:block;width:100%;margin-top:14px;border:0;background:#2a55e0;color:#fff;font-family:inherit;font-weight:700;font-size:16px;line-height:1;padding:15px;border-radius:14px;cursor:pointer}' +
       '#bthig-overlay .bthig-arrow{position:fixed;left:0;right:0;text-align:center;pointer-events:none;color:#fff;font:700 14px/1.3 var(--sans,system-ui,sans-serif);text-shadow:0 1px 6px rgba(0,0,0,.6)}' +
@@ -137,16 +138,16 @@
       shareStep = 'Tap the Share icon ' + SHARE_ICON + ' in the address bar, or open the <strong>&bull;&bull;&bull;</strong> menu and tap <strong>Share</strong>.';
       hint = 'Safari is the most reliable browser for saving apps on iPhone.';
     } else {
-      shareStep = 'Tap the <strong>&bull;&bull;&bull;</strong> at the <strong>bottom right</strong>, then tap Share ' + SHARE_ICON + '.';
+      shareStep = 'Tap the <strong>&equiv;</strong> (three lines) or the <strong>&bull;&bull;&bull;</strong> (three dots) in the bottom bar, then tap <strong>Share</strong> ' + SHARE_ICON + '. Already see the Share icon? Just tap it.';
       arrow = 'bottom';
-      hint = 'On some versions the Share icon is already showing in the bottom bar. If so, tap it.';
+      hint = '';
     }
     return {
       lead: 'It takes a few taps, then it opens like a regular app, full screen, with its own icon.',
       arrow: arrow,
       steps: [
         shareStep,
-        'Scroll down the list and tap Add to Home Screen ' + ADD_ICON + '. If you do not see it, tap <strong>View More</strong> first.',
+        'Scroll down the list and tap <strong>Add to Home Screen</strong> ' + ADD_ICON + '. Do not see it? Tap <strong>View More</strong> first.',
         'Leave <strong>Open as Web App</strong> turned on, then tap <strong>Add</strong>.'
       ],
       hint: hint
@@ -168,7 +169,7 @@
     }
     var arrow = '';
     if (s.arrow === 'top') arrow = '<div class="bthig-arrow top"><span>&#9650;</span>Share icon is up here</div>';
-    if (s.arrow === 'bottom') arrow = '<div class="bthig-arrow bottom">Menu is down here<span>&#9660;</span></div>';
+    if (s.arrow === 'bottom') arrow = '<div class="bthig-arrow bottom">Look down here<span>&#9660;</span></div>';
 
     o.innerHTML = arrow +
       '<div class="bthig-card">' +
