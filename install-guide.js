@@ -138,10 +138,7 @@
       shareStep = 'Tap the Share icon ' + SHARE_ICON + ' in the address bar, or open the <strong>&bull;&bull;&bull;</strong> menu and tap <strong>Share</strong>.';
       hint = 'Safari is the most reliable browser for saving apps on iPhone.';
     } else {
-      shareStep = 'Open the Safari menu. Pick the one that matches your iPhone:' +
-        '<span class="bthig-opt"><strong>Newer iPhone:</strong> tap the <strong>&equiv;</strong> (three lines) at the left of the address bar.</span>' +
-        '<span class="bthig-opt"><strong>See a Share icon ' + SHARE_ICON + ' in the bottom bar?</strong> Tap it.</span>' +
-        '<span class="bthig-opt"><strong>Older iPhone:</strong> tap the <strong>&bull;&bull;&bull;</strong> at the bottom right, then tap <strong>Share</strong>.</span>';
+      shareStep = 'Tap the <strong>&equiv;</strong> (three lines) or the <strong>&bull;&bull;&bull;</strong> (three dots) in the bottom bar, then tap <strong>Share</strong> ' + SHARE_ICON + '. Already see the Share icon? Just tap it.';
       arrow = 'bottom';
       hint = '';
     }
@@ -150,7 +147,7 @@
       arrow: arrow,
       steps: [
         shareStep,
-        'Tap <strong>Add to Home Screen</strong> ' + ADD_ICON + '. Do not see it? Tap <strong>Share</strong> first, then scroll down the list, or tap <strong>View More</strong>.',
+        'Scroll down the list and tap <strong>Add to Home Screen</strong> ' + ADD_ICON + '. Do not see it? Tap <strong>View More</strong> first.',
         'Leave <strong>Open as Web App</strong> turned on, then tap <strong>Add</strong>.'
       ],
       hint: hint
